@@ -4,3 +4,5 @@
 - [简体中文说明](../README.zh-CN.md)
 - [Signed macOS release and update workflow](RELEASING.md)
 - [Third-party notices](../THIRD_PARTY_NOTICES.md)
+
+- [1.2.14 changes and validation scope](RELEASE_1.2.14.md)

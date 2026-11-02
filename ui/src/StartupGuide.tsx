@@ -7,7 +7,7 @@ import type {AppState,Command} from './types';
 import {coalescePermissionRefresh,refreshPermissionSession,watchPermissionRefresh} from '../../shared/permission-refresh.mjs';
 import './settings-overlays-v6.css';
 
-export const OFFICIAL_DRIVER_URL='https://drive.nuphy.io/?lang=zh-CN';
+export const OFFICIAL_DRIVER_URL='https://drive.nuphyio.com/#/setting';
 type Permission='inputMonitoring'|'accessibility';
 export type OfficialDriverResult={opened:boolean;url:string;browser?:string;browserBundleId?:string;browserSupportsUSB?:boolean;needsSupportedBrowser?:boolean;message?:string;manual?:boolean;safeReleased?:boolean;prepareError?:string};
 import {firmwarePrompt,currentFirmwareReady,firmwareUpdateSatisfied,type FirmwarePrompt} from '../../shared/firmware-onboarding.mjs';
@@ -27,7 +27,7 @@ export async function requestAppPermission(command:Command,permission:Permission
 function officialUpdateURL(value:unknown){
   const raw=value&&typeof value==='object'&&'url' in value?String(value.url):'';
   const url=new URL(raw);
-  if(url.protocol!=='https:'||url.hostname!=='drive.nuphy.io'||url.username||url.password||url.port)throw new Error('Invalid official firmware update address.');
+  if(url.href!==OFFICIAL_DRIVER_URL)throw new Error('Invalid official firmware update address.');
   return url.href;
 }
 // USB handoff stays inside the native host. Product UI only asks the user to

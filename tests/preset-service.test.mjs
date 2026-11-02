@@ -8,7 +8,8 @@ test("every built-in preset can be sent, paused and saved through the real servi
   const service = await fakeService(t);
   await service.command({ op: "settings", settings: { brightness: 100, codexEnabled: false, quotaSideEnabled: false } });
   for (const preset of createPresets(layout)) {
-    const scene = { name: preset.name, colors: preset.colors, animation: preset.animation };
+    const scene = { name: preset.name, colors: preset.colors, animation: preset.animation,
+      ...(preset.trigger?{trigger:preset.trigger}:{}) };
     const saved = await service.command({ op: "saveScene", scene });
     assert.equal(saved.ok, true, preset.id);
     assert.notEqual(saved.result.savedScene.id, preset.id, "built-ins must save as independent user scenes");
@@ -17,12 +18,21 @@ test("every built-in preset can be sent, paused and saved through the real servi
       assert.equal(saved.result.savedScene.animation.frames.length, preset.animation.frames.length);
     const before = (await service.state()).playback.framesSent;
     const result = await service.command({
-      op: "play",
+      op: scene.trigger?'triggerArm':"play",
       colors: scene.colors,
       animation: scene.animation,
+      ...(scene.trigger?{trigger:scene.trigger}:{}),
     });
     assert.equal(result.ok, true, preset.id);
-    if (preset.animation.effect !== "static") {
+    if(scene.trigger){
+      assert.deepEqual(saved.result.savedScene.trigger,scene.trigger);
+      assert.equal((await service.state()).trigger.armed,true);
+      assert.ok((await service.state()).colors.every(color=>color==='#000000'));
+      await service.command({op:'triggerFire',code:'KeyG'});
+      await until(service.state,state=>state.colors.some(color=>color!=='#000000'),'typing preset did not react');
+      await until(service.state,state=>!state.trigger.flashing,'typing tail did not finish');
+      assert.equal((await service.state()).trigger.armed,true,'tail completion keeps listening');
+    } else if (preset.animation.effect !== "static") {
       await until(service.state, state => state.playback.framesSent >= before + 3, `${preset.id} did not advance`);
       assert.equal((await service.command({ op: "pause" })).ok, true);
       assert.equal((await service.state()).playback.playing, false);

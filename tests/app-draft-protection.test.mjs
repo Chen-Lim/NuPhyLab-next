@@ -3,11 +3,11 @@ import{appDraftFixture,scene,deferred}from'./helpers/app-draft-fixture.mjs';
 const key='air-studio-draft-v1',copy=v=>JSON.parse(JSON.stringify(v));
 const target=()=>scene('Target artwork',{id:'target-fixture',colors:Array(84).fill('#77aa88'),animation:{effect:'wave',direction:'left',speed:7,loop:true}});
 async function library(f){await f.click('作品库');return f.child('Library');}
-async function request(f,kind){const lib=await library(f);if(kind==='new')lib.props.onNew();else lib.props.onLoad(target(),kind==='play'?{play:true}:undefined);await f.flush();assert.equal(f.modal()?.props.title,'当前草稿有未保存修改');}
+async function request(f,kind){const lib=await library(f);if(kind==='new')lib.props.onNew();else lib.props.onLoad(target());await f.flush();assert.equal(f.modal()?.props.title,'当前草稿有未保存修改');}
 const guardPrimary=f=>f.nodes().find(n=>n.type?.displayName==='Button'&&n.props.kind==='primary');
 const alerts=f=>f.nodes().filter(n=>n.props.role==='alert').map(n=>f.text(n)).join('\n');
 
-for(const kind of['open','new','play'])test(`actual App dirty ${kind}: cancel preserves draft/output/storage and emits no stop/save`,async()=>{
+for(const kind of['open','new'])test(`actual App dirty ${kind}: cancel preserves draft/output/storage and emits no stop/save`,async()=>{
  const f=await appDraftFixture();const before=copy(f.draft()),stored=f.storage.get(key);await request(f,kind);assert.deepEqual(copy(f.draft()),before);assert.equal(f.commands.length,0);assert.equal(f.storage.get(key),stored);await f.click('取消');assert.equal(f.modal(),undefined);assert.deepEqual(copy(f.draft()),before);assert.equal(f.storage.get(key),stored);assert.equal(f.commands.length,0);f.unmount();
 });
 for(const kind of['open','new'])test(`actual App dirty ${kind}: stop failure retains saved canvas and retry does not save duplicate ID`,async()=>{
@@ -18,9 +18,6 @@ test('actual App save failure retains draft and retry reuses the same new scene 
 });
 test('actual App open/new transition locks concurrent requests and adopts only after stop succeeds once',async()=>{
  const wait=deferred();const f=await appDraftFixture({onCommand:body=>body.op==='stop'?wait.promise:Promise.resolve({ok:true})});await request(f,'open');const before=copy(f.draft()),discard=f.button('放弃修改并打开');discard.props.onClick();discard.props.onClick();await f.flush();assert.equal(f.commands.filter(c=>c.op==='stop').length,1);assert.deepEqual(copy(f.draft()),before);assert.ok(f.modal());wait.resolve({ok:true});await f.flush();assert.equal(f.modal(),undefined);assert.equal(f.draft().name,'Target artwork');assert.equal(f.commands.length,1);f.unmount();
-});
-test('actual App explicit play adopts once with no ordinary-load stop; request is consumed without new request',async()=>{
- const f=await appDraftFixture();await request(f,'play');const lib=f.child('Library');lib.props.onLoad(scene('Ignored second target'),{play:true});await f.click('放弃修改并播放');const studio=f.child('Studio'),requestId=studio.props.playRequestId,session=studio.key;assert.ok(requestId);assert.equal(f.draft().name,'Target artwork');assert.equal(f.commands.length,0);studio.props.onPlayRequestHandled();studio.props.onPlayRequestHandled();await f.flush();assert.equal(f.child('Studio').props.playRequestId,null);assert.equal(f.child('Studio').key,session);f.child('Studio').props.onPlayRequestFinished();await f.flush();assert.equal(f.commands.length,0);f.unmount();
 });
 test('actual App damaged stored draft is never overwritten by fallback or edits; read retry cancel preserves repaired record',async()=>{
  const damaged='{broken';const f=await appDraftFixture({storage:{[key]:damaged}});assert.ok(alerts(f).includes('原记录已保留'));assert.equal(f.storage.get(key),damaged);assert.equal(f.writes.length,0);await f.edit({name:'Edited fallback'});assert.equal(f.storage.get(key),damaged);assert.equal(f.writes.length,0);const recovered=scene('Recovered draft');const raw=JSON.stringify(recovered);f.storage.set(key,raw);await f.click('重试读取');assert.ok(f.modal());assert.equal(f.commands.length,0);await f.click('取消');assert.equal(f.storage.get(key),raw);assert.equal(f.draft().name,'Edited fallback');assert.ok(alerts(f).includes('原记录已保留'));await f.click('重试读取');await f.click('放弃修改并打开');assert.equal(f.draft().name,'Recovered draft');assert.equal(f.commands.filter(c=>c.op==='stop').length,0,'restoreKey adoption never stops old output');assert.equal(alerts(f),'');f.unmount();
@@ -60,12 +57,12 @@ async function createExplicitNew(f,{quota=false}={}){
  await request(f,'new');if(quota)f.setQuota(true);await f.click('放弃修改并新建');assert.equal(f.modal(),undefined);assert.equal(f.draft().name,'未命名作品');assert.ok(f.draft().colors.every(c=>c==='#000000'));return copy(f.draft());
 }
 
-test('FR05 explicit new, successfully adopted and never edited, bypasses the next open/new/play guard',async()=>{
- for(const action of['open','new','play']){
+test('FR05 explicit new, successfully adopted and never edited, bypasses the next open/new guard',async()=>{
+ for(const action of['open','new']){
   const f=await appDraftFixture();await createExplicitNew(f);const previousSession=f.child('Studio').key,lib=await library(f);
-  if(action==='new')lib.props.onNew();else lib.props.onLoad(target(),action==='play'?{play:true}:undefined);
+  if(action==='new')lib.props.onNew();else lib.props.onLoad(target());
   await f.flush();assert.equal(f.modal(),undefined,action+' must not guard untouched explicit creation');assert.equal(f.commands.some(c=>c.op==='saveScene'),false);assert.equal(f.child('Studio').key,previousSession+1);
-  if(action==='new')assert.equal(f.draft().name,'未命名作品');else assert.equal(f.draft().name,'Target artwork');if(action==='play')assert.ok(f.child('Studio').props.playRequestId);f.unmount();
+  if(action==='new')assert.equal(f.draft().name,'未命名作品');else assert.equal(f.draft().name,'Target artwork');f.unmount();
  }
 });
 

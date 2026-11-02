@@ -10,6 +10,8 @@ import { randomBytes } from "node:crypto";
 import { Store, validateColors, validateAnimation, validateSettings } from "./storage.mjs";
 import { Hardware,hasUnownedFunctionKeyHistory } from "./hardware.mjs";
 import {ConnectionRecovery} from './connection-recovery.mjs';
+import {AirConnectionWake} from './connection-wake.mjs';
+import {AIR_CONNECTION_WAKE_DURATION_MS} from '../shared/air-connection-wake.mjs';
 import {KeyAdaptation} from './key-adaptation.mjs';
 import {KeyCapture} from './key-capture.mjs';
 import {BluetoothInput} from './bluetooth-input.mjs';
@@ -26,7 +28,7 @@ import { layout, blank, defaultAnimation, setLayoutModel, getLayoutModel } from 
 import { validateGameType } from "../shared/games.mjs";
 import { GameSession } from "./games.mjs";
 import { TriggerEffect } from "./trigger.mjs";
-import { TRIGGER_KEYS, validateTrigger } from "../shared/trigger.mjs";
+import { TRIGGER_KEYS, TYPING_KEYS, validateTrigger } from "../shared/trigger.mjs";
 import {
   renderAnimation,
   animationDuration,
@@ -52,8 +54,16 @@ hardware.setOutputColorProfile(store.data.settings.outputColorProfile);
 const codex = new CodexAdapter();
 const keyAdaptation = new KeyAdaptation(hardware);
 const connectionRecovery = new ConnectionRecovery();
-hardware.on('disconnected', () => connectionRecovery.disconnected());
-hardware.on('disconnect', () => connectionRecovery.disconnected());
+const connectionWake = new AirConnectionWake();
+hardware.on('disconnected', () => {
+  connectionWake.absent();
+  invalidateLightingCache();
+  connectionRecovery.disconnected();
+});
+hardware.on('disconnect', () => {
+  cancelConnectionWake('helperLost');
+  connectionRecovery.disconnected();
+});
 const bluetoothInput = new BluetoothInput(hardware);
 const codexPresses=new PhysicalPressGate();
 const codexGestures=new CodexKeyGestures({
@@ -89,6 +99,7 @@ let colors = blank(),
   lastCommittedWire = null,
   stopping = false,
   busy = false,
+  wakeReleasePending = null,
   explicitDisconnect = false,
   commandTail = Promise.resolve(),
   lastStatusCheck = -Infinity,
@@ -341,6 +352,7 @@ function state() {
     audio: audio.snapshot(store.data.settings.audio),
     bluetooth: bluetoothInput.snapshot(),
     native: nativePermissions(),
+    connectionWake: connectionWake.snapshot(),
     playback,
     build,
     lightPower: {...lightPower.snapshot(store.data.settings), systemIdleAvailable},
@@ -358,12 +370,16 @@ function state() {
   };
 }
 async function output(input) {
-  let out = [...input];
+  const wakeFrame = connectionWake.frame(hardware.state, hardware.transportEpoch);
+  // Settings may redraw a static/paused work immediately after cancelling the
+  // wake. Return its side zone before that redraw consumes the release ticket.
+  if (!wakeFrame && wakeReleasePending) await handoffConnectionWakeSide();
+  let out = wakeFrame ?? [...input];
   let nextCodexSlots = null, nextClaudeSlots = null;
   // Timers apply to the ordinary artwork/background. An enabled AI overlay is
   // rendered afterwards and remains visible until the mode is turned off.
-  if (lightPower.sleeping || playback.mode === 'agent') out = blank();
-  const source = agentLightingSource();
+  if (!wakeFrame && (lightPower.sleeping || playback.mode === 'agent')) out = blank();
+  const source = wakeFrame ? null : agentLightingSource();
   if (source) {
     if (store.data.settings[`${source}LightMode`] === 'whole') await muteGameSide();
     if (source === "claude") {
@@ -377,7 +393,8 @@ async function output(input) {
       out = codexLights.render(out, nextCodexSlots, store.data.settings, snap.tasks ?? []);
     }
   }
-  const brightness = store.data.settings.brightness;
+  // A transient full-white welcome does not rewrite the user's saved dimmer.
+  const brightness = wakeFrame ? 100 : store.data.settings.brightness;
   const logicalColors = out.map(c => scaleColor(c, brightness / 100));
   const wireColors = hardware.outputColors(out, {brightness});
   const signature = wireColors.join("");
@@ -387,6 +404,7 @@ async function output(input) {
     previewColors = brightness === 0 ? blank() : [...out];
     // Equal colours can still represent different task identities.
     publishAgentOutput(source, nextCodexSlots, nextClaudeSlots, true);
+    if (!wakeFrame) wakeReleasePending = null;
     return;
   }
   const painted=await hardware.paint(out, {brightness});
@@ -397,6 +415,7 @@ async function output(input) {
     frameCommittedAt:Number.isFinite(painted?.frameCommittedAt) ? painted.frameCommittedAt : reusedDeviceFrame ? null : Date.now(),
     epoch: hardware.transportEpoch, modelId: getLayoutModel(), count: hardware.state.keyLedCount ?? 84};
   publishAgentOutput(source, nextCodexSlots, nextClaudeSlots, reusedDeviceFrame);
+  if (!wakeFrame) wakeReleasePending = null;
   lastFrame = signature;
   playback.framesSent++;
   const now = performance.now();
@@ -412,14 +431,151 @@ function publishAgentOutput(source, codexSlots, claudeSlots, reusedCommittedFram
     mode:store.data.settings[`${source}LightMode`] === 'whole' ? 'whole' : 'keys', bindingEpoch:keyBindingEpoch,
     frameCommittedAt:lastCommittedWire.frameCommittedAt,reusedCommittedFrame};
 }
-function invalidateLightingCache() {
+function invalidateLightingCache({preserveSide = false} = {}) {
   previewColors = blank();
-  gameSideMuted = false;
+  if (!preserveSide) gameSideMuted = false;
   lastQuotaColor = null;
   quotaChanged = -Infinity;
   lastFrame = "";
   lastCommittedWire = null;
   agentOutputReceipt = null;
+}
+function cancelConnectionWake(reason) {
+  if (reason === 'userAction' && reconnectPlayback) {
+    const saved = reconnectPlayback;
+    // An explicit new action wins over the deferred pre-unplug intent.
+    // Preserve its frozen position before pause/settings interprets the action.
+    if (saved.modelId === getLayoutModel() && saved.mode === playback.mode) {
+      started = performance.now() - saved.elapsed;
+      playback.elapsed = saved.elapsed;
+    }
+    reconnectPlayback = null;
+  }
+  const ticket = connectionWake.current;
+  if (connectionWake.cancel(reason)) {
+    wakeReleasePending = ticket;
+    invalidateLightingCache({preserveSide:true});
+  }
+}
+function observeConnectionFailure(error) {
+  if (error?.code === 'DEVICE_NOT_FOUND' || hardware.state.errorCode === 'DEVICE_NOT_FOUND')
+    connectionWake.absent();
+}
+async function beginConnectionWake(context) {
+  const ticket = connectionWake.begin(hardware.state, hardware.transportEpoch, context);
+  if (!ticket) return false;
+  wakeReleasePending = null;
+  invalidateLightingCache();
+  try {
+    // arm() preserves/validates the original keyboard settings and recovery.
+    // Avoid activate(): this introduction must not change ordinary timers.
+    await hardware.arm({connectionWake:true});
+    // The native wake transaction has already silenced both side zones.
+    // Keep that ownership until the next ordinary mode restores or keeps it.
+    gameSideMuted = true;
+    if (!connectionWake.matches(ticket, hardware.state, hardware.transportEpoch))
+      throw Object.assign(new Error('键盘连接已改变，启动灯效已停止。'), {code:'SESSION_CHANGED'});
+    // Finish the initial verified blackout before starting the animation clock;
+    // first-paint readback latency must not skip the two opening corner lights.
+    await output(blank());
+    // Input maintenance can still need one-time keymap reads on this USB
+    // attachment. Start the choreography in tickConnectionWake after those
+    // reads, so preparation cannot consume the opening corner sequence.
+    return true;
+  } catch(error) {
+    cancelConnectionWake('outputFailed');
+    playback.lastError = error.message;
+    await resumeAgentAfterWakeFailure(error);
+    throw error;
+  }
+}
+async function resumeAgentAfterWakeFailure(error) {
+  // Resume an enabled AI mode only after native explicitly verified rollback.
+  // Uncertain or deferred restoration stays stopped with its original journal.
+  if (!error?.protocolDetail?.includes('Original lighting was restored and verified.') ||
+      !agentEnabled() || integrationsSuspended || explicitDisconnect || driverHandoff || stopping || applicationUpdating)
+    return;
+  await reconcileHardwareError();
+  if (!hardware.state.connected || hardware.state.readOnly === true || hardware.state.armed ||
+      hardware.state.recoveryPending || hardware.state.needsRestore) return;
+  const message = playback.lastError;
+  try { await reconcileAgentLighting(); }
+  catch { await reconcileHardwareError(); }
+  finally { playback.lastError = message; }
+}
+async function settleConnectedOutput({automatic = false} = {}) {
+  if (await resumeReconnectPlayback()) { /* Previous scene is ready. */ }
+  else if (pendingSceneRestore) await restorePendingScene();
+  else if (playback.mode === 'game') {
+    await activate();
+    await muteGameSide();
+    await output(game.render());
+  } else if (automatic && playback.playing) await activate();
+  else await reconcileAgentLighting({resumeSuspended:!automatic});
+}
+function hasOrdinaryLighting() {
+  return ['static','animation','paused','game','agent'].includes(playback.mode) ||
+    playback.mode === 'trigger' && trigger.armed ||
+    playback.mode === 'audio' && Boolean(audio.session);
+}
+async function handoffConnectionWakeSide() {
+  if (!hasOrdinaryLighting()) return;
+  const source = agentLightingSource();
+  if (!['game','trigger','audio','agent'].includes(playback.mode) &&
+      !(source && store.data.settings[`${source}LightMode`] === 'whole') && !lightPower.sleeping)
+    await restoreGameSide();
+}
+async function releaseCancelledWake() {
+  const ticket = wakeReleasePending;
+  wakeReleasePending = null;
+  if (!ticket || connectionWake.active || ticket.sessionId !== hardware.state.connectionSessionId ||
+      ticket.epoch !== hardware.transportEpoch || !hardware.state.connected || !hardware.state.armed) return;
+  await settleConnectedOutput(ticket.context);
+  await handoffConnectionWakeSide();
+  if (['static','paused'].includes(playback.mode) && hardware.state.armed)
+    await output(playback.mode === 'paused' ? renderAnimation(baseColors, animation, playback.elapsed ?? 0) : baseColors);
+  else if (!hasOrdinaryLighting() && hardware.state.armed) {
+    await hardware.restore();
+    invalidateLightingCache();
+    colors = blank();
+  }
+}
+async function tickConnectionWake() {
+  const ticket = connectionWake.current;
+  if (!ticket) return false;
+  if (!connectionWake.matches(ticket, hardware.state, hardware.transportEpoch) || !hardware.state.armed) {
+    cancelConnectionWake('sessionChanged');
+    return false;
+  }
+  if (ticket.started === null && !connectionWake.start(ticket, hardware.state, hardware.transportEpoch))
+    return false;
+  const finishing = connectionWake.elapsed() >= AIR_CONNECTION_WAKE_DURATION_MS;
+  await output(blank());
+  if (!connectionWake.matches(ticket, hardware.state, hardware.transportEpoch) || !hardware.state.armed) {
+    cancelConnectionWake('sessionChanged');
+    return true;
+  }
+  // Complete only after a frame sampled at/after the end has been committed.
+  // A slow ACK for an earlier tail frame must not skip the verified blackout.
+  if (finishing) {
+    const context = connectionWake.handoff();
+    invalidateLightingCache({preserveSide:true});
+    await settleConnectedOutput(context);
+    await handoffConnectionWakeSide();
+    if (['static','paused'].includes(playback.mode) && hardware.state.armed)
+      await output(playback.mode === 'paused' ? renderAnimation(baseColors, animation, playback.elapsed ?? 0) : baseColors);
+    // An idle/native keyboard belongs to its original firmware lighting,
+    // whereas an existing Lab scene or AI mode resumes through its own path.
+    if (!hasOrdinaryLighting() && hardware.state.armed) {
+      await hardware.restore();
+      invalidateLightingCache();
+      colors = blank();
+    }
+    if (ticket.sessionId !== hardware.state.connectionSessionId || ticket.epoch !== hardware.transportEpoch || !hardware.state.connected)
+      connectionWake.cancel('sessionChanged');
+    else connectionWake.complete();
+  }
+  return true;
 }
 function rememberReconnectPlayback() {
   if(reconnectPlayback || explicitDisconnect || !['static','animation','paused'].includes(playback.mode)) return;
@@ -490,17 +646,24 @@ async function disableTrigger() {
     catch (error) { triggerWarning = "按键监听停止未确认：" + error.message; }
   }
 }
-async function fireTrigger() {
+async function fireTrigger(code, at = performance.now()) {
   if (playback.mode !== "trigger" || !trigger.armed || !hardware.state.connected)
     return trigger.snapshot();
-  if (trigger.fire(performance.now())) {
-    lightPower.wake();
+  const cross=trigger.snapshot().config.effect==='cross';
+  if(cross){
+    lightPower.activity();
+    lightPower.update(store.data.settings);
+    if(lightPower.sleeping)return trigger.snapshot();
+  }
+  if (trigger.fire(at,code)) {
+    if(!cross)lightPower.wake();
     playback.playing = true;
     await output(trigger.render(performance.now()));
   }
   return trigger.snapshot();
 }
 async function stop({restore = true, resumeAgent = true} = {}) {
+  cancelConnectionWake('stopped');
   audio.stop();
   let keyReleaseError;
   try { await codexGestures.release(); } catch(error) { keyReleaseError=error; }
@@ -625,9 +788,13 @@ async function tick() {
       const error=audio.error ?? "captureStopped";
       try {await stop();} finally {audio.stop(error);}
     }
-    await refreshBluetooth();
-    await syncKeyAdaptation();
+    const prioritizeUSB = connectionRecovery.due(hardware.state, !explicitDisconnect && store.data.settings.autoConnect);
+    if (!prioritizeUSB) {
+      await refreshBluetooth();
+      await syncKeyAdaptation();
+    }
     if (!hardware.state.connected || hardware.state.readOnly === true) {
+      cancelConnectionWake('connectionLost');
       rememberReconnectPlayback();
       if (audio.session) {audio.stop("keyboardDisconnected");playback.playing=false;playback.mode="idle";}
       lastGameTick = performance.now();
@@ -647,25 +814,28 @@ async function tick() {
         lastStatusCheck = performance.now();
         connectionRecovery.begin();
         try {
-          await hardware.connect();
+          await hardware.connect({connectionWake:connectionWake.available});
           await identifiedKeyboard();
           void firmware.refresh();
           invalidateLightingCache();
-          if (hardware.state.capabilities?.perKey === false) return;
-          playback.lastError = null;
-          if (await resumeReconnectPlayback()) { /* Previous scene is ready. */ }
-          else if (pendingSceneRestore) await restorePendingScene();
-          else if (playback.mode === "game") {
-            await activate();
-            await muteGameSide();
-            await output(game.render());
-          } else if (playback.playing) await activate();
-          else await reconcileAgentLighting();
-        } catch {} finally { connectionRecovery.finish(hardware.state); }
+          if (hardware.state.capabilities?.perKey !== false) {
+            playback.lastError = null;
+            if (!await beginConnectionWake({automatic:true})) await settleConnectedOutput({automatic:true});
+          }
+        } catch(error) { observeConnectionFailure(error); }
+        finally { connectionRecovery.finish(hardware.state); }
+      }
+      // USB takeover reaches its first frame before input-service maintenance;
+      // synchronize shortcuts now, while the connection animation is running.
+      if (prioritizeUSB) {
+        await refreshBluetooth();
+        await syncKeyAdaptation();
       }
       return;
     }
     void firmware.refresh();
+    await releaseCancelledWake();
+    if (await tickConnectionWake()) return;
     if (hardware.state.capabilities?.perKey === false) {
       if (performance.now() - lastStatusCheck > 4000) {
         lastStatusCheck = performance.now();
@@ -780,9 +950,16 @@ async function tick() {
       }
     }
   } catch (e) {
+    const failedWake = connectionWake.active;
+    cancelConnectionWake('outputFailed');
     playback.lastError = e.message;
-    if(playback.mode === "audio") {audio.stop("lightingFailed");playback.mode="idle";playback.playing=false;}
+    const audioFailed = playback.mode === 'audio';
+    if (audioFailed) audio.suspend(true);
     await reconcileHardwareError();
+    if (audioFailed) {
+      audio.stop(hardware.state.connected ? 'lightingFailed' : 'keyboardDisconnected');
+      playback.mode='idle';playback.playing=false;
+    }
     if (!hardware.state.connected || hardware.state.readOnly === true) rememberReconnectPlayback();
     if (playback.mode === "trigger") {
       await disableTrigger().catch(() => {});
@@ -794,6 +971,7 @@ async function tick() {
       game.status = "paused";
       playback.playing = false;
     } else if (hardware.state.connected) playback.playing = false;
+    if (failedWake) await resumeAgentAfterWakeFailure(e);
   } finally {
     busy = false;
   }
@@ -808,6 +986,7 @@ async function serialized(fn) {
     try {
       return await fn();
     } catch (error) {
+      cancelConnectionWake('outputFailed');
       await reconcileHardwareError();
       if (playback.mode === "trigger" && (!hardware.state.armed || !hardware.state.connected)) {
         await disableTrigger().catch(() => {});
@@ -818,7 +997,7 @@ async function serialized(fn) {
         integrationsSuspended = true;
       }
       if (playback.mode === "audio" && (!hardware.state.armed || !hardware.state.connected)) {
-        audio.stop("lightingFailed");playback.mode="idle";playback.playing=false;integrationsSuspended=true;
+        audio.stop(hardware.state.connected ? "lightingFailed" : "keyboardDisconnected");playback.mode="idle";playback.playing=false;integrationsSuspended=true;
       }
       if (playback.mode === "game" && (!hardware.state.armed || !hardware.state.connected)) {
         if (game.status === "running") game.status = "paused";
@@ -835,6 +1014,9 @@ async function serialized(fn) {
 }
 async function command(req) {
   if(applicationUpdating && req.op !== 'prepareAppUpdate') throw new Error('正在安装更新，请稍候。');
+  if (['disconnect','stop','restore','pause','play','preview','nativeLighting','gameStart','gameRestart','gameSelect','gamePause','gameStop',
+    'triggerArm','triggerStop','audioStart','audioStop','agentMode','confirmFunctionKeyRecovery','codexAdaptDriver','prepareFirmwareUpdate','prepareAppUpdate'].includes(req.op))
+    cancelConnectionWake('userAction');
   if(['disconnect','stop','restore','play','preview','nativeLighting','gameStart','triggerStart','audioStart','prepareFirmwareUpdate','prepareAppUpdate'].includes(req.op)) reconnectPlayback=null;
   if(bluetoothOnly() && ['audioStart','preview','play','triggerArm','gameStart','lightWake','codexWake','checkFirmware','prepareFirmwareUpdate'].includes(req.op))
     throw new Error('蓝牙模式保留 Codex 快捷键；灯光播放与固件设置请使用 USB 有线连接。');
@@ -934,7 +1116,7 @@ async function command(req) {
       // Always release the USB handle, including after a failed restoration.
       // Durable journals remain intact, and a real owned failure still fails.
       try { await hardware.disconnect(); } catch(error) { releaseError ??= error; }
-      if (releaseError || hardware.state.connected || hardware.state.recoveryPending ||
+      if (releaseError || hardware.state.connected || hardware.state.recoveryPending || hardware.state.boardSleepLease?.pending ||
           (hardware.state.functionKeyRecoveryPending && !hasUnownedFunctionKeyHistory(hardware.state)) ||
           hardware.state.unsafeWritesNeeded || hardware.state.historicalRecoveryLost || hardware.state.error) {
         if(releaseError)console.error('NuPhyIO handoff:',releaseError.message);
@@ -1011,22 +1193,23 @@ async function command(req) {
       driverHandoff = false;
       explicitDisconnect = false;
       integrationsSuspended = false;
+      // The current USB session is already verified and painting. A repeated
+      // UI connect must not reopen its HID handle or consume the saved scene
+      // before the temporary animation has handed it back.
+      if (connectionWake.active && hardware.state.armed &&
+          connectionWake.matches(connectionWake.current, hardware.state, hardware.transportEpoch))
+        return hardware.state;
       connectionRecovery.begin();
       let result;
-      try { result = await hardware.connect(); }
+      try { result = await hardware.connect({connectionWake:connectionWake.available}); }
+      catch(error) { observeConnectionFailure(error); throw error; }
       finally { connectionRecovery.finish(hardware.state); }
       await identifiedKeyboard();
       void firmware.refresh();
       invalidateLightingCache();
       if (hardware.state.capabilities?.perKey === false) return result;
       playback.lastError = null;
-      if (await resumeReconnectPlayback()) { /* Previous scene is ready. */ }
-      else if (pendingSceneRestore) await restorePendingScene();
-      else if (playback.mode === "game") {
-        await activate();
-        await muteGameSide();
-        await output(game.render());
-      } else await reconcileAgentLighting({resumeSuspended:true});
+      if (!await beginConnectionWake({automatic:false})) await settleConnectedOutput({automatic:false});
       return result;
     }
     case "disconnect":
@@ -1117,6 +1300,11 @@ async function command(req) {
         return store.settings(req.settings);
       // Reject an invalid mixed preference batch before touching held keys.
       validateSettings(req.settings, store.data.settings);
+      const lightingKeys = ['brightness','outputColorProfile','lightDurationMs','lightIdleMs','autoConnect','quotaSideEnabled','audio'];
+      if (connectionWake.active && Object.entries(req.settings).some(([key,value]) =>
+          (lightingKeys.includes(key) || key.startsWith('codex') || key.startsWith('claude') || key === 'agentSource') &&
+          JSON.stringify(value) !== JSON.stringify(store.data.settings[key])))
+        cancelConnectionWake('userAction');
       await codexGestures.release();
       codexPresses.reset();
       const old = store.data.settings;
@@ -1125,7 +1313,7 @@ async function command(req) {
       if(keyBindingFingerprint(old)!==keyBindingFingerprint(settings))keyBindingEpoch++;
       hardware.setOutputColorProfile(settings.outputColorProfile);
       if (JSON.stringify(old.outputColorProfile) !== JSON.stringify(settings.outputColorProfile))
-        invalidateLightingCache();
+        invalidateLightingCache({preserveSide:true});
       codex.track?.([...(settings.slotIds ?? []),settings.codexWholeTaskId]);
       claude.track([...(settings.claudeSlotIds ?? []),settings.claudeWholeTaskId]);
       if (Object.keys(req.settings).some(key=>key.startsWith("codex") || key === "slotIds")) codexLights.wake();
@@ -1182,7 +1370,7 @@ async function command(req) {
       await codexGestures.release();
       const pattern = validateColors(req.colors);
       const config = validateTrigger(req.trigger);
-      if (!layout.some(key => pattern[key.index] !== "#000000"))
+      if (config.effect==='cross' ? config.color==='#000000' : !layout.some(key => pattern[key.index] !== "#000000"))
         throw new Error("请先绘制图案，或选择默认爱心");
       if (!hardware.state.connected) throw new Error("请先连接键盘");
       audio.stop();
@@ -1199,7 +1387,9 @@ async function command(req) {
         try {
           await hardware.request("triggerMonitor", {
             enabled: true,
-            keyCode: TRIGGER_KEYS.find((key) => key.code === config.code).keyCode,
+            ...(config.effect==='cross'
+              ? {mode:'typing',keyCodes:TYPING_KEYS.filter(key=>layout.some(position=>position.code===key.code)).map(key=>key.keyCode)}
+              : {keyCode: TRIGGER_KEYS.find((key) => key.code === config.code).keyCode}),
           });
           triggerMonitor = "global";
         } catch (error) {
@@ -1215,11 +1405,20 @@ async function command(req) {
     }
     case "triggerFire":
       if (!trigger.armed) throw new Error("请先启用按键触发");
+      if(trigger.snapshot().config.effect==='cross'){
+        const code=req.code==='F13'?'PrintScreen':req.code??'Space';
+        if(!layout.some(key=>key.code===code))throw new Error('请选择支持的触发按键');
+        return fireTrigger(code);
+      }
       return fireTrigger();
-    case "triggerKey":
-      if (triggerMonitor !== "window" || req.code !== trigger.snapshot().config.code)
+    case "triggerKey": {
+      const code=req.code==='F13'?'PrintScreen':req.code;
+      if (triggerMonitor !== "window" || (trigger.snapshot().config.effect==='cross'
+          ? !layout.some(key=>key.code===code)
+          : code !== trigger.snapshot().config.code))
         return trigger.snapshot();
-      return fireTrigger();
+      return fireTrigger(code);
+    }
     case "triggerStop":
       if (playback.mode === "trigger" || trigger.armed) return stop();
       return playback;
@@ -1388,6 +1587,8 @@ async function command(req) {
     }
     case "readColors":
       return hardware.request("readColors");
+    case "readBoardSleep":
+      return hardware.request("readBoardSleep");
     case "verifyColors": {
       if (!hardware.state.connected || !hardware.state.armed) throw new Error("请先连接键盘并播放灯效");
       // HTTP commands and tick both own `busy` until their awaited output has
@@ -1559,7 +1760,16 @@ hardware.on("shortcut", (event) => {
 });
 hardware.on("triggerKey", (event) => {
   const generation = triggerGeneration;
-  if (triggerMonitor !== "global" || !trigger.armed || trigger.flashing) return;
+  const cross=trigger.snapshot().config.effect==='cross';
+  if (triggerMonitor !== "global" || !trigger.armed || !cross&&trigger.flashing) return;
+  if(cross){
+    const key=TYPING_KEYS.find(key=>key.keyCode===event.keyCode&&layout.some(position=>position.code===key.code));
+    if(!key)return;
+    const at=performance.now();
+    serialized(()=>generation===triggerGeneration?fireTrigger(key.code,at):undefined)
+      .catch(error=>{playback.lastError=error.message;});
+    return;
+  }
   const selected = TRIGGER_KEYS.find((key) => key.code === trigger.snapshot().config.code);
   if (event.keyCode !== selected?.keyCode) return;
   serialized(() => generation === triggerGeneration ? fireTrigger() : undefined)
@@ -1710,6 +1920,7 @@ hardware.on("diagnostic", detail => process.stderr.write(`[HIDBridge] ${detail}`
 async function shutdown() {
   if (stopping) return;
   stopping = true;
+  cancelConnectionWake('shutdown');
   audio.stop();
   playback.playing = false;
   timer.stop();

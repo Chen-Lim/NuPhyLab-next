@@ -19,6 +19,44 @@ struct WorkerRestartPolicy {
     }
 }
 
+struct AppUpdateReminder: Codable {
+    let version: String
+    let remindAfter: TimeInterval
+    static let delay: TimeInterval = 24 * 60 * 60
+    func allows(version: String, userInitiated: Bool, now: TimeInterval) -> Bool {
+        userInitiated || self.version != version || now >= remindAfter
+    }
+}
+
+enum AppUpdateAlertKind {case preparationFailed, keyboardReleaseFailed}
+func makeAppUpdateAlert(_ kind: AppUpdateAlertKind, english: Bool) -> NSAlert {
+    let alert=NSAlert()
+    switch kind {
+    case .preparationFailed:
+        alert.messageText=english ? "Unable to install the update yet" : "暂时无法安装更新"
+        alert.informativeText=english ? "Please try again later. Your app and work are kept." : "请稍后重试。当前软件和作品会保留。"
+        alert.addButton(withTitle:english ? "OK" : "知道了")
+    case .keyboardReleaseFailed:
+        alert.messageText=english ? "Update paused" : "更新暂时暂停"
+        alert.informativeText=english ? "Reconnect your keyboard and try again. Your current app and work are kept." : "请重新连接键盘后重试。当前软件和作品会保留。"
+        alert.addButton(withTitle:english ? "Try Again" : "重试");alert.addButton(withTitle:english ? "Later" : "稍后")
+    }
+    return alert
+}
+
+// Release notes are embedded in the signed feed. Only select a language from
+// the notes attached to this exact version; never substitute generic app copy.
+func localizedAppReleaseNotes(_ text: String, version: String, english: Bool) -> String? {
+    let normalized=text.replacingOccurrences(of:"\r\n",with:"\n")
+    let prefix="NUPHY-RELEASE-NOTES 1\nversion:\(version)\n[zh-CN]\n"
+    guard normalized.hasPrefix(prefix) else{return nil}
+    let sections=String(normalized.dropFirst(prefix.count)).components(separatedBy:"\n[en]\n")
+    guard sections.count == 2,sections.allSatisfy({!$0.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty}) else{return nil}
+    let selected=sections[english ? 1 : 0].trimmingCharacters(in:.whitespacesAndNewlines)
+    if english && selected.unicodeScalars.contains(where:{(0x3400...0x9fff).contains($0.value)}) {return nil}
+    return selected
+}
+
 struct PendingAppUpdate: Codable {
     let targetVersion: String
     let createdAt: TimeInterval
@@ -246,7 +284,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     let workerLogQueue = DispatchQueue(label: "AirStudio.WorkerLog")
     var terminating = false
     #if canImport(Sparkle)
-    var updaterController: SPUStandardUpdaterController?
+    var updater: SPUUpdater?
+    var updateUserDriver: LabUpdateUserDriver?
     #endif
     var pendingUpdateInstall: (() -> Void)?
     var pendingUpdateVersion: String?
@@ -264,7 +303,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         audioCapture.report = { [weak self] packet in self?.sendAudio(packet) }
         buildMenus()
         #if canImport(Sparkle)
-        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: nil)
+        let updateDriver=LabUpdateUserDriver(hostBundle:Bundle.main,isEnglish:{ [weak self] in self?.english == true })
+        updateUserDriver=updateDriver
+        let appUpdater=SPUUpdater(hostBundle:Bundle.main,applicationBundle:Bundle.main,userDriver:updateDriver,delegate:self)
+        updater=appUpdater
+        do {try appUpdater.start()} catch {updateDriver.showUpdaterError(error,acknowledgement:{ [weak updateDriver] in updateDriver?.dismissUpdateInstallation() })}
         #endif
         window=NativeTitlebarWindow(contentRect:NSRect(origin:.zero,size:defaultWindowSize()),styleMask:[.titled,.closable,.miniaturizable,.resizable,.fullSizeContentView],backing:.buffered,defer:false)
         (window as? NativeTitlebarWindow)?.dragGeometryObserver={ [weak self] geometry in
@@ -487,7 +530,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     @objc func checkForUpdates(){
         if pendingUpdateInstall != nil { prepareUpdateInstallation(); return }
         #if canImport(Sparkle)
-        updaterController?.checkForUpdates(nil)
+        updater?.checkForUpdates()
         #endif
     }
     func prepareUpdateInstallation(){
@@ -495,9 +538,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         guard let version=pendingUpdateVersion else{return}
         do {try PendingAppUpdate.stage(version:version)} catch {
             appendWorkerLog(Data("Unable to prepare update relaunch: \(error.localizedDescription)\n".utf8))
-            let alert=NSAlert();alert.messageText=english ? "Unable to install the update yet" : "暂时无法安装更新"
-            alert.informativeText=english ? "Please try again later. Your app and work are kept." : "请稍后重试。当前软件和作品会保留。"
-            alert.addButton(withTitle:english ? "OK" : "知道了");alert.runModal();return
+            makeAppUpdateAlert(.preparationFailed,english:english).runModal();return
         }
         preparingUpdate=true
         setExitPresentation(true)
@@ -515,9 +556,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                 } else {
                     self.setExitPresentation(false)
                     self.appendWorkerLog(Data("Update preparation failed: \(error?.localizedDescription ?? String(describing:result?["error"]))\n".utf8))
-                    let alert=NSAlert();alert.messageText=self.english ? "Update paused" : "更新暂时暂停"
-                    alert.informativeText=self.english ? "Reconnect your keyboard and try again. Your current app and work are kept." : "请重新连接键盘后重试。当前软件和作品会保留。"
-                    alert.addButton(withTitle:self.english ? "Try Again" : "重试");alert.addButton(withTitle:self.english ? "Later" : "稍后")
+                    let alert=makeAppUpdateAlert(.keyboardReleaseFailed,english:self.english)
                     if alert.runModal() == .alertFirstButtonReturn {self.prepareUpdateInstallation()}
                 }
             }
@@ -716,7 +755,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         }
         driverReturnTask?.resume()
     }
-    let officialDriverURL = URL(string:"https://drive.nuphy.io/?lang=zh-CN")!
+    let officialDriverURL = URL(string:"https://drive.nuphyio.com/#/setting")!
     func driverBrowserCandidates()->[DriverBrowser] {
         if let override=driverBrowserCandidatesOverride {return override()}
         var result=[DriverBrowser]()
@@ -927,7 +966,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             DispatchQueue.main.async {
                 guard let self=self,self.hotkeyPollGeneration==generation else{return}
                 self.hotkeyStateTask=nil
-                if let value=settings?["language"] as? String, ["en","zh-CN"].contains(value), self.english != (value == "en") { self.english = value == "en"; self.buildMenus() }
+                if let value=settings?["language"] as? String, ["en","zh-CN"].contains(value), self.english != (value == "en") {
+                    self.english = value == "en"; self.buildMenus()
+                    #if canImport(Sparkle)
+                    self.updateUserDriver?.refreshLanguage()
+                    #endif
+                }
                 self.applyKeyConfiguration(keys)
                 self.audioCapture.sync((state?["audio"] as? [String:Any])?["capture"] as? [String:Any])
             }
@@ -1159,7 +1203,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         if url.scheme=="blob"||url.host=="127.0.0.1"{decisionHandler(.allow);return}
         decisionHandler(.cancel)
         guard ["https","http"].contains(url.scheme ?? "") else{return}
-        if url.scheme=="https", url.host=="drive.nuphy.io" {
+        if url.scheme=="https", ["drive.nuphyio.com","drive.nuphy.io"].contains(url.host ?? "") {
             openOfficialDriver { [weak self] result,error in
                 guard let self=self else{return}
                 if let error=error {self.presentOfficialDriverMessage(error,error:true)}
@@ -1184,6 +1228,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
 
 #if canImport(Sparkle)
 extension AppDelegate: SPUUpdaterDelegate {
+    func updater(_ updater: SPUUpdater, shouldProceedWithUpdate item: SUAppcastItem, updateCheck: SPUUpdateCheck) throws {
+        if let data=UserDefaults.standard.data(forKey:"NuPhyLab.UpdateReminder.v1"),
+           let reminder=try? JSONDecoder().decode(AppUpdateReminder.self,from:data),
+           !reminder.allows(version:item.versionString,userInitiated:updateCheck == .updates,now:Date().timeIntervalSince1970) {
+            throw NSError(domain:NSCocoaErrorDomain,code:NSUserCancelledError,userInfo:[NSLocalizedDescriptionKey:english ? "This version's reminder is postponed." : "此版本的更新提醒已稍后。"])
+        }
+    }
+    func updater(_ updater: SPUUpdater, userDidMake choice: SPUUserUpdateChoice, forUpdate item: SUAppcastItem, state: SPUUserUpdateState) {
+        // Sparkle owns Skip This Version. Later alone adds a bounded reminder
+        // delay; a manual check and a different version always remain eligible.
+        if choice == .dismiss {
+            let reminder=AppUpdateReminder(version:item.versionString,remindAfter:Date().timeIntervalSince1970+AppUpdateReminder.delay)
+            if let data=try? JSONEncoder().encode(reminder){UserDefaults.standard.set(data,forKey:"NuPhyLab.UpdateReminder.v1")}
+        } else {
+            UserDefaults.standard.removeObject(forKey:"NuPhyLab.UpdateReminder.v1")
+        }
+    }
     func updater(_ updater: SPUUpdater, shouldPostponeRelaunchForUpdate item: SUAppcastItem,
                  untilInvokingBlock installHandler: @escaping () -> Void) -> Bool {
         pendingUpdateInstall=installHandler

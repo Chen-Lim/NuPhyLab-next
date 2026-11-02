@@ -28,3 +28,8 @@ native/hardware-qa-results.json
 
 # Local photo reference (not required to build)
 原图/
+
+# Historical local archives and private references (never publish)
+/archive/
+/references/upper-computer-control-v2/
+/references/原图/

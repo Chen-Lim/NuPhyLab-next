@@ -4,7 +4,10 @@
 import ts from '../../ui/node_modules/typescript/lib/typescript.js';
 import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
-import {validateTrigger} from '../../shared/trigger.mjs';
+import * as triggers from '../../shared/trigger.mjs';
+import {applyArtworkAppearance} from '../../shared/render-animation.mjs';
+import * as firmwareOnboarding from '../../shared/firmware-onboarding.mjs';
+const {validateTrigger}=triggers;
 
 const clone=value=>JSON.parse(JSON.stringify(value));
 const defaultAnimation={effect:'static',direction:'right',speed:4,loop:true};
@@ -45,6 +48,9 @@ export async function appDraftFixture(options={}){
     if(name==='./api')return{useAirApi:()=>api};
     if(name==='./draftPersistence')return persistence;
     if(name==='./types')return types;
+    if(name==='../../shared/trigger.mjs')return triggers;
+    if(name==='../../shared/render-animation.mjs')return{applyArtworkAppearance};
+    if(name==='../../shared/firmware-onboarding.mjs')return firmwareOnboarding;
     if(name==='./i18n')return{t:value=>value,useLanguage:()=>api.state.settings.language,setLanguage(){}};
     if(name==='./presets')return{presets:()=>[scene('Fallback preset',{colors:Array(84).fill('#234567')})]};
     if(name==='./codexKeys')return{useCodexKeys(){}};

@@ -5,6 +5,7 @@ import {createHash, randomUUID} from 'node:crypto';
 import path from 'node:path';
 import {applyOutputColorProfile, deriveOutputColorProfileStatus, validateOutputColorProfile} from '../shared/output-color-profile.mjs';
 import {scaleColor} from '../shared/render-animation.mjs';
+import {supportsAirConnectionWake} from './connection-wake.mjs';
 
 // Native's Kick journal directory is scoped to its serial (or USB location).
 // The legacy AIR backup directory identifies the application, not a keyboard,
@@ -174,7 +175,8 @@ export class Hardware extends EventEmitter {
     this.requests.clear();
   }
   request(op, args = {}) {
-    const deviceOperation = ['connect','status','arm','paint','restore','disconnect','readColors','nativeLighting','readKeymap',
+    const deviceOperation = ['connect','status','arm','armConnectionWake','paint','restore','disconnect','readColors','nativeLighting','readKeymap',
+      'readBoardSleep','acquireBoardSleepLease','releaseBoardSleepLease',
       'prepareFunctionKey','previewFunctionKeyRecovery','confirmFunctionKeyRecovery','side'].includes(op) ||
       (['adaptKeys','keyMappingStatus'].includes(op) && args.transport !== 'bluetooth');
     const epoch = deviceOperation ? this.transportEpoch : null;
@@ -213,18 +215,23 @@ export class Hardware extends EventEmitter {
     this.tail = promise.catch(() => {});
     return promise;
   }
-  connect() {
+  connect(options) {
     if (this.connecting) return this.connecting;
-    this.connecting = this.connectOnce().finally(() => { this.connecting = null; });
+    this.connecting = this.connectOnce(options).finally(() => { this.connecting = null; });
     return this.connecting;
   }
-  async connectOnce() {
+  async connectOnce({connectionWake = false} = {}) {
     let identified = false;
     try {
       let result = await this.request("connect");
       this.updateState(result);
       identified = true;
-      if (result.recoveryPending && !result.armed && result.readOnly !== true) {
+      // A verified wake transaction can continue the original lighting journal in
+      // one native transaction. Restoring its visible stock/custom scene here
+      // would flash that scene before the startup blackout. Ordinary connects
+      // retain their existing restore-first behavior.
+      const wakePreparation = connectionWake && supportsAirConnectionWake(this.state);
+      if (result.recoveryPending && !result.armed && result.readOnly !== true && !wakePreparation) {
         await this.restore();
         result = {
           ...result,
@@ -253,7 +260,7 @@ export class Hardware extends EventEmitter {
   }
   async status() {
     const result = await this.request("status");
-    const pendingError = result.recoveryPending && this.state.errorCode && this.state.errorCode !== "DEVICE_NOT_FOUND";
+    const pendingError = (result.recoveryPending || result.boardSleepLease?.pending) && this.state.errorCode && this.state.errorCode !== "DEVICE_NOT_FOUND";
     const reportedError = typeof result.errorCode === 'string' || typeof result.error === 'string' && result.error.length > 0;
     this.updateState({ ...result, ...(!reportedError ? pendingError ? { error: this.state.error, errorCode: this.state.errorCode } : result.recoveryPending === false ? { errorCode: null } : {} : {}) });
     return this.state;
@@ -276,18 +283,38 @@ export class Hardware extends EventEmitter {
       ...(result.connected === false && result.identified !== true ? {identified:false,firmwareDetectionAvailable:false,firmwareVersion:null} : {}),
     };
   }
-  async arm() {
+  async arm({connectionWake = false} = {}) {
     if (!this.state.connected) throw new Error("请先连接键盘");
     if (this.state.readOnly === true) throw new Error(this.state.error || '当前固件未通过兼容检查，请先通过官方 NuPhyIO 更新固件。');
-    if (this.state.armed) return;
+    if (connectionWake) {
+      if (!supportsAirConnectionWake(this.state))
+        throw Object.assign(new Error('此键盘尚未验证启动灯效接管，未开启灯光。'), {code:'CONNECTION_WAKE_UNSUPPORTED'});
+      await this.acquireBoardSleepLease();
+      // Native validates the profile and durable original before any write;
+      // it returns only after keys and side lights are safely black. Never
+      // interpose an ordinary restore/arm which can expose a stale palette.
+      const result = await this.request('armConnectionWake');
+      this.updateState({...result, armed:true, error:null, errorCode:null});
+      return;
+    }
+    if (this.state.armed) { await this.acquireBoardSleepLease(); return; }
     // A reconnect may identify USB successfully before recovery completes, or
     // the user may change Mac/Win while it remains connected. Retry recovery
     // for the current profile before opening a new lighting session.
     await this.status();
-    if (this.state.armed) return;
+    if (this.state.armed) { await this.acquireBoardSleepLease(); return; }
     if (this.state.recoveryPending || this.state.needsRestore) await this.restore();
+    await this.acquireBoardSleepLease();
     const result = await this.request("arm");
     this.updateState({ ...result, armed: true, error: null, errorCode: null });
+  }
+  async acquireBoardSleepLease() {
+    if (this.state.capabilities?.boardSleepLease !== true) return;
+    const result = await this.request('acquireBoardSleepLease');
+    if (result.verified !== true)
+      throw Object.assign(new Error('键盘休眠设置尚未通过校验，已停止播放。'), {code:'SLEEP_VERIFY_FAILED'});
+    if (result.boardSleepLease) this.state.boardSleepLease = result.boardSleepLease;
+    return result;
   }
   async paint(colors, options) {
     const wire=this.outputColors(colors, options),session=this.state.connectionSessionId,epoch=this.transportEpoch;
@@ -318,9 +345,9 @@ export class Hardware extends EventEmitter {
     return corrected.map(color => scaleColor(color, brightness / 100));
   }
   async restore() {
-    if (this.state.readOnly === true && !this.state.recoveryPending && !this.state.needsRestore && !this.state.unsafeWritesNeeded)
+    if (this.state.readOnly === true && !this.state.recoveryPending && !this.state.needsRestore && !this.state.unsafeWritesNeeded && !this.state.boardSleepLease?.pending)
       return {restored:true,verified:true,readOnly:true};
-    if (!this.state.connected && !this.state.recoveryPending && !this.state.needsRestore) return;
+    if (!this.state.connected && !this.state.recoveryPending && !this.state.needsRestore && !this.state.boardSleepLease?.pending) return;
     try {
       const result = await this.request("restore");
       if (result.verified !== true) throw new Error("键盘灯效恢复尚未通过校验");
@@ -337,6 +364,7 @@ export class Hardware extends EventEmitter {
     this.transportEpoch++;
     const result = await this.request("disconnect");
     const pending = result.recoveryPending === true ||
+      result.boardSleepLease?.pending === true ||
       (result.functionKeyRecoveryPending === true && !hasUnownedFunctionKeyHistory(result)) ||
       result.unsafeWritesNeeded === true || result.historicalRecoveryLost === true || result.keyRestoreErrors?.length > 0;
     this.updateState({ ...result, connected: false, identified:false, firmwareDetectionAvailable:false, armed: false,

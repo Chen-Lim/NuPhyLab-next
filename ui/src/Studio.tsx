@@ -34,6 +34,8 @@ import './studio-play-edit-v8.css';
 import './studio-workspace-layout.css';
 import {useWorkspaceLayout} from './useWorkspaceLayout';
 import { renderAnimation, animationDuration, applyArtworkAppearance, scaleColor } from "../../shared/render-animation.mjs";
+import { triggerPlaybackConfig } from "../../shared/trigger.mjs";
+import { typingCrossThumbnail } from "../../shared/typing-cross.mjs";
 import { Keyboard, lightingPeak } from "./Keyboard";
 import { ColorWheel } from "./ColorWheel";
 import { GamePanel } from "./GamePanel";
@@ -81,7 +83,8 @@ const sceneContent = (scene: Scene) => JSON.stringify([
   scene.name, scene.colors, scene.animation.effect, scene.animation.direction,
   scene.animation.speed, scene.animation.loop, scene.animation.hueShift ?? 0, scene.animation.colorOverride?.toLowerCase() ?? null, scene.animation.brightness ?? 100,
   (scene.animation.frames || []).map(frame => [frame.colors, frame.duration]),
-  scene.trigger?.code, scene.trigger?.count, scene.trigger?.intervalMs,
+  scene.trigger?Object.entries(scene.trigger).sort(([a],[b])=>a.localeCompare(b))
+    .map(([key,value])=>[key,key==='color'&&typeof value==='string'?value.toLowerCase():value]):null,
 ]);
 const animationContent = (scene: Pick<Scene, "colors" | "animation">) => JSON.stringify([
   scene.colors.map(color => color.toLowerCase()), scene.animation.effect,
@@ -115,6 +118,10 @@ export function Studio({
 }: Props) {
   const workspace=useWorkspaceLayout({aspectRatio:layout.length===80?1009/440:959/384,enabled:tab!=='game'});
   const perKeySupported = state?.device.capabilities?.perKey !== false;
+  const isCross=tab==='trigger'&&draft.trigger?.effect==='cross';
+  const triggerArmed=Boolean(state?.trigger?.armed&&state.playback.mode==='trigger');
+  const crossThumbnail=useMemo(()=>isCross?typingCrossThumbnail(layout,triggerPlaybackConfig(draft.trigger,draft.animation).color):null,[isCross,layout,draft.trigger,draft.animation]);
+  const [crossPreviewColors,setCrossPreviewColors]=useState<string[]|null>(null);
   const previewPeak = useMemo(() => lightingPeak([draft.colors, ...(draft.animation.frames || []).map(frame => frame.colors)]
     .map(colors => applyArtworkAppearance(colors, {...draft.animation, brightness: 100}))), [draft.colors, draft.animation]);
   const [tool, setTool] = useState<"paint" | "select" | "erase">("paint");
@@ -283,8 +290,17 @@ export function Studio({
       commit(next, false);
     }
   };
-  const setAnimation = (patch: Partial<Animation>) =>
+  const setAnimation = (patch: Partial<Animation>) => {
+    if (patch.effect && patch.effect !== draft.animation.effect) {
+      setPagePreview(false);
+      setEditingPattern(false);
+      // A frame sequence starts from this artwork, without discarding any
+      // sequence already created before switching to an effect and back.
+      if (patch.effect === "frames" && !draft.animation.frames?.length)
+        patch = {...patch, frames: [{colors: draft.colors.slice(), duration: 300}]};
+    }
     setDraft({ ...draft, animation: { ...draft.animation, ...patch } });
+  };
   const applyHex = () => {
     const next = hex.startsWith("#") ? hex : `#${hex}`;
     if (/^#[0-9a-f]{6}$/i.test(next)) changeColor(next.toUpperCase());
@@ -357,9 +373,9 @@ export function Studio({
   const savedScene = draft.id ? state?.scenes.find(scene => scene.id === draft.id) : undefined;
   const draftSaved = savedScene ? sceneContent(savedScene) === sceneContent(draft) : false;
   const selectedFrame = frames[Math.min(frameIndex, Math.max(0, frames.length - 1))];
-  const paintTools = tab === "paint" || Boolean(frameEditor) || editingPattern;
+  const paintTools = !isCross&&(tab === "paint" || Boolean(frameEditor) || editingPattern);
   const showingDraft = tab === "animation" && (!hardwarePlaying || animationNeedsApply) && (!paused || animationNeedsApply);
-  const currentColors = frameEditor ? frameColors : paintTools ? draft.animation.colorOverride !== undefined && !editingPattern ? applyArtworkAppearance(draft.colors, draft.animation) : draft.colors : pagePreview && previewColors ? previewColors
+  const currentColors = isCross ? triggerArmed?(state?.colors||blankColors()):(crossPreviewColors||crossThumbnail||blankColors()) : frameEditor ? frameColors : paintTools ? applyArtworkAppearance(draft.colors, editingPattern ? {brightness: draft.animation.brightness ?? 100} : draft.animation) : pagePreview && previewColors ? previewColors
     : showingDraft ? applyArtworkAppearance(draft.animation.effect === "frames" ? selectedFrame?.colors || draft.colors : draft.colors, draft.animation)
       : tab === "trigger" && !(state?.playback.mode === "trigger" && state.trigger?.armed) ? applyArtworkAppearance(draft.colors, draft.animation) : outputColors;
   useEffect(() => {
@@ -403,7 +419,8 @@ export function Studio({
       commit(blankColors());
     }
   };
-  const triggerArmed = Boolean(state?.trigger?.armed && state.playback.mode === "trigger");
+  const triggerHasPattern=isCross?triggerPlaybackConfig(draft.trigger,draft.animation).color?.toLowerCase()!=='#000000'
+    :applyArtworkAppearance(draft.colors,draft.animation).some(value=>value.toLowerCase()!=='#000000');
   // Explain the existing live effect above; this display never changes eligibility.
   const syncHoldReason = !live || tab !== 'paint' ? ''
     : connectionDisplay?.stateId === 'serviceUnknown' ? '同步状态未确认：本地服务未响应。'
@@ -431,7 +448,7 @@ export function Studio({
       : state?.device.connected && state.device.armed && state.playback.mode !== "idle" ? "正在显示其他输出；当前画布待应用"
       : "当前画布待应用到键盘");
   const status = tab === "paint" ? paintStatus : state?.lightPower?.sleeping ? "灯光已休眠" : !state?.device.connected ? "连接 USB 后即可播放到键盘"
-    : tab === "trigger" ? triggerArmed ? state?.trigger?.flashing ? "正在闪烁" : "等待按键 · 键盘保持熄灭" : "未启用按键触发"
+    : tab === "trigger" ? triggerArmed ? isCross?state?.trigger?.flashing?"连续按键独立叠加":"等待按键 · 每次按键产生独立光波":state?.trigger?.flashing ? "正在闪烁" : "等待按键 · 键盘保持熄灭" : "未启用按键触发"
     : animationNeedsApply ? "点击「更新播放」应用当前动画。"
     : paused ? "播放已暂停" : hardwarePlaying ? "正在显示当前画布" : "尚未播放到键盘";
   const triggerAction = async (newPattern = false) => {
@@ -439,14 +456,14 @@ export function Studio({
       notify("当前无法播放到键盘，请检查连接状态。");
       return;
     }
-    if ((!triggerArmed || newPattern) && !applyArtworkAppearance(draft.colors, draft.animation).some(value => value.toLowerCase() !== "#000000")) {
+    if ((!triggerArmed || newPattern) && !triggerHasPattern) {
       notify((draft.animation.brightness ?? 100) === 0 ? "作品亮度为 0%，调高亮度后可启用按键触发。" : "当前没有亮起的按键，先选一个图案。");
       return;
     }
     setPlayBusy(true);
     try {
       if (triggerArmed && !newPattern) await command({ op: "triggerStop" });
-      else await command({ op: "triggerArm", colors: applyArtworkAppearance(draft.colors, draft.animation), trigger: draft.trigger || { code: "Space", count: 3, intervalMs: 600 } });
+      else await command({ op: "triggerArm", colors: applyArtworkAppearance(draft.colors, draft.animation), trigger: triggerPlaybackConfig(draft.trigger,draft.animation) });
     } finally { setPlayBusy(false); }
   };
   const handledPlayRequest = useRef<string | null>(null);
@@ -461,6 +478,8 @@ export function Studio({
   }, [playRequestId]);
   const paintPanel = (
     <aside className="v5-properties v5-paint-properties">
+      {tab === "animation" && !frameEditor && <AnimationControls draft={draft} setAnimation={setAnimation}/>}
+      {!frameEditor && <ArtworkBrightness animation={draft.animation} setAnimation={setAnimation}/>}
       <h3>{tr("画笔颜色")}</h3>
       {(Boolean(draft.animation.hueShift) || draft.animation.colorOverride !== undefined || (draft.animation.brightness ?? 100) !== 100) && <p className="v8-palette-help">{tr("这里编辑原始颜色；整体配色与亮度在预览和播放时统一应用。")}</p>}
       <div className="v7-color-scope-field">
@@ -507,7 +526,7 @@ export function Studio({
         {workspace.previewAway&&<Button kind="ghost" className="v5-workspace-return" data-workspace-navigation onClick={workspace.returnToKeyboard}><ArrowUp size={14}/>{tr('回到键盘')}</Button>}
         {frameEditor ? <><Button kind="ghost" onClick={() => finishFrame(false)}>{tr("取消")}</Button><Button kind="primary" icon={<Check size={16} />} onClick={() => finishFrame(true)}>{tr(`应用到第 ${frameEditor.index + 1} 帧`)}</Button></> : <>
           <Button onClick={onSave}>{tr("保存作品")}</Button>
-          <div className="v7-keyboard-action">{tab === "trigger" ? <Button kind="primary" icon={triggerArmed ? <Square size={16} /> : <Play size={16} />} busy={playBusy} disabled={!perKeySupported || !state?.device.connected || state?.firmware?.compatible === false || (!triggerArmed && !applyArtworkAppearance(draft.colors, draft.animation).some(value => value.toLowerCase() !== "#000000"))} onClick={() => run(triggerAction())}>{tr(triggerArmed ? "关闭按键触发" : "启用按键触发")}</Button> : <Button kind="primary" icon={togglePlayback && hardwarePlaying ? <Pause size={16} /> : <Play size={16} />} busy={playBusy} disabled={!perKeySupported || !state?.device.connected || state?.firmware?.compatible === false} onClick={() => run(togglePlayback ? command({ op: "pause" }) : play())}>{tr(tab === "paint" ? "播放到键盘" : animationNeedsApply ? paused ? "更新并播放" : "更新播放" : hardwarePlaying ? "暂停播放" : paused ? "继续播放" : "播放到键盘")}</Button>}{connectionDisplay && keyboardActionHint(connectionDisplay) && <span className="v7-keyboard-action-hint">{keyboardActionHint(connectionDisplay)}</span>}</div>
+          <div className="v7-keyboard-action">{tab === "trigger" ? <Button kind="primary" icon={triggerArmed ? <Square size={16} /> : <Play size={16} />} busy={playBusy} disabled={!perKeySupported || !state?.device.connected || state?.firmware?.compatible === false || (!triggerArmed && !triggerHasPattern)} onClick={() => run(triggerAction())}>{tr(triggerArmed ? "关闭按键触发" : "启用按键触发")}</Button> : <Button kind="primary" icon={togglePlayback && hardwarePlaying ? <Pause size={16} /> : <Play size={16} />} busy={playBusy} disabled={!perKeySupported || !state?.device.connected || state?.firmware?.compatible === false} onClick={() => run(togglePlayback ? command({ op: "pause" }) : play())}>{tr(tab === "paint" ? "播放到键盘" : animationNeedsApply ? paused ? "更新并播放" : "更新播放" : hardwarePlaying ? "暂停播放" : paused ? "继续播放" : "播放到键盘")}</Button>}{connectionDisplay && keyboardActionHint(connectionDisplay) && <span className="v7-keyboard-action-hint">{keyboardActionHint(connectionDisplay)}</span>}</div>
         </>}
       </div>
     </header>
@@ -525,23 +544,24 @@ export function Studio({
             <div className="v5-history"><Button kind="ghost" className="icon-button" aria-label={tr("撤销")} title={tr("撤销")} disabled={!undoStack.length} icon={<Undo2 size={16} />} onClick={undo} /><Button kind="ghost" className="icon-button" aria-label={tr("重做")} title={tr("重做")} disabled={!redoStack.length} icon={<Redo2 size={16} />} onClick={redo} /></div>
             {tab === "paint" && <Switch label={tr("绘制时同步到键盘")} checked={live && perKeySupported && Boolean(state?.device.connected)} disabled={!perKeySupported || !state?.device.connected} onChange={value => { if (value) lastPreview.current = ""; setLive(value); }} />}
             {editingPattern && <Button onClick={() => setEditingPattern(false)} icon={<Check size={16} />}>{tr("完成编辑")}</Button>}
-          </> : tab === "animation" ? <><Button icon={<Eye size={16} />} onClick={() => setPagePreview(value => !value)}>{tr(pagePreview ? "停止预览" : "预览动画")}</Button><span className="v5-helper">{tr("仅在页面播放")}</span>{draft.animation.effect !== "frames" && <Button kind="ghost" icon={<Paintbrush size={16} />} onClick={() => {setPagePreview(false);setEditingPattern(true);}}>{tr("编辑图案")}</Button>}</> : tab === "trigger" ? <Button icon={<Paintbrush size={16} />} onClick={() => setEditingPattern(true)}>{tr("编辑图案")}</Button> : null}
-          <Button kind="ghost" icon={<Trash2 size={16}/>} disabled={!clearSource.some(value => !/^#0{6}$/i.test(value))} onClick={clearCanvas}>{tr(frameEditor || tab === "animation" && draft.animation.effect === "frames" ? "清空当前帧" : "清空画板")}</Button>
+            {tab === "animation" && !frameEditor && <Button icon={<Eye size={16}/>} onClick={() => {setEditingPattern(false);setPagePreview(true);}}>{tr("预览动画")}</Button>}
+          </> : tab === "animation" ? <><Button icon={<Eye size={16} />} onClick={() => setPagePreview(value => !value)}>{tr(pagePreview ? "停止预览" : "预览动画")}</Button><span className="v5-helper">{tr("仅在页面播放")}</span>{draft.animation.effect !== "frames" && <Button kind="ghost" icon={<Paintbrush size={16} />} onClick={() => {setPagePreview(false);setEditingPattern(true);}}>{tr("编辑图案")}</Button>}</> : tab === "trigger"&&!isCross ? <Button icon={<Paintbrush size={16} />} onClick={() => setEditingPattern(true)}>{tr("编辑图案")}</Button> : null}
+          {!isCross&&<Button kind="ghost" icon={<Trash2 size={16}/>} disabled={!clearSource.some(value => !/^#0{6}$/i.test(value))} onClick={clearCanvas}>{tr(frameEditor || tab === "animation" && draft.animation.effect === "frames" ? "清空当前帧" : "清空画板")}</Button>}
         </div>
-        <div ref={workspace.keyboardRef} className="v5-keyboard" tabIndex={tab === "trigger" && !editingPattern ? -1 : undefined} onPointerDown={tab === "trigger" && !editingPattern ? event => { event.preventDefault(); event.currentTarget.focus({ preventScroll: true }); } : undefined}>
+        <div ref={workspace.keyboardRef} className="v5-keyboard" tabIndex={tab === "trigger" && !editingPattern && !isCross ? -1 : undefined} onPointerDown={tab === "trigger" && !editingPattern && !isCross ? event => { event.preventDefault(); event.currentTarget.focus({ preventScroll: true }); } : undefined}>
           {layout.length ? <Keyboard layout={layout} colors={currentColors} lightPreview={tab === "animation" && draft.animation.effect !== "static"} lightPreviewPeak={previewPeak} selected={paintTools ? selected : []} onKey={paintTools ? touchKey : undefined} onStrokeStart={paintTools ? startStroke : undefined} sideColor={state?.device.connected && typeof state.device.sideColor === "string" ? state.device.sideColor : undefined} /> : <div className="layout-loading">{tr("正在读取键盘布局…")}</div>}
         </div>
         </div>
         <div ref={workspace.auxiliaryRef} className="v5-workspace-aux">
         {frameEditor ? <div className="v5-canvas-note">{tr(`本次修改只应用到第 ${frameEditor.index + 1} 帧`)}</div>
-          : tab === "trigger" ? <div className="v5-canvas-note">{tr(`平时熄灭；按下 ${(draft.trigger?.code || "Space").replace(/^(Key|Digit)/, "")} 时显示此图案。`)}</div>
+          : tab === "trigger" ? <div className="v5-canvas-note">{tr(isCross?'按任意键，从对应位置向横纵扩散。':`平时熄灭；按下 ${(draft.trigger?.code || "Space").replace(/^(Key|Digit)/, "")} 时显示此图案。`)}</div>
           : tab === "animation" ? <>
             <div className="v5-animation-kind"><h3>{tr(draft.animation.effect === "frames" ? "逐帧动画" : "效果动画")}</h3><button onClick={() => { setPagePreview(false); setAnimation({ effect: draft.animation.effect === "frames" ? "move" : "frames" }); }}>{tr(draft.animation.effect === "frames" ? "切换到效果动画" : "切换到逐帧动画")}</button></div>
             {draft.animation.effect === "frames" && <div className="v5-frame-strip">{frames.map((frame, index) => <button key={index} className={`v5-frame-chip ${frameIndex === index ? "active" : ""}`} aria-label={tr(`选择第 ${index + 1} 帧`)} onClick={() => { setFrameIndex(index); setPagePreview(false); }}><Keyboard layout={layout} colors={draft.animation.colorOverride !== undefined ? applyArtworkAppearance(frame.colors, draft.animation) : frame.colors} mini /><span><b>{index + 1}</b><span>{frame.duration} ms</span></span></button>)}<button className="v5-add-frame" disabled={frames.length >= 120} onClick={() => { setAnimation({ frames: [...frames, { colors: selectedFrame?.colors.slice() || draft.colors.slice(), duration: 300 }] }); setFrameIndex(frames.length); }}><Plus size={16} />{tr("新建帧")}</button></div>}
           </> : <div className="v5-canvas-controls v7-output-controls"><span>{tr("逐键输出亮度")}</span><input aria-label={tr("逐键输出亮度")} aria-describedby="studio-output-brightness-help" type="range" min="0" max="100" value={brightness} style={rangeStyle(brightness)} onChange={event => setBrightness(Number(event.target.value))} onPointerUp={() => run(command({ op: "settings", settings: { brightness } }))} onKeyUp={() => run(command({ op: "settings", settings: { brightness } }))} /><span>{brightness}%</span><button className="text-button" onClick={() => run(command({ op: "restore" }))} disabled={!state?.device.connected}><RotateCcw size={16} />{tr("恢复原灯效")}</button><div id="studio-output-brightness-help" className="v7-output-help"><p>{tr('影响所有逐键输出；不改 HEX，不随作品保存。')}</p><p>{tr('AI 状态灯还会叠加此全局亮度。')}</p></div></div>}
         </div>
       </section>
-      {paintTools ? paintPanel : tab === "trigger" ? <TriggerPanel state={state} command={command} draft={draft} setDraft={setDraft} layout={layout} notify={notify} onColors={commit} /> : tab === "animation" ? <AnimationProperties draft={draft} setAnimation={setAnimation} frameIndex={frameIndex} setFrameIndex={setFrameIndex} onEditFrame={beginFrame} /> : <GamePanel state={state} command={command} />}
+      {paintTools ? paintPanel : tab === "trigger" ? <TriggerPanel state={state} command={command} draft={draft} setDraft={setDraft} layout={layout} notify={notify} onColors={commit} onPreviewColors={setCrossPreviewColors} /> : tab === "animation" ? <AnimationProperties draft={draft} setAnimation={setAnimation} frameIndex={frameIndex} setFrameIndex={setFrameIndex} onEditFrame={beginFrame} /> : <GamePanel state={state} command={command} />}
     </div>
   </section>;
 }
@@ -554,19 +574,16 @@ function AnimationProperties({ draft, setAnimation, frameIndex, setFrameIndex, o
   const index = Math.min(frameIndex, Math.max(0, frames.length - 1));
   const frame = frames[index];
   return <aside className="v5-properties v5-animation-properties">
-    <AnimationPalette draft={draft} setAnimation={setAnimation}/>
-    <h3>{tr(animation.effect === "frames" ? `第 ${index + 1} 帧` : "动画参数")}</h3>
+    <AnimationControls draft={draft} setAnimation={setAnimation}/>
+    <ArtworkBrightness animation={animation} setAnimation={setAnimation}/>
     {animation.effect === "frames" ? <>
+      <h3>{tr(`第 ${index + 1} 帧`)}</h3>
       <label className="v5-property-field"><span>{tr("单帧时长")}</span>{frame ? <FrameDuration value={frame.duration} index={index} onChange={duration => setAnimation({ frames: frames.map((value, i) => i === index ? { ...value, duration } : value) })} /> : <span className="v5-helper">{tr("先新建一帧")}</span>}</label>
       <Button className="v5-edit-frame" icon={<Paintbrush size={16} />} disabled={!frame} onClick={() => onEditFrame(index)}>{tr("编辑这一帧")}</Button>
       <div className="v5-frame-actions"><Button kind="ghost" icon={<Copy size={16} />} disabled={!frame || frames.length >= 120} onClick={() => { if (!frame) return; setAnimation({ frames: [...frames.slice(0, index + 1), { colors: frame.colors.slice(), duration: frame.duration }, ...frames.slice(index + 1)] }); setFrameIndex(index + 1); }}>{tr("复制")}</Button><Button kind="ghost" className="v5-danger" icon={<Trash2 size={16} />} disabled={!frame} onClick={() => { setAnimation({ frames: frames.filter((_, i) => i !== index) }); setFrameIndex(Math.max(0, index - 1)); }}>{tr("删除")}</Button></div>
       <p className="v5-property-help">{tr("编辑只影响所选帧；整体配色影响全部帧。")}</p>
-    </> : <>
-      <label className="v5-property-field"><span>{tr("灯光效果")}</span><select aria-label={tr("动画效果")} value={animation.effect} onChange={event => setAnimation({ effect: event.target.value as Animation["effect"] })}>{Object.entries(labels).filter(([key]) => key !== "frames").map(([value, label]) => <option key={value} value={value}>{tr(label)}</option>)}</select></label>
-      {animation.effect === "move" && <label className="v5-property-field"><span>{tr("方向")}</span><select aria-label={tr("动画方向")} value={animation.direction} onChange={event => setAnimation({ direction: event.target.value as Direction })}>{directions.map(([value, label]) => <option key={value} value={value}>{tr(label)}</option>)}</select></label>}
-    </>}
-    <label className="v5-property-field v5-speed"><span>{tr("速度")}<span>{animation.speed} / 10</span></span><input aria-label={tr("动画速度")} type="range" min="1" max="10" value={animation.speed} style={rangeStyle(animation.speed,1,10)} disabled={animation.effect === "static"} onChange={event => setAnimation({ speed: Number(event.target.value) })} /></label>
-    <Switch label={tr("循环播放")} checked={animation.loop} onChange={loop => setAnimation({ loop })} />
+    </> : null}
+    <AnimationPalette draft={draft} setAnimation={setAnimation}/>
     <p className="v8-palette-help">{tr("播放中可继续调整颜色与参数；修改后点击「更新播放」。")}</p>
     <button type="button" className="text-button v8-back-to-play" onClick={() => {
       const action = document.querySelector<HTMLButtonElement>(".v7-keyboard-action button");
@@ -576,8 +593,30 @@ function AnimationProperties({ draft, setAnimation, frameIndex, setFrameIndex, o
   </aside>;
 }
 
+function AnimationControls({draft, setAnimation}: {draft: Scene; setAnimation: (patch: Partial<Animation>) => void}) {
+  const animation = draft.animation;
+  return <section className="studio-animation-controls" aria-label={tr("动画设置")}>
+    <h3>{tr("动画设置")}</h3>
+    <label className="v5-property-field"><span>{tr("灯光效果")}</span><select aria-label={tr("动画效果")} value={animation.effect} onChange={event => setAnimation({effect: event.target.value as Animation["effect"]})}>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{tr(label)}</option>)}</select></label>
+    {animation.effect === "move" && <label className="v5-property-field"><span>{tr("方向")}</span><select aria-label={tr("动画方向")} value={animation.direction} onChange={event => setAnimation({direction: event.target.value as Direction})}>{directions.map(([value, label]) => <option key={value} value={value}>{tr(label)}</option>)}</select></label>}
+    <label className="v5-property-field v5-speed"><span>{tr("速度")}<span>{animation.speed} / 10</span></span><input aria-label={tr("动画速度")} type="range" min="1" max="10" value={animation.speed} style={rangeStyle(animation.speed,1,10)} disabled={animation.effect === "static"} onChange={event => setAnimation({speed: Number(event.target.value)})}/></label>
+    <Switch label={tr("循环播放")} checked={animation.loop} disabled={animation.effect === "static"} onChange={loop => setAnimation({loop})}/>
+    <p className="v8-palette-help">{tr(animation.effect === "static" ? "选择呼吸、移动或波浪，让当前图案动起来。" : animation.effect === "frames" ? "新建下一帧，绘制不同图案，再预览动画。" : "调整动效后可预览；点击「播放到键盘」或「更新播放」应用。")}</p>
+  </section>;
+}
+
+function ArtworkBrightness({animation, setAnimation}: {animation: Animation; setAnimation: (patch: Partial<Animation>) => void}) {
+  const value = animation.brightness ?? 100;
+  return <section className="studio-artwork-brightness" aria-label={tr("作品亮度设置")}>
+    <label className="v5-property-field"><span>{tr("作品亮度")}<output>{value}%</output></span><input aria-label={tr("作品亮度")} aria-valuetext={`${value}%`} type="range" min="0" max="100" step="1" value={value} style={rangeStyle(value)} onChange={event => setAnimation({brightness: Number(event.target.value)})}/></label>
+    <button type="button" className="text-button" disabled={value === 100} onClick={() => setAnimation({brightness: 100})}>{tr("还原亮度")}</button>
+    <p className="v8-palette-help">{tr("画布实时预览，随作品保存；原始颜色保留。")}</p>
+    {value === 0 && <p className="v8-palette-help" role="status">{tr("作品亮度为 0%；应用后该作品熄灭，原始颜色仍保留。")}</p>}
+  </section>;
+}
+
 function AnimationPalette({draft, setAnimation}: {draft: Scene; setAnimation: (patch: Partial<Animation>) => void}) {
-  const animation = draft.animation, artworkBrightness = animation.brightness ?? 100;
+  const animation = draft.animation;
   const memory = useRef<HSV | null>(null);
   const original = draft.colors.find(color => color.toLowerCase() !== "#000000")
     ?? animation.frames?.flatMap(frame => frame.colors).find(color => color.toLowerCase() !== "#000000")
@@ -590,11 +629,6 @@ function AnimationPalette({draft, setAnimation}: {draft: Scene; setAnimation: (p
     <ColorWheel color={selectedColor} memory={memory} onChange={color => setAnimation({colorOverride: color.toLowerCase()})}
       entry={<div className="v8-palette-selection"><span style={{background: selectedColor}} aria-hidden="true"/><output aria-label={tr("当前整体颜色")}>{selectedColor.toUpperCase()}</output></div>}/>
     <Button kind="ghost" icon={<RotateCcw size={14}/>} disabled={animation.colorOverride === undefined} onClick={() => setAnimation({colorOverride: undefined})}>{tr("还原配色")}</Button>
-    <label className="v5-property-field v8-artwork-brightness"><span>{tr("作品亮度")}<output>{artworkBrightness}%</output></span>
-      <input aria-label={tr("作品亮度")} aria-valuetext={`${artworkBrightness}%`} type="range" min="0" max="100" step="1" value={artworkBrightness} style={rangeStyle(artworkBrightness)} onChange={event => setAnimation({brightness: Number(event.target.value)})}/>
-    </label>
-    <Button kind="ghost" icon={<RotateCcw size={14}/>} disabled={artworkBrightness === 100} onClick={() => setAnimation({brightness: 100})}>{tr("还原亮度")}</Button>
-    {artworkBrightness === 0 && <p className="v8-palette-help" role="status">{tr("作品亮度为 0%；应用后该作品熄灭，原始颜色仍保留。")}</p>}
     <p className="v8-palette-help">{tr("选色应用到图案和全部帧；熄灭的按键保持不亮。")}</p>
     <p className="v8-palette-help">{tr("还原配色可恢复原来的颜色；作品亮度单独调整。")}</p>
   </section>;

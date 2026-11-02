@@ -1,0 +1,19 @@
+{
+  "version": "1.2.14",
+  "zh-CN": [
+    "新增一石二鸟打字灯效：每次按键从对应位置向横纵扩散，连续输入独立叠加，支持调整颜色与速度。",
+    "作品库可在当前页面直接播放；打开编辑进入相应创作模式，并保留草稿保护。",
+    "修正空闲唤醒重置总时长的问题；兼容的 Air75 V3 在 Lab 控灯期间临时托管设备休眠，停止控灯后恢复。",
+    "补全英文界面，保留用户自定义作品与任务名称的原文。",
+    "设置新增更新入口与当前键盘适用固件的提示红点，固件入口直达 NuPhyIO 设置页。",
+    "软件更新窗口随应用语言显示对应版本说明，支持更新、稍后和跳过；同版稍后提醒至少间隔 24 小时。"
+  ],
+  "en": [
+    "Add One stone, two birds: each keystroke sends a cross from its key, with overlapping waves, adjustable colour and speed.",
+    "Play artworks directly from the Library. Open edit enters the matching Studio mode and protects unsaved drafts.",
+    "Keep the original lighting duration deadline after idle activity. On supported Air75 V3 keyboards, temporarily manage device sleep during Lab lighting and restore it afterwards.",
+    "Complete the English interface while preserving user-entered artwork and task names.",
+    "Add Settings update controls and a dot for firmware updates verified for the connected keyboard. Open firmware settings directly in NuPhyIO.",
+    "Show version-specific release notes and update controls in the application language. Later pauses automatic reminders for the same version for at least 24 hours."
+  ]
+}

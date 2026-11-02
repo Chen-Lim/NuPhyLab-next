@@ -42,7 +42,7 @@ import {createInterface} from 'node:readline';
 import {readFileSync,appendFileSync} from 'node:fs';
 const file=process.argv[process.argv.indexOf('--backup')+1];
 const config=JSON.parse(readFileSync(file,'utf8'));
-let connected=false,armed=false,pending=Boolean(config.recoveryPending),restoreAttempts=0,sameChunkRemoved=false,matchingReplies=0;
+let connected=false,armed=false,pending=Boolean(config.recoveryPending),restoreAttempts=0,sameChunkRemoved=false,matchingReplies=0,connectAttempts=0;
 const answer=(message,result)=>{
  let output=JSON.stringify({id:message.id,ok:true,result})+'\\n';
  if(config.sameChunkRemovalOp===message.op&&!sameChunkRemoved&&matchingReplies++>=(config.sameChunkRemovalSkip??0)){
@@ -54,11 +54,14 @@ const answer=(message,result)=>{
 const lines=createInterface({input:process.stdin});
 lines.on('line',line=>{
  const message=JSON.parse(line);appendFileSync(file+'.log',message.op+'\\n');
- const state=()=>({connected,armed,recoveryPending:pending,needsRestore:pending,firmware:[16,0,1,170,6,0,0,0],firmwareVersion:'1.0.16.6',ledCount:104,capabilities:{perKey:true},error:null});
+ const state=()=>({connected,armed,recoveryPending:pending,needsRestore:pending,firmware:[16,0,1,170,6,0,0,0],firmwareVersion:'1.0.16.6',ledCount:104,
+  ...(config.quietIdentity?{identified:true,transport:'USB',vendorId:0x19f5,productId:0x1028,modelId:'air75-v3',keyLedCount:84,protocolReady:true,readOnly:false}:{}),
+  capabilities:{perKey:true,...(config.quietIdentity?{readProbeVerified:true}:{}),...(config.connectionWake!==undefined?{connectionWake:config.connectionWake}:{})},error:null});
  switch(message.op){
-  case 'connect':connected=true;answer(message,state());break;
+  case 'connect':if(++connectAttempts<=(config.missingConnectAttempts??0)){process.stdout.write(JSON.stringify({id:message.id,ok:false,error:{code:'DEVICE_NOT_FOUND',message:'Waiting for keyboard.'}})+'\\n');break;}connected=true;answer(message,state());break;
   case 'status':answer(message,state());break;
   case 'arm':if(pending&&!armed){process.stdout.write(JSON.stringify({id:message.id,ok:false,error:{code:'RECOVERY_REQUIRED',message:'A previous lighting backup exists.'}})+'\\n');break;}armed=true;pending=true;answer(message,state());break;
+  case 'armConnectionWake':armed=true;pending=true;answer(message,{...state(),quiet:true});break;
   case 'paint':if(config.removeDuringPaint)setTimeout(()=>{connected=false;armed=false;process.stdout.write(JSON.stringify({event:'disconnected',needsRestore:pending})+'\\n');},5);setTimeout(()=>answer(message,{painted:84}),config.paintDelay??0);break;
   case 'restoreKeys':if(config.keyRestoreError){process.stdout.write(JSON.stringify({id:message.id,ok:false,error:{message:'simulated key restoration failed'}})+'\\n');}else answer(message,{restored:true});break;
   case 'restore':if(config.restoreError||++restoreAttempts<=(config.restoreFailures??0)){process.stdout.write(JSON.stringify({id:message.id,ok:false,error:{code:'STATE_VERIFY_FAILED',message:'simulated restoration failed'}})+'\\n');}else{armed=false;if(!config.unverifiedRestore)pending=false;answer(message,{...(config.minimalRestore?{}:state()),restored:!config.unverifiedRestore,verified:!config.unverifiedRestore});}break;
@@ -104,6 +107,44 @@ test("reconnect restores an existing backup before allowing another arm", async 
     "arm",
   ]);
   await hardware.close();
+});
+
+test('verified quiet wake continues the durable original without showing a restore first',async t=>{
+  const {hardware,operations}=await fakeHardware(t,{recoveryPending:true,quietIdentity:true,connectionWake:true});
+  const connected=await hardware.connect({connectionWake:true});
+  assert.equal(connected.recoveryPending,true,'original journal must remain pending until normal restoration');
+  await hardware.arm({connectionWake:true});
+  assert.equal(hardware.state.armed,true);
+  assert.deepEqual(await operations(),['connect','armConnectionWake']);
+  await hardware.restore();
+  assert.equal(hardware.state.recoveryPending,false);
+  assert.deepEqual(await operations(),['connect','armConnectionWake','restore']);
+});
+
+test('quiet wake requires its explicit native capability and full identity',async t=>{
+  for(const config of [{quietIdentity:true},{quietIdentity:true,connectionWake:false},{connectionWake:true}]) {
+    const {hardware,operations}=await fakeHardware(t,{recoveryPending:true,...config});
+    await hardware.connect({connectionWake:true});
+    assert.equal(hardware.state.recoveryPending,false,'unsupported quiet path retains restore-first connection');
+    await assert.rejects(hardware.arm({connectionWake:true}),error=>error.code==='CONNECTION_WAKE_UNSUPPORTED');
+    assert.deepEqual(await operations(),['connect','restore','status']);
+  }
+});
+
+test('ordinary connections still restore first even when the helper supports wake preparation',async t=>{
+  const {hardware,operations}=await fakeHardware(t,{recoveryPending:true,quietIdentity:true,connectionWake:true});
+  await hardware.connect();
+  assert.equal(hardware.state.recoveryPending,false);
+  assert.deepEqual(await operations(),['connect','restore','status']);
+});
+
+test('removal in the same quiet-arm reply cannot publish an armed replacement session',async t=>{
+  const {hardware,operations}=await fakeHardware(t,{quietIdentity:true,connectionWake:true,sameChunkRemovalOp:'armConnectionWake'});
+  await hardware.connect({connectionWake:true});
+  await assert.rejects(hardware.arm({connectionWake:true}),error=>error.code==='SESSION_CHANGED');
+  assert.equal(hardware.state.connected,false);
+  assert.equal(hardware.state.armed,false);
+  assert.deepEqual(await operations(),['connect','armConnectionWake']);
 });
 
 test("failed recovery retains device identity and later recovery clears the error immediately", async (t) => {
@@ -258,6 +299,18 @@ test("concurrent connect requests share one complete identification",async t=>{
   const results=await Promise.all([hardware.connect(),hardware.connect(),hardware.connect()]);
   assert(results.every(result=>result.connected));
   assert.equal((await operations()).filter(op=>op==='connect').length,1);
+});
+test("absent-device discovery reuses one quiet helper and performs no lighting operations",async t=>{
+  const {hardware,operations}=await fakeHardware(t,{missingConnectAttempts:12});
+  let helper,diagnostics='';hardware.on('diagnostic',detail=>diagnostics+=detail);
+  for(let i=0;i<12;i++){
+    await assert.rejects(hardware.connect(),error=>error.code==='DEVICE_NOT_FOUND');
+    helper??=hardware.child;assert.equal(hardware.child,helper);
+    assert.equal(hardware.state.connected,false);assert.equal(hardware.state.error,null);
+  }
+  assert.equal((await hardware.connect()).connected,true);
+  assert.equal(hardware.child,helper);assert.equal(diagnostics,'');
+  assert.deepEqual(await operations(),Array(13).fill('connect'));
 });
 
 for(const operation of ['connect','status','arm','restore','disconnect','paint']) {

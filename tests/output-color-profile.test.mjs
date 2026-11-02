@@ -346,7 +346,8 @@ async function outputSourceFixture() {
   hardware.request = async (op, args) => {if (op === 'paint') paints.push(args.colors); return {};};
   const context = vm.createContext({hardware, store: {data: {settings: {brightness: 27}}}, scaleColor, blank:()=>Array(84).fill('#000000'),
     agentEnabled: () => false, agentLightingSource: () => null, playback: {mode: 'static', framesSent: 0}, lightPower: {sleeping: false},
-    colors: [], previewColors:[], lastFrame: '', lastCommittedWire: null, agentOutputReceipt:null, frameTimes: [], getLayoutModel: () => 'kick75',
+    colors: [], previewColors:[], lastFrame: '', lastCommittedWire: null, agentOutputReceipt:null, frameTimes: [],
+    connectionWake:{frame:()=>null},wakeReleasePending:null,getLayoutModel: () => 'kick75',
     performance: {now: () => 100}, gameSideMuted: false, lastQuotaColor: null, quotaChanged: 0});
   new vm.Script(functions + '\nasync function verifyFixture(){' + verifyBody + '}').runInContext(context);
   return {context, hardware, paints};

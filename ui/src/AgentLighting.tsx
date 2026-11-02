@@ -19,7 +19,9 @@ import './agent-audio-workspace.css';
 export function AgentLighting({source,state,command,focusColors,serviceUnknown=false,onSelectTasks,onSetup}:{source:AgentSource;state:AppState|null;command:Command;focusColors?:boolean;serviceUnknown?:boolean;onSelectTasks?:()=>void;onSetup?:()=>void}) {
   const copy=useStartupCopy();
   const view=resolveAgentLightingView(source,state,{serviceUnknown});
-  const {settings,tasks,slots,whole,ownsOutput,showing,selectedId:controlId,wholeTask,ambientTask}=view;
+  const {settings,tasks,slots,whole,ownsOutput:ownsAgentOutput,showing:showingAgentOutput,selectedId:controlId,wholeTask,ambientTask}=view;
+  const connectionWakeActive=!serviceUnknown&&state?.connectionWake?.active===true;
+  const ownsOutput=ownsAgentOutput&&!connectionWakeActive,showing=showingAgentOutput||connectionWakeActive;
   const claude=source==='claude',name=claude?'Claude Code':'Codex';
   const keyLayout=state?.layout??(state?.device.modelId==='kick75'?kickLayout:airLayout);
   const workspace=useWorkspaceLayout({aspectRatio:keyLayout.length===80?1009/440:959/384});
@@ -31,18 +33,20 @@ export function AgentLighting({source,state,command,focusColors,serviceUnknown=f
   useEffect(()=>{const media=window.matchMedia('(prefers-reduced-motion: reduce)');const update=()=>setReducedMotion(media.matches);media.addEventListener('change',update);return()=>media.removeEventListener('change',update);},[]);
   useEffect(()=>{
     setElapsed(0);
-    if(ownsOutput||!view.animated||reducedMotion)return;
+    if(connectionWakeActive||ownsOutput||!view.animated||reducedMotion)return;
     const start=performance.now();
     const timer=window.setInterval(()=>{if(!document.hidden)setElapsed(performance.now()-start);},100);
     return()=>window.clearInterval(timer);
-  },[source,controlId,ownsOutput,view.animated,reducedMotion]);
-  const preview=ownsOutput&&state?.previewColors?state.previewColors
+  },[source,controlId,connectionWakeActive,ownsOutput,view.animated,reducedMotion]);
+  const preview=connectionWakeActive?state?.previewColors??state?.colors??[]
+    :ownsOutput&&state?.previewColors?state.previewColors
     :renderAgentLightingPreview(source,slots,settings,tasks,controlId,elapsed);
   const selectedId=String(settings[`${source}WholeTaskId`]??'');
   const ambient=settings[`${source}Ambient`]===true;
   const hasSlots=slots.some(Boolean);
   const hasZeroBrightness=Number(settings.brightness??100)===0||Number(settings[`${source}Brightness`]??100)===0;
   const status=serviceUnknown?copy('状态暂未确认；当前仅页面预览。','Status is not confirmed. This is an on-screen preview.')
+    :connectionWakeActive?copy('正在播放连接启动灯效','Playing the connection wake animation')
     :ownsOutput?hasZeroBrightness?copy('当前亮度为 0%，键盘保持熄灭。','Brightness is 0%. Keyboard lights stay off.')
       :whole&&!wholeTask?copy('已开始监听，等待跟随任务。','Listening for the followed task.')
       :!whole&&!hasSlots?copy('已开始监听，等待任务键绑定。','Listening; waiting for bound task keys.')
@@ -63,7 +67,7 @@ export function AgentLighting({source,state,command,focusColors,serviceUnknown=f
       </div><div ref={workspace.auxiliaryRef} className="agent-workspace-aux">
       <div className="agent-brightness v7-agent-brightness"><label htmlFor={`${source}-brightness`}>{t('状态灯亮度')}</label><input id={`${source}-brightness`} aria-label={`${name} ${t('状态灯亮度')}`} aria-describedby={`${source}-brightness-help`} type="range" min="0" max="100" style={{'--range-progress':`${Number(settings[`${source}Brightness`]??100)}%`} as CSSProperties} value={Number(settings[`${source}Brightness`]??100)} disabled={!state||unavailable||serviceUnknown} onChange={e=>set({[`${source}Brightness`]:Number(e.target.value)})}/><output>{Number(settings[`${source}Brightness`]??100)}%</output>
         <Button kind="ghost" icon={<Moon size={16}/>} onClick={()=>window.dispatchEvent(new CustomEvent('nuphylab:navigate',{detail:'lighting'}))}>{t('普通作品休眠设置')}</Button><p id={`${source}-brightness-help`} className="v7-agent-brightness-help">{t('状态灯亮度还会叠加全局逐键输出亮度。')}</p><p className="v7-agent-brightness-help">{t('页面预览不受全局亮度影响。')}</p><p className="v7-agent-brightness-help">{t('对话状态灯持续显示，关闭模式后停止。')}</p></div>
-      {!ownsOutput&&hasZeroBrightness&&<p className="agent-note" role="status">{copy('此来源的状态灯或全局亮度为 0%，开始显示后也会保持熄灭。','This source or global brightness is 0%. Starting display will keep its lights off.')}</p>}
+      {!connectionWakeActive&&!ownsOutput&&hasZeroBrightness&&<p className="agent-note" role="status">{copy('此来源的状态灯或全局亮度为 0%，开始显示后也会保持熄灭。','This source or global brightness is 0%. Starting display will keep its lights off.')}</p>}
       {(unavailable||bluetooth)&&<p className="agent-note" role="status">{t(bluetooth?'实时灯光需要 USB 连接。':lightingUnavailableMessage(state))}</p>}
       {bindings.some(binding=>binding.ledIndex===null)&&<p className="agent-note">{t('Del 可执行按键动作，但该位置没有可独立控制的灯。')}</p>}
       </div>

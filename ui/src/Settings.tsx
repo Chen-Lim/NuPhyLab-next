@@ -2,21 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ChevronRight, CircleHelp, RotateCcw, Sun } from "lucide-react";
 import { Button, Modal, run, Switch } from "./primitives";
 import { DurationField } from "./DurationField";
-import { DEFAULT_LIGHT_TIME_MS } from "../../shared/lighting-power.mjs";
-import { requestAppPermission, refreshAppPermissions, useStartupCopy } from "./StartupGuide";
+import { DEFAULT_LIGHT_TIME_MS, lightingTimerDeadline } from "../../shared/lighting-power.mjs";
+import { requestAppPermission, refreshAppPermissions, useStartupCopy, OFFICIAL_DRIVER_URL } from "./StartupGuide";
 import { nativeCodexKeys } from "./codexKeys";
-import { useLanguage } from "./i18n";
+import { useLanguage, t } from "./i18n";
 import type { AppState, Command } from "./types";
 import packageInfo from "../../package.json";
 import { readAppState } from "./api";
 import type { ConnectionDisplay } from "../../shared/connection-display.mjs";
 import { connectionCopy } from "./connection-copy-v7";
+import { UpdatePreferences } from "./UpdatePreferences";
+import { availableFirmwareUpdate } from "../../shared/firmware-onboarding.mjs";
 import type { OutputColorProfile, OutputColorProfileStatus } from "../../shared/output-color-profile.mjs";
 import "./device-settings-v5.css";
 import "./settings-overlays-v6.css";
 import "./action-reasons-v7.css";
 
-type SettingsTab = "general" | "lighting" | "permissions" | "about";
+type SettingsTab = "general" | "lighting" | "permissions" | "updates" | "about";
 type Permission = "inputMonitoring" | "accessibility";
 const timeOptions = [0, 60000, 300000, 900000, 1800000, 3600000, 7200000];
 function granted(value: unknown) { return value === true || value === "granted" || value === "authorized"; }
@@ -35,8 +37,8 @@ function LightingPreferences({ state, command, display, onNavigateStudio }: {sta
   const connectionReason = display&&display.stateId!=="usbReady"?connectionCopy(display.workTitle):"";
   const timeLabel = (value: number) => value === 0 ? copy("不限", "Unlimited") : value % 3600000 === 0 ? `${value / 3600000} ${copy("小时", value === 3600000 ? "hour" : "hours")}` : value % 60000 === 0 ? `${value / 60000} ${copy("分钟", value === 60000 ? "minute" : "minutes")}` : `${value / 1000} ${copy("秒", "seconds")}`;
   const rows = [
-    { key: "lightDurationMs", label: copy("每次亮灯时长", "Lighting duration"), detail: copy("达到时长后熄灭，需手动重新亮灯。", "Lights turn off when time is up. Restart them manually.") },
-    { key: "lightIdleMs", label: copy("空闲多久后休眠", "Sleep when idle"), detail: copy("无操作达到此时间后熄灭，继续操作自动唤醒。", "Lights turn off when idle and wake when you resume.") },
+    { key: "lightDurationMs", label: copy("每次亮灯时长", "Lighting duration"), detail: copy("从播放或重新计时起计算；到时熄灭，空闲唤醒不会延长。", "Counts from playback or Restart timer. Idle activity does not extend this deadline.") },
+    { key: "lightIdleMs", label: copy("空闲多久后休眠", "Sleep when idle"), detail: copy("持续无操作会提前休眠；总时长未到时，继续操作自动唤醒。", "Inactivity can sleep the lights earlier. Activity wakes them while the duration has not expired.") },
   ];
   const wake = async () => { if(busy)return;setBusy(true);setTimerError(""); try { await command({op: "lightWake"},{silent:true}); } catch(error) { setTimerError(error instanceof Error ? error.message : copy("暂时无法重新计时，请重试。", "Could not restart the timer. Try again.")); } finally { setBusy(false); } };
   const saveDuration = async (key:string,next:number) => {
@@ -48,15 +50,19 @@ function LightingPreferences({ state, command, display, onNavigateStudio }: {sta
       if(Number(current?.settings[key]) !== next) throw error;
     }
   };
-  const remaining = power?.remainingMs;
+  const durationLimit = Number(state?.settings.lightDurationMs ?? 0), idleLimit = Number(state?.settings.lightIdleMs ?? 0);
+  const deadline = lightingTimerDeadline(power,{lightDurationMs:durationLimit,lightIdleMs:idleLimit});
+  const remaining = deadline.nextSleepInMs;
   const timerTitle = timerStateUnknown ? copy("当前计时", "Current timer") : power?.sleeping ? copy(power.reason === "duration" ? "灯光计时已结束" : "空闲休眠中", power.reason === "duration" ? "Lighting timer ended" : "Sleeping while idle") : copy("当前计时", "Current timer");
   const countdown = timerStateUnknown ? connectionCopy(display?.sidebar)
     : noLightingSession ? copy("当前未播放键盘灯光。","No keyboard lighting session is active.")
-    : power?.sleeping ? copy("点击重新亮灯即可开始新的计时。", "Restart the lights to begin a new timer.")
+    : power?.sleeping ? power.reason === "idle"
+      ? copy("继续操作会唤醒；本次亮灯总时长继续计时。", "Activity wakes the lights; the current duration keeps counting down.")
+      : copy("点击重新亮灯即可开始新的计时。", "Restart the lights to begin a new timer.")
     : remaining == null ? copy("当前未设置亮灯时限。", "No lighting time limit is active.")
-    : copy("剩余亮灯时间", "Lighting time remaining") + " " + timeLabel(Math.max(1000, Math.ceil(remaining / 60000) * 60000));
+    : copy(deadline.nextSleepReason === "idle" ? "若无操作，将在此时间后休眠" : "本次亮灯剩余时间", deadline.nextSleepReason === "idle" ? "If inactive, sleep in" : "Lighting duration remaining") + " " + timeLabel(Math.max(1000, Math.ceil(remaining / 60000) * 60000));
   return <div className="lab-lighting-preferences">
-    <div className="lab-settings-intro"><h2>{copy("灯光与休眠", "Lighting and sleep")}</h2><p>{copy("计时适用于普通作品。AI 状态灯持续显示，关闭模式后才停止。", "Timers apply to ordinary artwork. AI status lights stay on until the mode is turned off.")}</p></div>
+    <div className="lab-settings-intro"><h2>{copy("灯光与休眠", "Lighting and sleep")}</h2><p>{copy("计时适用于普通作品。两项分别计时，先到先熄灯；AI 状态灯持续显示，关闭模式后才停止。", "Timers apply to ordinary artwork. The first deadline sleeps the lights; AI status lights stay on until the mode is turned off.")}</p></div>
     <div className="lab-setting-panel lab-timer-panel">{rows.map(({key,label,detail}) => {
       const value = Number(state?.settings[key] ?? DEFAULT_LIGHT_TIME_MS);
       const options = timeOptions.includes(value) ? timeOptions : [...timeOptions, value].sort((a,b)=>a-b);
@@ -69,16 +75,18 @@ function LightingPreferences({ state, command, display, onNavigateStudio }: {sta
         {custom === key && <div className="lab-custom-duration"><DurationField label={label} value={value} disabled={!state} onChange={next => saveDuration(key,next)} onBusyChange={setCustomBusy} onDone={() => setCustom(null)} /></div>}
       </div>;
     })}</div>
+    {durationLimit > 0 && idleLimit > 0 && idleLimit < durationLimit && <p className="lab-settings-note" role="status">{copy(`亮灯时长为 ${timeLabel(durationLimit)}，空闲休眠为 ${timeLabel(idleLimit)}；持续无操作时会先进入空闲休眠。`, `Lighting duration is ${timeLabel(durationLimit)} and idle sleep is ${timeLabel(idleLimit)}. Continued inactivity reaches idle sleep first.`)}</p>}
+    {state?.device.modelId === "air75-v3" && <p className="lab-settings-note">{copy("Air75 V3 自身另有自动休眠，开启时约 6 分钟无键盘输入会熄灯，不受本页时长控制。若灯光早于这里的计时熄灭，请检查键盘自身的休眠设置。", "Air75 V3 also has its own auto sleep. When enabled, about 6 minutes without keyboard input can turn off its lights independently of these timers. If lighting stops earlier, check the keyboard's sleep setting.")} <a href={OFFICIAL_DRIVER_URL}>{copy("打开 NuPhyIO 设置", "Open NuPhyIO settings")}<ArrowUpRight size={13} aria-hidden="true"/></a></p>}
     <div className="lab-lighting-summary-stack">
     <div className={`lab-setting-panel lab-current-timer ${noLightingSession?"v7-timer-unavailable":""}`}><div><h3>{timerTitle}</h3><p>{countdown}</p></div><Button kind={power?.sleeping ? "primary" : "secondary"} icon={power?.sleeping ? <Sun size={16}/> : <RotateCcw size={16}/>} busy={busy} disabled={!state?.device.armed || nativeOnly} aria-describedby={noLightingSession||nativeOnly?"lighting-timer-unavailable":undefined} onClick={() => run(wake())}>{copy(power?.sleeping ? "重新亮灯" : "重新计时", power?.sleeping ? "Restart lighting" : "Restart timer")}</Button>
       {noLightingSession&&<p id="lighting-timer-unavailable" className="v7-timer-action-reason" role="status">{connectionReason&&<span>{connectionReason}</span>}<span>{copy("开始键盘灯光后可重新计时；仍可修改时长与休眠设置。","Start keyboard lighting to restart its timer. Duration and sleep settings can still be edited.")}</span>{onNavigateStudio&&<button type="button" className="text-button v7-action-link v7-timer-studio-link" onClick={onNavigateStudio}>{copy("前往灯光创作","Go to lighting studio")}<ChevronRight size={16} aria-hidden="true"/></button>}</p>}
     </div>
-    {timerError && <p className="settings-v6-note is-error" role="alert">{timerError}</p>}
+    {timerError && <p className="settings-v6-note is-error" role="alert">{t(timerError)}</p>}
     <OutputColorPreferences state={state} command={command} serviceUnknown={timerStateUnknown}/>
     </div>
     {nativeOnly && <p id="lighting-timer-unavailable" className="lab-settings-note">{copy("当前固件使用键盘内置灯效；升级后可使用灯光计时。", "Built-in lighting is active. Update firmware to use lighting timers.")}</p>}
     {power?.systemIdleAvailable === false && <p className="lab-settings-note">{copy("系统空闲时间暂不可读，当前仅根据本应用内的操作判断空闲。", "System idle time is unavailable. Idle detection currently uses activity in this app.")}</p>}
-    <details className="lab-settings-help"><summary><CircleHelp size={15}/>{copy("计时说明", "About timers")}</summary><p>{copy("自定义时间支持 1 秒至 24 小时；设为 0 或选择「不限」可关闭对应计时。空闲休眠后，使用键盘、鼠标或操作本应用会自动唤醒；不记录按键内容。休眠时动画和游戏暂停推进。", "Custom times range from 1 second to 24 hours. Set 0 or choose Unlimited to disable a timer. Keyboard, mouse or app activity wakes idle lighting without recording key content. Animations and games pause during sleep.")}</p></details>
+    <details className="lab-settings-help"><summary><CircleHelp size={15}/>{copy("计时说明", "About timers")}</summary><p>{copy("自定义时间支持 1 秒至 24 小时；设为 0 或选择「不限」只关闭对应计时。空闲休眠后，使用键盘、鼠标或操作本应用会自动唤醒，但不会重新开始本次总时长；总时长到期需手动重新亮灯。休眠时动画和游戏暂停推进，不记录按键内容。", "Custom times range from 1 second to 24 hours. Set 0 or choose Unlimited to disable only that timer. Keyboard, mouse or app activity wakes idle lighting without restarting the duration. An expired duration requires Restart lighting. Animations and games pause during sleep; key content is not recorded.")}</p></details>
   </div>;
 }
 
@@ -112,7 +120,7 @@ function OutputColorPreferences({state, command, serviceUnknown}: {state: AppSta
       <Switch label={copy("启用已保存校正", "Use saved correction")} checked={profile.enabled} disabled={busy || serviceUnknown} onChange={value => run(toggle(value))}/>
     </div>
     <p className="v8-output-color-help">{copy("只修正这把键盘的逐键输出，不改作品原始颜色。其他键盘不会自动套用。", "Only corrects this keyboard's per-key output. Artwork colors are kept, and other keyboards do not inherit it.")}</p>
-    {error && <p className="settings-v6-note is-error" role="alert">{error}</p>}
+    {error && <p className="settings-v6-note is-error" role="alert">{t(error)}</p>}
   </section>;
 }
 
@@ -149,8 +157,8 @@ function PermissionPreferences({ state, command }: {state: AppState | null; comm
       <div className="lab-setting-row lab-permission-row"><div><h3>{copy("麦克风", "Microphone")}</h3><p>{copy("选择麦克风作为声音来源时请求。", "Requested when microphone input is used.")}</p></div><span className={`lab-permission-status ${state?.audio?.active && (state.settings.audio as {source?:string}|undefined)?.source === "microphone" ? "ready" : ""}`}><i/>{state?.audio?.active && (state.settings.audio as {source?:string}|undefined)?.source === "microphone" ? copy("已允许", "Allowed") : copy("使用时请求", "Requested when used")}</span></div>
     </div>
     <div className="lab-permission-footer"><details className="lab-settings-help"><summary><CircleHelp size={15}/>{copy("授权帮助", "Permission help")}</summary><p>{copy("点击「前往授权」直达对应设置，在系统中开启 NuPhy Lab。列表中没有 NuPhy Lab 时，用「＋」添加。返回后会自动检查权限；如系统提示重新打开应用，请按提示操作。", "Choose Allow access and enable NuPhy Lab in System Settings. If it is missing, add it with +. Permissions refresh when you return. Reopen the app if macOS asks you to.")}</p></details><Button kind="ghost" icon={<RotateCcw size={15}/>} busy={busy === "refresh"} disabled={Boolean(busy)} onClick={() => run(perform("refresh"))}>{copy(busy === "refresh" ? "正在检查…" : "重新检查",busy === "refresh" ? "Checking…" : "Check again")}</Button></div>
-    {error && <p className="settings-v6-note is-error" role="alert">{error}</p>}
-    {Boolean(native.error) && <p className="lab-settings-note">{String(native.error)}</p>}
+    {error && <p className="settings-v6-note is-error" role="alert">{t(error)}</p>}
+    {Boolean(native.error) && <p className="lab-settings-note">{t(String(native.error))}</p>}
   </div>;
 }
 
@@ -204,7 +212,7 @@ function AboutPreferences({ state }: {state: AppState | null}) {
       </div>}
       {open === "licenses" && (licenseError ? <div className="overlay-error" role="alert">{copy("暂时无法读取许可文件。可查看随应用提供的 THIRD_PARTY_NOTICES.md。","Could not load the license file. See THIRD_PARTY_NOTICES.md provided with the app.")}</div> : licenseText === null ? <div className="settings-v6-loading" role="status">{copy("正在读取…","Loading…")}</div> : <pre className="settings-v6-license">{licenseText}</pre>)}
       {open === "diagnostics" && <><dl className="settings-v6-diagnostics">{diagnosticRows.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
-        {diagnosticError && <section className="settings-v6-diagnostic-error"><h3>{copy("最近错误","Latest error")}</h3><div className="overlay-error" role="status">{diagnosticError}</div></section>}
+        {diagnosticError && <section className="settings-v6-diagnostic-error"><h3>{copy("最近错误","Latest error")}</h3><div className="overlay-error" role="status">{t(diagnosticError)}</div></section>}
         {!state && <div className="overlay-notice">{copy("当前没有可用的诊断数据，稍后重新打开此窗口。","No diagnostic data is available. Open this window again later.")}</div>}
       </>}
     </Modal>}
@@ -216,13 +224,14 @@ export function Settings({ state, command, initialTab = "general", display, onNa
   const language = useLanguage();
   const [tab, setTab] = useState<SettingsTab>(initialTab);
   useEffect(() => { setTab(initialTab); }, [initialTab]);
-  const tabs: [SettingsTab,string][] = [["general",copy("通用", "General")],["lighting",copy("灯光与休眠", "Lighting and sleep")],["permissions",copy("权限", "Permissions")],["about",copy("关于", "About")]];
+  const tabs: [SettingsTab,string][] = [["general",copy("通用", "General")],["lighting",copy("灯光与休眠", "Lighting and sleep")],["permissions",copy("权限", "Permissions")],["updates",copy("更新", "Updates")],["about",copy("关于", "About")]];
   return <section className="lab-settings-page">
-    <div className="lab-settings-tabs" role="tablist" aria-label={copy("设置分类", "Settings categories")}>{tabs.map(([id,label]) => <button key={id} id={`settings-tab-${id}`} role="tab" aria-selected={tab === id} aria-controls={`settings-panel-${id}`} onClick={() => setTab(id)}>{label}</button>)}</div>
+    <div className="lab-settings-tabs" role="tablist" aria-label={copy("设置分类", "Settings categories")}>{tabs.map(([id,label]) => <button key={id} id={`settings-tab-${id}`} role="tab" aria-selected={tab === id} aria-controls={`settings-panel-${id}`} onClick={() => setTab(id)}>{label}{id==='updates'&&availableFirmwareUpdate(state)&&<i className="settings-update-dot" aria-label={copy('键盘固件有可用更新','Keyboard firmware update available')}/>}</button>)}</div>
     <div className="lab-settings-content" id={`settings-panel-${tab}`} role="tabpanel" aria-labelledby={`settings-tab-${tab}`}>
-      {tab === "general" && <div className="lab-setting-panel lab-general-panel"><div className="lab-setting-row"><h3>语言 / Language</h3><select aria-label="Language / 语言" disabled={!state} value={language} onChange={event => run(command({op: "settings", settings: {language:event.target.value}}))}><option value="zh-CN">简体中文</option><option value="en">English</option></select></div><div className="lab-setting-row"><Switch label={copy("插线后自动连接", "Connect automatically when plugged in")} disabled={!state} checked={Boolean(state?.settings.autoConnect)} onChange={autoConnect => run(command({op:"settings",settings:{autoConnect}}))}/></div></div>}
+      {tab === "general" && <div className="lab-setting-panel lab-general-panel"><div className="lab-setting-row"><h3>{copy("语言 / Language", "Language")}</h3><select aria-label={copy("Language / 语言", "Language")} disabled={!state} value={language} onChange={event => run(command({op: "settings", settings: {language:event.target.value}}))}><option value="zh-CN">{copy("简体中文", "Simplified Chinese")}</option><option value="en">English</option></select></div><div className="lab-setting-row"><Switch label={copy("插线后自动连接", "Connect automatically when plugged in")} disabled={!state} checked={Boolean(state?.settings.autoConnect)} onChange={autoConnect => run(command({op:"settings",settings:{autoConnect}}))}/></div></div>}
       {tab === "lighting" && <LightingPreferences state={state} command={command} display={display} onNavigateStudio={onNavigateStudio}/>}
       {tab === "permissions" && <PermissionPreferences state={state} command={command}/>}
+      {tab === "updates" && <UpdatePreferences state={state} command={command}/>}
       {tab === "about" && <AboutPreferences state={state}/>}
     </div>
   </section>;

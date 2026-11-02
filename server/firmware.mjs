@@ -1,4 +1,4 @@
-export const FIRMWARE_URL = "https://drive.nuphy.io/?lang=zh-CN";
+export const FIRMWARE_URL = "https://drive.nuphyio.com/#/setting";
 export const FIRMWARE_API = "https://drive.nuphy.io/prod-api/api/nuphyIo/getLastFirmwareVersionsByType?businessId=1930212869851615233&type=1";
 // Hardware-tested version is distinct from protocol support and online latest.
 export const VERIFIED_FIRMWARE = "1.0.23.6";

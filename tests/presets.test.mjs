@@ -5,6 +5,7 @@ import { layout } from "../shared/layout.mjs";
 import { createPresets, heartColors, DEFAULT_COLOR } from "../shared/presets.mjs";
 import { validateAnimation, validateScene } from "../server/storage.mjs";
 import { renderAnimation } from "../shared/render-animation.mjs";
+import {TypingCross} from '../shared/typing-cross.mjs';
 
 const lit = (colors) => colors.map((color, index) => color !== "#000000" ? index : -1).filter((index) => index >= 0);
 const centroidX = (colors) => {
@@ -19,13 +20,13 @@ const centroidX = (colors) => {
 
 test("curated catalog animates every preset and preserves the chosen heart shape", () => {
   const presets = createPresets(layout);
-  assert.equal(presets.length, 12);
+  assert.equal(presets.length, 7);
   assert.equal(new Set(presets.map((preset) => preset.id)).size, presets.length);
   assert.equal(presets[0].id, "heart");
   assert.equal(presets[0].name, "一颗小心意");
   assert.ok(!presets.some(preset => ["blank", "diamond", "bowtie"].includes(preset.id)));
-  assert.equal(presets.filter((preset) => preset.category === "pattern").length, 6);
-  assert.equal(presets.filter((preset) => preset.category === "motion").length, 6);
+  assert.equal(presets.filter((preset) => preset.category === "pattern").length, 3);
+  assert.equal(presets.filter((preset) => preset.category === "motion").length, 4);
   assert.deepEqual(lit(presets[0].colors).map((index) => layout.find((key) => key.index === index).code).sort(), [...heartKeys].sort());
   assert.equal(lit(presets[0].colors).length, 19);
   assert.ok(lit(presets[0].colors).every((index) => presets[0].colors[index] === DEFAULT_COLOR));
@@ -34,7 +35,12 @@ test("curated catalog animates every preset and preserves the chosen heart shape
   assert.deepEqual(heartColors(layout, "#ff1122").filter((color) => color !== "#000000"), Array(19).fill("#ff1122"));
   assert.ok(!JSON.stringify(presets).includes("rainbow"));
   for (const preset of presets) {
-    const frames = Array.from({ length: 100 }, (_, i) => renderAnimation(preset.colors, preset.animation, i * 80));
+    const cross=preset.trigger?.effect==='cross'?new TypingCross(layout):null;
+    if(cross){
+      assert.ok(cross.render(0,preset.trigger).every(color=>color==='#000000'),'typing preset must wait for input');
+      cross.fire('KeyG',0);
+    }
+    const frames = Array.from({ length: 100 }, (_, i) => cross?cross.render(i*8,preset.trigger):renderAnimation(preset.colors, preset.animation, i * 80));
     assert.ok(new Set(frames.map(JSON.stringify)).size >= 16, `${preset.id}: playback must visibly change`);
   }
   const heart = presets[0];

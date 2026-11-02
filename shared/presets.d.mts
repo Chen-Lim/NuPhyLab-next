@@ -20,6 +20,7 @@ export type Preset = {
   description: string;
   colors: string[];
   animation: PresetAnimation;
+  trigger?: import('./trigger.mjs').TriggerConfig;
 };
 export const DEFAULT_COLOR: string;
 export function heartColors(keys: readonly PresetKey[], color?: string): string[];

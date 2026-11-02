@@ -117,6 +117,32 @@ test('actual AI lighting has no second start/stop/sleep action and uses the comm
   const keyboard=walkAll(instance.tree,node=>node.type===f.nodes.Keyboard)[0];assert.equal(keyboard.props.colors,f.current.previewColors);assert.notEqual(keyboard.props.colors,f.current.colors);assert.ok(textOf(instance.tree).includes('正在显示 Codex 任务状态'));assert.equal(textOf(instance.tree).includes('灯光已休眠'),false);assert.deepEqual(f.commands,[]);instance.unmount();f.instance.unmount();
 });
 
+for(const source of['codex','claude'])for(const language of['zh','en'])test(`actual ${source} lighting labels the connection wake in ${language} and restores its normal preview without changing mode controls`,async()=>{
+  const f=await fixture({source,enabled:true});
+  f.ui.modules['./StartupGuide'].useStartupCopy=()=> (zh,en)=>language==='en'?en:zh;
+  const Lighting=(await f.ui.load(new URL('../ui/src/AgentLighting.tsx',import.meta.url))).exports.AgentLighting;
+  f.current[source].lighting={selectedId:'task-a',ownsOutput:true,outputOwner:{source,connectionSessionId:'fixture:1',mode:'keys',frameCommittedAt:10},pausedReason:null};
+  f.current.connectionWake={active:true,status:'playing',elapsedMs:800,durationMs:4400,sessionId:'fixture:1'};
+  f.current.previewColors=Array(84).fill('#ffffff');
+  const instance=f.ui.mount(Lighting,{source,state:f.current,command:f.command});
+  const keyboard=()=>walkAll(instance.tree,node=>node.type===f.nodes.Keyboard)[0];
+  const status=()=>textOf(walkAll(instance.tree,node=>String(node.props?.className??'').split(' ').includes('agent-live-status'))[0]);
+  const wakeMessage=language==='en'?'Playing the connection wake animation':'正在播放连接启动灯效';
+  for(const brightness of[0,27]){
+    f.current.settings.brightness=brightness;f.current.settings[`${source}Brightness`]=brightness;instance.render();f.instance.render();
+    assert.equal(keyboard().props.colors,f.current.previewColors,'show the actual wake frame, including at zero saved brightness');
+    assert.equal(status(),wakeMessage,'a stale Agent receipt must not describe the wake as task colors');
+    assert.equal(textOf(instance.tree).includes('Starting display will keep its lights off.'),false);
+    assert.equal(textOf(instance.tree).includes('开始显示后也会保持熄灭'),false);
+    assert.equal(walkAll(instance.tree,node=>node.type==='fieldset')[0].props.disabled,false);
+    assert.equal(f.mode().props.checked,true);assert.equal(f.mode().props.disabled,false);assert.equal(f.current.codex.keys.enabled,true);
+  }
+  f.current.connectionWake.active=false;f.current.previewColors=Array(84).fill('#304ffe');instance.render();
+  assert.equal(keyboard().props.colors,f.current.previewColors);assert.ok(status().includes(`正在显示 ${source==='claude'?'Claude Code':'Codex'} 任务状态`));
+  assert.equal(f.current.settings.brightness,27);assert.equal(f.current.settings[`${source}Brightness`],27);assert.deepEqual(f.commands,[]);
+  instance.unmount();f.instance.unmount();
+});
+
 test('actual source selector hands an active mode over atomically and leaves an off mode off',async()=>{
   for(const enabled of[true,false]){
     const f=await fixture({enabled}),Source=(await f.ui.load(new URL('../ui/src/AgentSourceSwitch.tsx',import.meta.url))).exports.AgentSourceSwitch;

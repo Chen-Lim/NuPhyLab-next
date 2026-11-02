@@ -39,11 +39,15 @@ export type TriggerConfig = {
   code: string;
   count: number;
   intervalMs: number;
+  effect?: 'cross';
+  color?: string;
+  speed?: number;
 };
 export type TriggerState = {
   armed: boolean;
   flashing: boolean;
   completed: number;
+  activeWaves?: number;
   config: TriggerConfig;
   monitor: "global" | "window" | "off";
   warning?: string | null;
@@ -110,7 +114,9 @@ export type AppState = {
   audio?: import("./AudioPanel").AudioState;
   bluetooth?: {connected:boolean;status:'connected'|'disconnected'|'ambiguous'|'unavailable';count:number;error:string|null};
   lightPower?: {sleeping:boolean;reason:"duration"|"idle"|null;remainingMs:number|null;idleMs:number;systemIdleAvailable:boolean|null};
+  connectionWake?: {active:boolean;status:string;elapsedMs:number;durationMs:number;sessionId:string|null};
   firmware?: {
+    modelId?: "air75-v3" | "kick75" | null;
     modelName?: string;
     minimumRequired?: string | null;
     latestConfirmed?: boolean;

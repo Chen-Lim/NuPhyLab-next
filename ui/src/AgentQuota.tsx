@@ -33,10 +33,13 @@ function quotaWindows(value: unknown): QuotaWindow[] {
           : minutes > 0
             ? `${minutes / 60} 小时`
             : "";
+    // These are system quota labels. Translate each part before composing;
+    // translation placeholders deliberately preserve artwork and task names.
+    const parts = [...new Set([...name.split(" · "), duration].filter(Boolean).map(part => tr(part)))];
     result.push({
-      name: String(
-        item.label || item.name || [name, duration].filter(Boolean).join(" · "),
-      ),
+      name: item.label || item.name
+        ? tr(String(item.label || item.name))
+        : parts.join(" · "),
       used: used === null ? null : Math.max(0, Math.min(100, used)),
       resetsAt: (item.resetsAt ?? item.resets_at) as
         | number

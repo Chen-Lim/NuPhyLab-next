@@ -7,6 +7,8 @@ import vm from 'node:vm';
 import ts from '../ui/node_modules/typescript/lib/typescript.js';
 import {blank,airLayout,kickLayout} from '../shared/layout.mjs';
 import * as appearance from '../shared/render-animation.mjs';
+import * as triggers from '../shared/trigger.mjs';
+import * as typingCross from '../shared/typing-cross.mjs';
 import * as color from '../shared/color.mjs';
 import {Store,validateAnimation} from '../server/storage.mjs';
 import {appDraftFixture,scene} from './helpers/app-draft-fixture.mjs';
@@ -125,7 +127,7 @@ async function paletteFixture(initial){
     if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:Symbol.for('fixture.Fragment')};
     if(name.endsWith('.css'))return{};if(name==='lucide-react')return new Proxy({},{get:(_t,key)=>component(String(key))});
     if(name==='./i18n')return{t:v=>v};if(name==='./rangeStyle')return{rangeStyle:()=>({})};
-    if(name==='../../shared/render-animation.mjs')return appearance;if(name==='../../shared/color.mjs')return color;
+    if(name==='../../shared/render-animation.mjs')return appearance;if(name==='../../shared/trigger.mjs')return triggers;if(name==='../../shared/typing-cross.mjs')return typingCross;if(name==='../../shared/color.mjs')return color;
     if(name==='./presets')return{DEFAULT_COLOR:'#d07d74'};if(name==='./ColorWheel')return{ColorWheel:component('ColorWheel')};
     if(name==='./primitives')return{Button:component('Button'),Switch:component('Switch'),run:p=>p};
     return new Proxy({},{get:(_t,key)=>component(String(key))});
@@ -184,7 +186,7 @@ async function studioFixture(mode){
   const require=name=>{
     if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:Symbol.for('fixture.Fragment')};if(name.endsWith('.css'))return{};
     if(name==='lucide-react')return new Proxy({},{get:(_t,key)=>component(String(key))});if(name==='./i18n')return{t:v=>v};
-    if(name==='./rangeStyle')return{rangeStyle:()=>({})};if(name==='../../shared/render-animation.mjs')return appearance;
+    if(name==='./rangeStyle')return{rangeStyle:()=>({})};if(name==='../../shared/render-animation.mjs')return appearance;if(name==='../../shared/trigger.mjs')return triggers;if(name==='../../shared/typing-cross.mjs')return typingCross;
     if(name==='./useWorkspaceLayout')return{useWorkspaceLayout:()=>({mode:'flow',style:{},headerRef:{},gridRef:{},stageRef:{},keyboardRef:{},auxiliaryRef:{},returnToKeyboard(){}})};
     if(name==='./connection-copy-v7')return{canvasCaption:()=>'',connectionCopy:v=>v?.zh??'',keyboardActionHint:()=>''};
     if(name==='../../shared/device-status.mjs')return{lightingUnavailableMessage:()=>''};
@@ -199,7 +201,7 @@ async function studioFixture(mode){
   const text=node=>node==null||typeof node==='boolean'?'':typeof node==='string'||typeof node==='number'?String(node):Array.isArray(node)?node.map(text).join(''):text(node.props?.children);
   const render=()=>{let attempts=0;do{if(++attempts>30)throw Error('Studio fixture render loop');cursor=0;dirty=false;tree=exports.Studio(props);for(const effect of effects.splice(0))effect();}while(dirty);return tree;};
   const flush=async()=>{for(let i=0;i<20;i++){if(dirty)render();if(pending.size)await Promise.all([...pending]);await Promise.resolve();}render();};
-  const button=label=>walk(tree).find(n=>n.props.onClick&&text(n)===label),patch=animation=>{const node=walk(tree).find(n=>['AnimationProperties','AnimationPalette'].includes(n.type?.name));assert.ok(node);node.props.setAnimation(animation);render();};
+  const button=label=>walk(tree).find(n=>n.props.onClick&&text(n)===label),patch=animation=>{const node=walk(tree).find(n=>['AnimationProperties','AnimationPalette','AnimationControls'].includes(n.type?.name));assert.ok(node);node.props.setAnimation(animation);render();};
   render();return{props,state,commands,render,flush,patch,button,walk,get tree(){return tree;},async click(label){const node=button(label);assert.ok(node,'Missing Studio action '+label);node.props.onClick();await flush();},async timers(){const work=[...timers.values()];timers.clear();for(const fn of work)fn();await flush();},unmount(){for(const hook of hooks)hook.cleanup?.();timers.clear();}};
 }
 
@@ -253,4 +255,66 @@ test('actual Studio frame thumbnails reflect selected colour and retain legacy r
   assert.deepEqual(first,raw());assert.equal(second[12],'#71958b');assert.deepEqual(frames.map(frame=>frame.duration),[200,400]);
   f.props.draft={...f.props.draft,animation:{...f.props.draft.animation,colorOverride:undefined}};f.render();views=thumbnails();
   assert.equal(views[0].props.colors,first,'without a new override, the preexisting raw frame-thumbnail behavior stays exact');assert.equal(views[1].props.colors,second);assert.equal(f.props.draft.animation.hueShift,120);f.unmount();
+});
+
+// Render the production stateless control sections inside the controlled Studio
+// fixture, so tests exercise the actual slider/select handlers rather than a
+// duplicate implementation. Hook-owning palette/frame editors remain children.
+function studioControl(f, name) {
+  const nodes=f.walk(f.tree).flatMap(node=>node.type?.name==='AnimationProperties'?f.walk(node.type(node.props)):[node]);
+  const section=nodes.find(node=>node.type?.name===name);assert.ok(section,'Missing '+name);
+  return f.walk(section.type(section.props));
+}
+
+test('paint brightness is available before the brush and previews without an overall colour override',async()=>{
+  const f=await studioFixture('paint'),source=structuredClone(f.props.draft.colors);
+  const nodes=f.walk(f.tree),brightnessAt=nodes.findIndex(node=>node.type?.name==='ArtworkBrightness'),paletteAt=nodes.findIndex(node=>node.type?.displayName==='ColorWheel');
+  assert.ok(brightnessAt>=0&&brightnessAt<paletteAt,'brightness is above the brush colour controls');
+  const adjust=value=>{studioControl(f,'ArtworkBrightness').find(node=>node.props['aria-label']==='作品亮度').props.onChange({target:{value:String(value)}});f.render();};
+  adjust(50);assert.equal(f.props.draft.animation.brightness,50);
+  assert.equal(f.walk(f.tree).find(node=>node.type?.displayName==='Keyboard').props.colors[31],'#800000');
+  assert.deepEqual(f.props.draft.colors,source);assert.equal(f.props.draft.animation.colorOverride,undefined);assert.equal(f.commands.length,0);
+  adjust(0);assert.ok(f.walk(f.tree).find(node=>node.type?.displayName==='Keyboard').props.colors.every(c=>c==='#000000'));
+  const reset=studioControl(f,'ArtworkBrightness').find(node=>node.type==='button');assert.equal(reset.props.disabled,false);reset.props.onClick();f.render();
+  assert.equal(f.props.draft.animation.brightness,100);assert.deepEqual(f.props.draft.colors,source);f.unmount();
+});
+
+test('paint live brightness coalesces slider changes and applies artwork dimming exactly once',async()=>{
+  const f=await studioFixture('paint'),source=structuredClone(f.props.draft.colors);
+  f.walk(f.tree).find(n=>n.type?.displayName==='Switch'&&n.props.label==='绘制时同步到键盘').props.onChange(true);f.render();await f.timers();const sent=f.commands.length;
+  for(const value of [80,65,40]){studioControl(f,'ArtworkBrightness').find(n=>n.props['aria-label']==='作品亮度').props.onChange({target:{value:String(value)}});f.render();}
+  assert.equal(f.commands.length,sent);await f.timers();assert.equal(f.commands.length,sent+1);assert.equal(f.commands.at(-1).op,'preview');assert.equal(f.commands.at(-1).colors[31],'#660000');
+  assert.equal(f.commands.some(command=>command.op==='settings'),false);assert.deepEqual(f.props.draft.colors,source);f.unmount();
+});
+
+test('animation settings precede the colour palette and remain usable while editing a pattern',async()=>{
+  const f=await studioFixture('animation');
+  const properties=f.walk(f.tree).find(n=>n.type?.name==='AnimationProperties'),children=f.walk(properties.type(properties.props));
+  assert.ok(children.findIndex(n=>n.type?.name==='AnimationControls')<children.findIndex(n=>n.type?.name==='AnimationPalette'));
+  await f.click('播放到键盘');await f.click('编辑图案');
+  let controls=studioControl(f,'AnimationControls');assert.ok(controls.find(n=>n.props['aria-label']==='动画效果'));assert.ok(f.button('预览动画'));
+  controls.find(n=>n.props['aria-label']==='动画速度').props.onChange({target:{value:'8'}});f.render();assert.equal(f.props.draft.animation.speed,8);assert.ok(f.button('完成编辑'));assert.ok(f.button('更新播放'));
+  await f.click('更新播放');assert.equal(f.commands.filter(c=>c.op==='play').length,2);assert.equal(f.commands.at(-1).animation.speed,8);
+  controls=studioControl(f,'AnimationControls');controls.find(n=>n.props['aria-label']==='动画效果').props.onChange({target:{value:'move'}});f.render();
+  studioControl(f,'AnimationControls').find(n=>n.props['aria-label']==='动画方向').props.onChange({target:{value:'up'}});f.render();assert.equal(f.props.draft.animation.direction,'up');
+  assert.ok(f.button('更新播放'));assert.equal(f.commands.length,2,'parameter edits require an explicit playback update');f.unmount();
+});
+
+test('switching to frames seeds the first frame from this artwork and restores an existing sequence',async()=>{
+  const f=await studioFixture('animation'),source=structuredClone(f.props.draft.colors);
+  f.patch({effect:'frames'});assert.deepEqual(structuredClone(f.props.draft.animation.frames),[{colors:source,duration:300}]);
+  f.props.draft.animation.frames.push({colors:blank(),duration:700});f.render();const frames=structuredClone(f.props.draft.animation.frames);
+  f.patch({effect:'pulse'});f.patch({effect:'frames'});assert.deepEqual(structuredClone(f.props.draft.animation.frames),frames);assert.deepEqual(f.props.draft.colors,source);assert.equal(f.commands.length,0);f.unmount();
+});
+
+test('pattern editing shows source colours through overall palette overrides while previewing artwork brightness',async()=>{
+  const f=await studioFixture('animation');f.patch({colorOverride:'#0000ff',hueShift:120,brightness:50});
+  await f.click('编辑图案');
+  const keyboard=()=>f.walk(f.tree).find(n=>n.type?.displayName==='Keyboard');
+  assert.equal(keyboard().props.colors[31],'#800000','raw red remains visible for editing instead of becoming the overall blue');
+  const brush=f.walk(f.tree).find(n=>n.type?.displayName==='ColorWheel');brush.props.onChange('#00ff00');f.render();
+  keyboard().props.onStrokeStart();keyboard().props.onKey(31);f.render();
+  assert.equal(f.props.draft.colors[31],'#00ff00');assert.equal(keyboard().props.colors[31],'#008000');
+  await f.click('完成编辑');assert.equal(keyboard().props.colors[31],'#000080','animation preview restores the overall palette');
+  assert.equal(f.props.draft.animation.colorOverride,'#0000ff');assert.equal(f.props.draft.animation.hueShift,120);assert.equal(f.commands.length,0);f.unmount();
 });

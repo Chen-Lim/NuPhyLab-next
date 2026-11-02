@@ -4,6 +4,18 @@ import {readFile} from 'node:fs/promises';
 import {fakeService,until} from './helpers/fake-service.mjs';
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 const art=Array(84).fill('#123456');
+test('idle activity restores artwork within the original duration without starting another full timer',async t=>{
+ const s=await fakeService(t,{storedSettings:{autoConnect:false,codexEnabled:false,claudeEnabled:false,brightness:100,lightDurationMs:2000,lightIdleMs:1000}});
+ await s.command({op:'preview',colors:art});
+ const asleep=await until(s.state,state=>state.lightPower.sleeping&&state.lightPower.reason==='idle','artwork did not reach idle sleep');
+ await s.command({op:'lightActivity'});
+ const resumed=await until(s.state,state=>!state.lightPower.sleeping&&state.colors[0]==='#123456','idle activity did not restore the artwork');
+ assert.ok(resumed.lightPower.remainingMs<=asleep.lightPower.remainingMs,'idle wake must preserve the original duration deadline');
+ assert.ok(resumed.lightPower.remainingMs<1200);
+ const ended=await until(s.state,state=>state.lightPower.sleeping&&state.lightPower.reason==='duration','the original duration deadline was extended by idle activity');
+ assert.equal(ended.lightPower.remainingMs,0);
+ await s.command({op:'lightActivity'});assert.equal((await s.state()).lightPower.reason,'duration');
+});
 test('successful Codex task keys, task buttons and command keys wake the global timer without resetting it while awake',async t=>{
  const s=await fakeService(t,{tasks:[{id:'a',status:'running'}]});
  await s.command({op:'settings',settings:{codexEnabled:true,codexSelectedPulse:false,brightness:100,lightDurationMs:1000,lightIdleMs:0}});

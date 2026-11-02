@@ -17,7 +17,7 @@ test('a Kick with the old 218 LED reply retains identity and reaches the firmwar
   assert.equal(before.firmware.updateRequired,true);
   const handoff=await service.command({op:'prepareFirmwareUpdate'});
   assert.equal(handoff.ok,true);
-  assert.equal(handoff.result.url,'https://drive.nuphy.io/?lang=zh-CN');
+  assert.equal(handoff.result.url,'https://drive.nuphyio.com/#/setting');
   const after=await service.state();
   assert.equal(after.device.connected,false);
   assert.equal(after.device.identified,false);

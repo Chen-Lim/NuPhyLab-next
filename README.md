@@ -4,13 +4,17 @@ A macOS lighting studio for **NuPhy AIR75 V3 and Kick75 (ANSI)**. Connect USB to
 
 Includes drawing, animation, key-triggered effects, games, audio reactive lighting, a local artwork library, and Codex / Claude Code task shortcuts and status lights. AIR75 V3 also supports Bluetooth shortcut control; lighting requires USB.
 
+## Version 1.2.14
+
+Add One stone, two birds typing waves, direct Library playback with draft protection, independent duration and idle timers, complete English system text, and localized software update controls. This release also includes the white Air75 V3 USB wake animation and seven curated built-in artworks. See [changes and verification scope](docs/RELEASE_1.2.14.md).
+
 ## Install
 
 Download the signed and Apple-notarized DMG using the [latest version download](https://github.com/bohu8264/NuPhyLab-next/releases/latest/download/NuPhyLab-macOS-AppleSilicon.dmg), then drag **NuPhy Lab** to Applications. This download link stays the same for future stable releases. The current release requires Apple Silicon and macOS 13.5 or later. See [release notes and older versions](https://github.com/bohu8264/NuPhyLab-next/releases).
 
 Allow Input Monitoring and Accessibility when prompted. Audio permissions are requested when using audio reactive lighting. Switch the keyboard to wired mode. If its firmware needs updating, follow the NuPhyIO reminder, close the website after the upgrade, then return to the app.
 
-Version 1.2.4 includes signed in-app updates. New releases appear automatically, or choose **Check for Updates** in the app menu or Device page. Artwork and settings remain intact. Users on 1.1.x need to install the current version once manually.
+NuPhy Lab includes signed in-app updates. New releases appear automatically, or choose **Check for Updates** in the app menu or Device page. Artwork and settings remain intact. Users on 1.1.x need to install the current version once manually.
 
 ## Build
 
@@ -22,6 +26,8 @@ npm run build
 npm test
 npm start
 ```
+
+Before `npm start`, quit the installed NuPhy Lab app and other keyboard control software. The source server uses live local data and may automatically connect a keyboard; automated regression tests use isolated fixtures.
 
 The native build downloads a pinned, checksum-verified Sparkle framework. Run `npm run fetch-node` to fetch the standalone runtime, then `npm run package`. Follow [the release workflow](docs/RELEASING.md) for distribution signing, notarization and update verification.
 

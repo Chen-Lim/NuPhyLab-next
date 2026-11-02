@@ -1,0 +1,933 @@
+{
+  "schemaVersion": 1,
+  "id": "UX01",
+  "title": "Connection and keyboard-output display contract",
+  "date": "2026-10-30",
+  "reviewFocus": "P0",
+  "priorityConvention": {
+    "P0": "仅为本轮核查重点名称，不是缺陷严重度，不表示安全漏洞。",
+    "actualFindings": "体验缺陷按research原有P1/P2如实分级；不升为安全P0。"
+  },
+  "status": "implementation-ready design specification; no production changes",
+  "baseline": {
+    "closeout": "以root最新协调为准：21:55主表R01-R05与DEL01均closed，本机13:53 UTC verified。此为父任务提供的最新基线，本子任务未重新运行本机验证。",
+    "newScope": "本规范只处理v7新增体验问题，不重开v6已销项。"
+  },
+  "research": "../research/connection-review.json",
+  "scope": {
+    "allowed": [
+      "共享纯展示派生函数",
+      "现有header/侧栏/创作/Device的状态、文案、tone和导航映射",
+      "现有动作的显式按钮复用",
+      "中英与窄窗规则"
+    ],
+    "excluded": [
+      "新硬件API",
+      "多设备选择器",
+      "自动断开任一键盘",
+      "绕过多USB guard",
+      "因进入页面/渲染发出connect/restore/arm/play/paint",
+      "自动改权限/固件/作品",
+      "全局禁止保存",
+      "恢复日志或F4内部细节产品化"
+    ],
+    "implementationRule": "同一纯函数一次派生stateId/reasonId/tone/identity/capabilities/output；各表面不再独立解释connected/playback。函数零副作用。"
+  },
+  "inputs": {
+    "state": "现有AppState或null；允许保留最后一次成功快照用于继续编辑。",
+    "serviceError": "现有useAirApi.serviceError；非空立即使缓存的connected与playback不再代表当前已确认状态。",
+    "serviceFresh": "state非null且serviceError为空。此定义沿用当前请求结果，不增加任意超时阈值、后台轮询或API。",
+    "keyRecoveryProblem": "复用ui/src/KeyRecoveryPanel.tsx现有helper；active、unownedHistory和unownedFunctionKeyHistory继续排除。",
+    "nativeLightingOnly": "复用shared/device-status.mjs既有已连接、非readOnly、Kick+stockEffects/perKey能力判定。",
+    "sidebarDeviceIdentity": "仅在serviceFresh时调用既有helper作为当前连接身份来源；不从最后画布或保留型号推断连接。",
+    "modelId": "本展示模型中的modelId只表示当前画布版型，由已有layout/model归属导出；无布局时null。显示为“当前画布”，不成为可点击设备或新增版型切换器。",
+    "verifiedRestoreEvidence": "可选、仅限既有明确verified:true的恢复回执，且能绑定本次恢复动作和当前connectionSessionId。公共stop/restore返回的hardware.state经浅合并可能残留verified字段，字段存在本身不证明本次恢复成功；当前缺少本次动作/connectionSession绑定，本批默认null，不能由pending=false、armed=false或idle推断。不得为文案新增API。"
+  },
+  "normalization": {
+    "freshUsb": "serviceFresh && state.device.connected === true",
+    "bluetoothOnly": "serviceFresh && state.device.connected !== true && state.bluetooth?.connected === true",
+    "explicitPause": "serviceFresh && !freshUsb && state.device.connectionPaused === true",
+    "phase": "state.device.connection?.status；仅serviceFresh时解释",
+    "usbReadOnly": "freshUsb && state.device.readOnly === true",
+    "knownPerKey": "freshUsb && !usbReadOnly && state.device.capabilities?.perKey === true && state.firmware?.compatible !== false",
+    "stockOnly": "nativeLightingOnly(state)；不得以官方固件查询失败推导",
+    "keyRecoveryBlocked": "Boolean(keyRecoveryProblem(state))，沿用helper归属与active排除",
+    "lightingRecoveryBlocked": "freshUsb && state.device.armed !== true && (state.device.recoveryPending === true || state.device.needsRestore === true || state.device.unsafeWritesNeeded === true) && (errorCode属于RESTORE_REQUIRED/RECOVERY_REQUIRED/PRESET_RECOVERY_CONFLICT，或既有状态/错误已明确报告本会话恢复失败)。普通journal存在不够。",
+    "normalRecoveryJournal": "state.device.armed === true && recoveryPending/needsRestore为真且无既有blocking错误；不产生attention，不遮挡正常输出。",
+    "historicalRecovery": "unowned历史、断开后的待恢复元数据不成为当前键盘故障；离线时可显示轻量“下次连接时检查恢复”，不能显示正在恢复或已恢复。",
+    "capabilityUnknown": "已连接但能力字段未确认；只说USB已连接/正在读取能力，不说灯光与快捷键全部可用。保留现有业务动作门槛，不新增探测。"
+  },
+  "stateSelection": {
+    "method": "按顺序first-match；返回8种stateId之一。显式暂停分支只维护现有用户断开意图，不改变后台连接策略。",
+    "orderedRules": [
+      {
+        "when": "Boolean(serviceError)",
+        "stateId": "serviceUnknown"
+      },
+      {
+        "when": "state === null",
+        "stateId": "loading"
+      },
+      {
+        "when": "explicitPause",
+        "stateId": "paused"
+      },
+      {
+        "when": "currentReason !== null",
+        "stateId": "attention"
+      },
+      {
+        "when": "!freshUsb && phase === 'reconnecting'",
+        "stateId": "reconnecting"
+      },
+      {
+        "when": "!freshUsb && !bluetoothOnly && phase === 'paused'",
+        "stateId": "paused"
+      },
+      {
+        "when": "freshUsb",
+        "stateId": "usbReady"
+      },
+      {
+        "when": "bluetoothOnly",
+        "stateId": "bluetoothOnly"
+      },
+      {
+        "when": "otherwise",
+        "stateId": "disconnected"
+      }
+    ],
+    "currentReasonOrder": [
+      {
+        "reasonId": "multipleUsb",
+        "when": "device.errorCode === 'DEVICE_AMBIGUOUS'；优先于generic reconnect/attention"
+      },
+      {
+        "reasonId": "appUpdateRequired",
+        "when": "phase === 'updateRequired'或device.errorCode === 'UNSUPPORTED_FIRMWARE'，沿既有产品规则为更新NuPhy Lab"
+      },
+      {
+        "reasonId": "keyRecoveryBlocked",
+        "when": "keyRecoveryBlocked；不暴露journal或单独键位"
+      },
+      {
+        "reasonId": "lightingRecoveryBlocked",
+        "when": "lightingRecoveryBlocked"
+      },
+      {
+        "reasonId": "readOnly",
+        "when": "usbReadOnly"
+      },
+      {
+        "reasonId": "genericConnection",
+        "when": "phase === 'attention'且无上述更具体原因"
+      }
+    ],
+    "exclusions": [
+      "firmware.error/stale本身不是connection attention",
+      "updateAvailable本身不阻断兼容的逐键能力",
+      "normalRecoveryJournal不是attention",
+      "仅device.modelId/identified或layout不能创建usbReady",
+      "服务错误优先于缓存的任何设备、固件和播放状态"
+    ]
+  },
+  "stateMatrix": [
+    {
+      "stateId": "serviceUnknown",
+      "tone": "neutral",
+      "header": {
+        "zh": "本地服务未响应",
+        "en": "Local service unavailable"
+      },
+      "sidebar": {
+        "zh": "输出未确认",
+        "en": "Output unconfirmed"
+      },
+      "workTitle": {
+        "zh": "暂时无法确认键盘状态",
+        "en": "Keyboard status is unconfirmed"
+      },
+      "workBody": {
+        "zh": "画布已保留，可继续编辑和页面预览。保存结果需重新确认，失败时可重试。",
+        "en": "Your canvas is retained. You can keep editing and previewing on screen. Saving may need verification or a retry."
+      },
+      "deviceTitle": {
+        "zh": "本地服务未响应",
+        "en": "Local service unavailable"
+      },
+      "primaryAction": "refreshService",
+      "hardware": "不把缓存connected/playback当当前硬件事实；不自动发任何硬件动作。",
+      "localWork": "编辑/页面预览继续；保存按钮与v6事务保留，不保证成功，不擅自全局禁用。",
+      "cachedDetail": {
+        "zh": "上次状态",
+        "en": "Last known state"
+      }
+    },
+    {
+      "stateId": "loading",
+      "tone": "neutral",
+      "header": {
+        "zh": "正在读取状态",
+        "en": "Reading status"
+      },
+      "sidebar": {
+        "zh": "正在读取输出状态",
+        "en": "Reading output status"
+      },
+      "workTitle": {
+        "zh": "正在读取键盘与本机数据",
+        "en": "Reading keyboard and local data"
+      },
+      "workBody": {
+        "zh": "已有画布可继续编辑。",
+        "en": "You can keep editing an available canvas."
+      },
+      "deviceTitle": {
+        "zh": "正在读取状态",
+        "en": "Reading status"
+      },
+      "primaryAction": null,
+      "hardware": "不宣称已连接、已播放或已恢复。",
+      "localWork": "沿已有layout和草稿可用性；不新增保存禁用规则，不承诺尚未取得的本机数据。"
+    },
+    {
+      "stateId": "attention",
+      "tone": "attention",
+      "header": {
+        "zh": "连接需处理",
+        "en": "Connection needs attention"
+      },
+      "sidebar": {
+        "zh": "输出未确认",
+        "en": "Output unconfirmed"
+      },
+      "workTitle": "reason.title",
+      "workBody": "reason.body + copy.offlineCapabilities once",
+      "deviceTitle": "reason.title",
+      "primaryAction": "reason.action",
+      "hardware": "保持现有guard及各业务门槛；不以文案推测硬件能力。",
+      "localWork": "服务健康时继续编辑、页面预览和保存。"
+    },
+    {
+      "stateId": "reconnecting",
+      "tone": "neutral",
+      "header": {
+        "zh": "正在重新连接",
+        "en": "Reconnecting"
+      },
+      "sidebar": {
+        "zh": "等待确认输出",
+        "en": "Awaiting output confirmation"
+      },
+      "workTitle": {
+        "zh": "正在重新连接键盘",
+        "en": "Reconnecting to your keyboard"
+      },
+      "workBody": {
+        "zh": "可继续编辑、页面预览和保存。",
+        "en": "You can keep editing, previewing on screen and saving."
+      },
+      "deviceTitle": {
+        "zh": "正在重新连接",
+        "en": "Reconnecting"
+      },
+      "primaryAction": null,
+      "hardware": "只显示既有重连状态；按钮沿现有busy锁，不能由新组件触发自动重连。",
+      "localWork": "不打断草稿、帧编辑、页面预览或已打开的保存流程。"
+    },
+    {
+      "stateId": "paused",
+      "tone": "neutral",
+      "header": {
+        "zh": "连接已暂停",
+        "en": "Connection paused"
+      },
+      "sidebar": {
+        "zh": "连接已暂停",
+        "en": "Connection paused"
+      },
+      "workTitle": {
+        "zh": "USB连接已暂停",
+        "en": "USB connection is paused"
+      },
+      "workBody": {
+        "zh": "可继续离线创作；需要播放时再连接。",
+        "en": "You can keep creating offline and reconnect when you want to play."
+      },
+      "deviceTitle": {
+        "zh": "连接已暂停",
+        "en": "Connection paused"
+      },
+      "primaryAction": "connect",
+      "hardware": "保持显式断开/暂停，不添加自动重连。若仍有已确认蓝牙，只作为补充连接信息。",
+      "localWork": "服务健康时编辑、页面预览和保存均可用。"
+    },
+    {
+      "stateId": "usbReady",
+      "tone": "capability-derived",
+      "header": {
+        "zh": "{device} · USB已连接",
+        "en": "{device} · USB connected"
+      },
+      "sidebar": "outputRule result",
+      "workTitle": "existing work/canvas heading",
+      "workBody": "无阻断时不新增全局notice；能力修饰仅在相关工作区说明。",
+      "deviceTitle": {
+        "zh": "USB已连接",
+        "en": "USB connected"
+      },
+      "primaryAction": null,
+      "hardware": "逐键/内置/只读/固件能力分别判，USB连接本身不等于全部功能可用。",
+      "localWork": "保留已有全部创作操作；本状态不触发播放。",
+      "successToneWhen": "knownPerKey或已确认stockOnly且当前无阻断；能力未知用neutral。"
+    },
+    {
+      "stateId": "bluetoothOnly",
+      "tone": "neutral",
+      "header": {
+        "zh": "Air75 V3 · 蓝牙已连接",
+        "en": "Air75 V3 · Bluetooth connected"
+      },
+      "sidebar": {
+        "zh": "未通过USB输出",
+        "en": "No USB lighting output"
+      },
+      "workTitle": {
+        "zh": "蓝牙已连接 · 灯光需接线",
+        "en": "Bluetooth connected · USB needed for lighting"
+      },
+      "workBody": {
+        "zh": "可继续编辑、页面预览和保存；播放到键盘需要USB连接。",
+        "en": "You can edit, preview on screen and save. Playing lighting on the keyboard requires USB."
+      },
+      "deviceTitle": {
+        "zh": "蓝牙已连接",
+        "en": "Bluetooth connected"
+      },
+      "primaryAction": "navigateDevice",
+      "hardware": "不发USB灯光/游戏/音频/按键灯效；快捷键可用性仍由既有权限与适配状态决定，不一概承诺就绪。",
+      "localWork": "完整保留；不因蓝牙状态误切旧Kick内置灯效页。"
+    },
+    {
+      "stateId": "disconnected",
+      "tone": "neutral",
+      "header": {
+        "zh": "未连接键盘",
+        "en": "No keyboard connected"
+      },
+      "sidebar": {
+        "zh": "离线创作",
+        "en": "Creating offline"
+      },
+      "workTitle": {
+        "zh": "正在离线创作",
+        "en": "Creating offline"
+      },
+      "workBody": {
+        "zh": "可编辑、页面预览和保存。连接USB后可播放到键盘。",
+        "en": "You can edit, preview on screen and save. Connect by USB to play lighting on the keyboard."
+      },
+      "deviceTitle": {
+        "zh": "连接键盘",
+        "en": "Connect your keyboard"
+      },
+      "primaryAction": "navigateDevice",
+      "hardware": "现有播放/同步guard保持；不从画布型号创建连接身份。",
+      "localWork": "服务健康时编辑、页面预览和保存可用。"
+    }
+  ],
+  "reasons": {
+    "multipleUsb": {
+      "title": {
+        "zh": "检测到多把USB键盘",
+        "en": "Multiple USB keyboards detected"
+      },
+      "short": {
+        "zh": "多把USB键盘",
+        "en": "Multiple USB keyboards"
+      },
+      "body": {
+        "zh": "请仅用数据线连接要使用的一把键盘。暂不能播放到键盘。",
+        "en": "Connect only the keyboard you want to use by USB. Keyboard lighting playback is unavailable."
+      },
+      "action": "navigateDevice",
+      "devicePrimary": "connect",
+      "devicePrimaryCopy": {
+        "zh": "重新检查",
+        "en": "Check again"
+      },
+      "suppress": [
+        "通用三步USB连接指南",
+        "确认有线模式/关闭其他软件的重复通用notice",
+        "固件升级引导，除非它是另一个已独立确认的原因"
+      ],
+      "constraint": "本任务不操作真实连接。此说明是用户未来自行处理的产品文案；没有多设备列表/选择/自动断连。"
+    },
+    "appUpdateRequired": {
+      "title": {
+        "zh": "需要更新NuPhy Lab",
+        "en": "NuPhy Lab update required"
+      },
+      "short": {
+        "zh": "需要更新应用",
+        "en": "App update required"
+      },
+      "body": {
+        "zh": "请检查NuPhy Lab更新后重试。",
+        "en": "Check for a NuPhy Lab update and try again."
+      },
+      "action": "checkAppUpdates",
+      "suppress": [
+        "前往NuPhyIO，除非既有firmwarePrompt另有独立原因"
+      ]
+    },
+    "keyRecoveryBlocked": {
+      "title": {
+        "zh": "连接尚未完成",
+        "en": "Connection is incomplete"
+      },
+      "short": {
+        "zh": "连接尚未完成",
+        "en": "Connection incomplete"
+      },
+      "body": {
+        "zh": "请关闭其他键盘设置程序，再重新连接。",
+        "en": "Close other keyboard apps, then reconnect."
+      },
+      "action": "navigateDevice",
+      "devicePrimary": "connect",
+      "suppress": [
+        "F4",
+        "journal",
+        "恢复记录ID",
+        "要求产品新增同键盘确认流程"
+      ]
+    },
+    "lightingRecoveryBlocked": {
+      "title": {
+        "zh": "需完成灯效恢复",
+        "en": "Lighting recovery needs attention"
+      },
+      "short": {
+        "zh": "需完成灯效恢复",
+        "en": "Lighting recovery pending"
+      },
+      "body": {
+        "zh": "原灯效尚未确认恢复。请在设备页重新检查。",
+        "en": "Restoration of the original lighting is unconfirmed. Check the connection in Device."
+      },
+      "action": "navigateDevice",
+      "devicePrimary": "connect",
+      "existingRestore": "仅当Device现有restore按钮条件满足时保留；不因新状态自动执行。",
+      "suppress": [
+        "原灯效已恢复",
+        "正在恢复，除非已有明确进行中状态"
+      ]
+    },
+    "readOnly": {
+      "title": {
+        "zh": "已识别 · 灯光暂不可用",
+        "en": "Identified · Lighting unavailable"
+      },
+      "short": {
+        "zh": "已识别 · 需检查",
+        "en": "Identified · Check connection"
+      },
+      "body": {
+        "zh": "键盘已识别，灯光控制尚未就绪。请在设备页检查连接。",
+        "en": "The keyboard is identified, but lighting control is not ready. Check the connection in Device."
+      },
+      "action": "navigateDevice",
+      "devicePrimary": "connect",
+      "suppress": [
+        "绿色ready",
+        "灯光与快捷键全部可用",
+        "未经firmwarePrompt确认的升级固件文案"
+      ]
+    },
+    "genericConnection": {
+      "title": {
+        "zh": "连接暂时中断",
+        "en": "Connection interrupted"
+      },
+      "short": {
+        "zh": "连接暂时中断",
+        "en": "Connection interrupted"
+      },
+      "body": {
+        "zh": "请确认有线模式，并关闭其他键盘设置程序。",
+        "en": "Check wired mode and close other keyboard apps."
+      },
+      "action": "navigateDevice",
+      "devicePrimary": "connect",
+      "suppress": [
+        "用此通用原因覆盖多USB、更新、只读或明确恢复原因"
+      ]
+    }
+  },
+  "commonCopy": {
+    "sidebarLabel": {
+      "zh": "键盘输出",
+      "en": "Keyboard output"
+    },
+    "offlineCapabilities": {
+      "zh": "仍可编辑、页面预览和保存。",
+      "en": "You can still edit, preview on screen and save."
+    },
+    "canvasIdentity": {
+      "zh": "当前画布 · {model}",
+      "en": "Canvas · {model}"
+    },
+    "preview": {
+      "zh": "页面预览",
+      "en": "On-screen preview"
+    },
+    "sessionPrefix": {
+      "zh": "当前会话 · ",
+      "en": "Current session · "
+    },
+    "historicalPrefix": {
+      "zh": "上次状态 · ",
+      "en": "Last known · "
+    },
+    "noArtworkPlaying": {
+      "zh": "未播放作品",
+      "en": "No artwork playing"
+    },
+    "outputUnconfirmed": {
+      "zh": "输出未确认",
+      "en": "Output unconfirmed"
+    },
+    "restored": {
+      "zh": "原灯效已恢复",
+      "en": "Original lighting restored"
+    },
+    "restoreDeferred": {
+      "zh": "下次连接时检查恢复",
+      "en": "Check recovery on reconnection"
+    },
+    "capabilitiesLoading": {
+      "zh": "正在读取灯光能力",
+      "en": "Reading lighting capabilities"
+    }
+  },
+  "outputRules": {
+    "sidebarTitle": "commonCopy.sidebarLabel，替换旧“键盘灯光”；不新增第二张连接卡。",
+    "orderedRules": [
+      {
+        "when": "stateId !== 'usbReady'",
+        "value": "对应stateMatrix.sidebar；不得使用原灯效/草稿名/未限定的缓存mode"
+      },
+      {
+        "when": "freshUsb && device.armed === true && no current blocking reason && lightPower.sleeping === true",
+        "value": {
+          "zh": "当前会话 · 灯光休眠",
+          "en": "Current session · Lighting asleep"
+        }
+      },
+      {
+        "when": "freshUsb && device.armed === true && no current blocking reason",
+        "value": "commonCopy.sessionPrefix + modeCopy；模式未知则用outputUnconfirmed"
+      },
+      {
+        "when": "freshUsb && valid verifiedRestoreEvidence && !device.armed && !pendingBlockingRecovery",
+        "value": "commonCopy.restored；公共API可能含缓存verified字段，但无本次动作/当前connectionSession绑定仍非证据，本批默认不出现"
+      },
+      {
+        "when": "freshUsb && stockOnly",
+        "value": {
+          "zh": "内置灯效可用",
+          "en": "Built-in lighting available"
+        }
+      },
+      {
+        "when": "freshUsb && capabilityUnknown",
+        "value": "commonCopy.capabilitiesLoading"
+      },
+      {
+        "when": "otherwise",
+        "value": "commonCopy.noArtworkPlaying"
+      }
+    ],
+    "modeCopy": {
+      "static": {
+        "zh": "静态灯光",
+        "en": "Static lighting"
+      },
+      "animation": {
+        "zh": "动画",
+        "en": "Animation"
+      },
+      "paused": {
+        "zh": "已暂停",
+        "en": "Paused"
+      },
+      "agent": {
+        "zh": "{agent}状态灯",
+        "en": "{agent} status lights"
+      },
+      "audio": {
+        "zh": "声音律动",
+        "en": "Audio reactive"
+      },
+      "trigger": {
+        "zh": "按键触发",
+        "en": "Key trigger"
+      },
+      "game": {
+        "zh": "{game}",
+        "en": "{game}"
+      },
+      "native": {
+        "zh": "内置灯效",
+        "en": "Built-in lighting"
+      }
+    },
+    "gameModifiers": {
+      "paused": {
+        "zh": " · 已暂停",
+        "en": " · Paused"
+      },
+      "over": {
+        "zh": " · 已结束",
+        "en": " · Finished"
+      },
+      "won": {
+        "zh": " · 已结束",
+        "en": " · Finished"
+      },
+      "rule": "终局仍归game直到现有结束动作释放；不把自然结束说成原灯效已恢复。"
+    },
+    "sentReceipt": {
+      "allowed": {
+        "zh": "已发送到键盘",
+        "en": "Sent to keyboard"
+      },
+      "rule": "仅直接对应现有成功preview/play等用户动作回执的短暂反馈；不是持续实时回读状态。跨会话、服务失败或断线后失效。",
+      "unavailable": "无明确成功回执时采用当前会话模式或未确认，不用草稿名称作输出事实。"
+    },
+    "restoreEvidencePolicy": {
+      "actualSource": "server/hardware.mjs:278-281检查恢复结果verified并调用updateState；:247-249浅合并state与result，可能保留既有verified字段。server/main.mjs:360-379调用restore后返回hardware.state，因此公共API可能含缓存verified，但缺少与本次动作/当前connectionSession绑定的恢复证据。",
+      "currentDefault": "本批默认verifiedRestoreEvidence=null；仅有公共回包或hardware.state中的verified字段不改变此默认。因此纯前端v7实施没有“原灯效已恢复”肯定兜底；idle使用“未播放作品”，不为文案新增API。",
+      "neverInferFrom": [
+        "公共回包或hardware.state中无本次动作/当前connectionSession绑定的verified=true字段",
+        "playback.mode=idle",
+        "device.armed=false",
+        "recoveryPending=false",
+        "needsRestore=false",
+        "connected=true",
+        "一次connect成功",
+        "页面预览结束"
+      ],
+      "invalidation": [
+        "connectionSessionId变化",
+        "USB断开",
+        "serviceUnknown",
+        "新的硬件播放/输出会话",
+        "新的blocking恢复错误"
+      ]
+    }
+  },
+  "capabilityRules": {
+    "perKey": {
+      "when": "knownPerKey",
+      "device": {
+        "zh": "逐键灯光可用",
+        "en": "Per-key lighting available"
+      },
+      "tone": "ready",
+      "rule": "只描述已确认的灯光能力；任务键/命令键仍由独立权限/适配控制。"
+    },
+    "stockOnly": {
+      "when": "既有nativeLightingOnly(state)为真",
+      "device": {
+        "zh": "内置灯效可用",
+        "en": "Built-in lighting available"
+      },
+      "tone": "ready for built-in capability only",
+      "work": {
+        "zh": "当前固件支持内置灯效。逐键创作可先离线编辑和保存。",
+        "en": "This firmware supports built-in lighting. You can edit and save per-key artwork offline."
+      },
+      "firmwareAction": "仅复用既有showFirmwareGuide/firmwarePrompt；不新增自动固件移交。"
+    },
+    "readOnly": {
+      "when": "usbReadOnly",
+      "stateId": "attention",
+      "reasonId": "readOnly",
+      "tone": "attention"
+    },
+    "bluetooth": {
+      "when": "bluetoothOnly",
+      "stateId": "bluetoothOnly",
+      "lighting": "unavailable",
+      "shortcuts": "independent existing readiness"
+    },
+    "unknown": {
+      "when": "freshUsb && no known per-key/stock capability",
+      "tone": "neutral",
+      "label": "commonCopy.capabilitiesLoading",
+      "rule": "不显示假成功，不擅自新增硬件探测；业务禁用沿现有条件，禁止把unknown当能力已确认。"
+    },
+    "firmware": {
+      "currentVersion": "优先现有firmware.current/device.firmware；未读取用—，缓存时标已有读取/缓存语义。",
+      "upToDateWhen": "latestConfirmed===true && status in [current,newer]，并无error/stale",
+      "checking": {
+        "zh": "正在检查官方固件",
+        "en": "Checking official firmware"
+      },
+      "stale": {
+        "zh": "官方固件信息未确认",
+        "en": "Official firmware unconfirmed"
+      },
+      "unavailable": {
+        "zh": "暂时无法检查官方固件",
+        "en": "Official firmware check unavailable"
+      },
+      "detected": {
+        "zh": "已读取当前版本",
+        "en": "Current version detected"
+      },
+      "rules": [
+        "官方查询失败不等于固件过旧",
+        "固件可选更新不自动阻断兼容逐键能力",
+        "appUpdateRequired不链接到NuPhyIO",
+        "只在既有firmwarePrompt确认时呈现NuPhyIO更新动作",
+        "未连接时不把缓存版本称当前新读取"
+      ]
+    }
+  },
+  "surfaces": {
+    "header": {
+      "placement": "沿v5页标题右侧现有连接按钮；不新增常驻大卡片。",
+      "content": "stateMatrix.header；attention桌面可用reason.short替代泛称，窄窗保留“连接需处理”。",
+      "identity": "仅serviceFresh并由sidebarDeviceIdentity确认的连接名称可前缀；画布modelId不前缀。",
+      "interaction": "点击只导航Device；serviceUnknown也可去Device，重检使用独立既有按钮。",
+      "a11y": "可见状态文字+可识别设备页入口；不依赖hover title或圆点颜色。"
+    },
+    "sidebar": {
+      "label": "commonCopy.sidebarLabel",
+      "content": "outputRules唯一结果；不独立重算connected/恢复/模式。",
+      "truncation": "短文本可单行省略，完整可访问名称必须保留；重要未确认/离线前缀不可先被裁掉。",
+      "narrow": "沿现有700px以下隐藏侧栏输出卡；主工作区与header继续承载必要状态。"
+    },
+    "workArea": {
+      "placement": "创作身份/操作区附近的一条上下文状态说明，尽量复用原output-status位置。",
+      "deduplication": "每页最多一条连接原因说明；多USB时不再追加通用USB指南、蓝牙notice、shared helper通用attention文案三重堆叠。",
+      "scope": "硬件动作被现有状态阻断时解释原因，并说明本机工作能力；正常USB无需持续notice。",
+      "preview": "页面预览有自己的标签与开始/停止反馈，不能覆盖sidebar硬件输出。",
+      "preserve": [
+        "当前草稿和型号归属",
+        "帧编辑的应用/取消",
+        "当前预览进度",
+        "既有保存/读回/重试",
+        "原有焦点返回"
+      ]
+    },
+    "device": {
+      "identity": "被动显示当前已确认设备身份；移除两型号selected-tab的选择暗示，不添加切换器。",
+      "canvas": "如需显示版型，使用commonCopy.canvasIdentity；这是画布信息而非另一把已连接设备。",
+      "status": "统一stateId/reasonId/tone；readOnly/attention/reconnecting不可套ready绿色。",
+      "reason": "具体阻断原因在最前；multipleUsb替换通用三步连接指南，给仅一把USB的说明与重新检查。",
+      "actions": "复用现有显式connect/restore/checkFirmware/checkForUpdates/返回创作；保持busy锁与条件，不自动调用。",
+      "airModule": "现有旋钮/键帽偏好保留，只改预览外观说明与独立按钮语义不变。",
+      "rawErrors": "既有错误详情可折叠/次级显示，主文案不暴露F4/journal或测试路径。"
+    }
+  },
+  "actions": {
+    "navigateDevice": {
+      "copy": {
+        "zh": "查看连接",
+        "en": "View connection"
+      },
+      "handler": "现有setPage('device')",
+      "sideEffect": "navigation only"
+    },
+    "continueCreation": {
+      "copy": {
+        "zh": "继续创作",
+        "en": "Keep creating"
+      },
+      "handler": "复用现有返回离线创作/创作入口；保留已有草稿与模式",
+      "sideEffect": "navigation only; no connect/stop/restore"
+    },
+    "refreshService": {
+      "copy": {
+        "zh": "重新检查",
+        "en": "Check again"
+      },
+      "handler": "现有refresh()与checkingService锁",
+      "sideEffect": "existing read-only state refresh"
+    },
+    "connect": {
+      "copy": {
+        "zh": "重新连接",
+        "en": "Reconnect"
+      },
+      "handler": "Device现有execute('connect')，用户明确激活",
+      "sideEffect": "existing authorized command only; no new auto trigger"
+    },
+    "checkAppUpdates": {
+      "copy": {
+        "zh": "检查应用更新",
+        "en": "Check app updates"
+      },
+      "handler": "现有nativeCodexKeys({kind:'checkForUpdates'})，显式激活",
+      "sideEffect": "existing native action only"
+    },
+    "restore": {
+      "copy": {
+        "zh": "恢复键盘原灯效",
+        "en": "Restore keyboard lighting"
+      },
+      "handler": "Device现有execute('restore')及其原条件",
+      "sideEffect": "existing explicit action; no implied success without evidence"
+    },
+    "save": {
+      "copy": {
+        "zh": "保存作品",
+        "en": "Save artwork"
+      },
+      "handler": "保留App现有save事务",
+      "sideEffect": "本地作品存储；服务未知仍可尝试，不提前宣称成功"
+    }
+  },
+  "saveContract": {
+    "usbOfflineServiceHealthy": "不因USB/Bluetooth/多USB/暂停/只读而禁用保存。保存仍进当前版型作品库，页面预览不发硬件输出。",
+    "serviceUnknown": "不擅自全局禁保存。沿用v6：用户可尝试保存→失败保留名称/画布→读回确认是否已保存→确认失败时重试；未知结果不重复创建作品。",
+    "existingMessagesPreserved": [
+      {
+        "zh": "未能完成保存。已保留名称和画布，请重试。",
+        "en": "Could not save. Your name and canvas are kept. Try again."
+      },
+      {
+        "zh": "暂时无法确认保存结果。名称和画布已保留，重试不会重复创建作品。",
+        "en": "Could not confirm the save. Your name and canvas are kept; retrying will not create a duplicate."
+      }
+    ],
+    "success": "仅保留现有成功回执或读回匹配后的成功提示；不因为客户端草稿缓存写入而称作品已保存。",
+    "evidence": "ui/src/App.tsx:153-169；不重写事务、signature核对、request id或错误恢复。"
+  },
+  "acceptanceFixtures": [
+    {
+      "id": "F01",
+      "given": "state=null,serviceError=''",
+      "expect": "loading；不出现原灯效/USB已连接"
+    },
+    {
+      "id": "F02",
+      "given": "缓存connected=true,armed=true,playback.animation；serviceError非空",
+      "expect": "serviceUnknown优先；输出未确认；画布保留，保存无全局禁用"
+    },
+    {
+      "id": "F03",
+      "given": "服务健康；无USB/蓝牙；waiting",
+      "expect": "disconnected；离线编辑/页面预览/保存；hardware output log无新增写入"
+    },
+    {
+      "id": "F04",
+      "given": "DEVICE_AMBIGUOUS；phase=reconnecting或attention",
+      "expect": "attention/multipleUsb立即显示具体原因；无generic指南堆叠；guard不变"
+    },
+    {
+      "id": "F05",
+      "given": "connectionPaused=true且无USB；保留历史error/model",
+      "expect": "paused保留用户意图；不自动connect；历史型号仅作画布"
+    },
+    {
+      "id": "F06",
+      "given": "无USB；phase=reconnecting；无具体原因",
+      "expect": "reconnecting；不宣称缓存播放已恢复"
+    },
+    {
+      "id": "F07",
+      "given": "connected=true,readOnly=true,perKey=false,phase=attention",
+      "expect": "attention/readOnly；非绿色；不凭查询失败引导固件升级"
+    },
+    {
+      "id": "F08",
+      "given": "connected=true,readOnly=false,capabilities.perKey=true,armed=true,playback.static,playing=false",
+      "expect": "usbReady；当前会话·静态灯光；不能因playing=false误报未输出"
+    },
+    {
+      "id": "F09",
+      "given": "同F08且recoveryPending=true，keyRecovery.status=active",
+      "expect": "normal journal不阻断；仍当前会话静态灯光"
+    },
+    {
+      "id": "F10",
+      "given": "freshUSB,!armed,pending=true,errorCode=RESTORE_REQUIRED",
+      "expect": "attention/lightingRecoveryBlocked；未确认恢复，不写已恢复"
+    },
+    {
+      "id": "F11",
+      "given": "freshUSB,!armed,idle,pending=false；公共回包可含缓存verified=true，但无本次动作/当前connectionSession绑定的恢复回执",
+      "expect": "未播放作品；不推断原灯效已恢复"
+    },
+    {
+      "id": "F12",
+      "given": "仅既有来源确有绑定本次恢复动作和当前connectionSessionId的verified=true回执；随后freshUSB,!armed且无待办",
+      "expect": "才可显示原灯效已恢复；session变化/服务失联立即失效"
+    },
+    {
+      "id": "F13",
+      "given": "freshUSB,旧Kick已确认stockEffects=true,perKey=false,readOnly=false",
+      "expect": "usbReady/stockOnly；内置灯效可用；离线逐键编辑保存继续；不是只读"
+    },
+    {
+      "id": "F14",
+      "given": "USB未连接,蓝牙Air已连接，保留旧Kick型号/布局",
+      "expect": "bluetoothOnly；header Air蓝牙；画布可标Kick但不冒充当前设备或切旧Kick能力页"
+    },
+    {
+      "id": "F15",
+      "given": "freshUSB能力未知；firmware.error/stale",
+      "expect": "USB连接可显示；能力读取中；官方版本未确认，不显示过旧或全部就绪"
+    },
+    {
+      "id": "F16",
+      "given": "UNSUPPORTED_FIRMWARE/phase updateRequired",
+      "expect": "attention/appUpdateRequired；检查NuPhy Lab更新，不去NuPhyIO"
+    },
+    {
+      "id": "F17",
+      "given": "新草稿名称改变或本页预览开/关，硬件会话无变化",
+      "expect": "sidebar只按实际会话mode；不跟着草稿名或页面预览改硬件输出事实"
+    },
+    {
+      "id": "F18",
+      "given": "服务未知时保存失败/丢回执，之后恢复",
+      "expect": "原v6名称/画布/ID保留，读回成功或幂等重试；无重复作品；不增加全局保存禁用"
+    },
+    {
+      "id": "F19",
+      "given": "unownedHistory=true或keyRecovery.status=active",
+      "expect": "复用helper，不将历史记录/active当当前连接阻断"
+    },
+    {
+      "id": "F20",
+      "given": "任意game over/won且mode=game/armed=true",
+      "expect": "当前会话·游戏·已结束；直到现有End动作释放，不声称已恢复"
+    },
+    {
+      "id": "F21",
+      "given": "CN/EN×1080/720/390×attention/serviceUnknown",
+      "expect": "原因和动作可见，按钮自然换行，完整可访问名，无水平溢出，不靠颜色"
+    }
+  ],
+  "verificationBoundary": "全部用隔离fixture/组件纯展示和mock command log。不得调用真实API、连断设备或改配置来验收本规范；真机V06不由这些fixture销项。",
+  "codeAnchors": [
+    "ui/src/App.tsx:191-219",
+    "ui/src/Device.tsx:24-121",
+    "ui/src/Studio.tsx:317-384",
+    "ui/src/api.ts:49-68",
+    "ui/src/KeyRecoveryPanel.tsx:4-11",
+    "shared/device-status.mjs:1-27",
+    "server/connection-recovery.mjs:25-31",
+    "server/main.mjs:360-379",
+    "server/main.mjs:882-913",
+    "server/hardware.mjs:273-285",
+    "native/HIDBridge.swift:865-867"
+  ],
+  "completion": "本文件仅追加v7-experience/spec；research、v5、v6和生产源码未改。"
+}

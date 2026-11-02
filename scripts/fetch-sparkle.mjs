@@ -18,7 +18,9 @@ export async function ensureSparkle() {
   if(createHash('sha256').update(data).digest('hex')!==config.sparkleSHA256)throw new Error('Sparkle checksum mismatch');
   await writeFile(archive,data);
   await mkdir(sparkleDirectory,{recursive:true});
-  execFileSync('/usr/bin/tar',['-xJf',archive,'-C',sparkleDirectory]);
+  // Keep the pinned SDK archive intact, and extract only build/release inputs.
+  // Debug symbols and the vendor's demo app are unnecessary project copies.
+  execFileSync('/usr/bin/tar',['-xJf',archive,'-C',sparkleDirectory,'./Sparkle.framework','./bin','./LICENSE']);
   await access(path.join(sparkleDirectory,'Sparkle.framework/Sparkle'));
   return sparkleDirectory;
 }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {LightingPower,DEFAULT_LIGHT_TIME_MS} from '../shared/lighting-power.mjs';
+import {LightingPower,DEFAULT_LIGHT_TIME_MS,lightingTimerDeadline} from '../shared/lighting-power.mjs';
 import {CodexLights} from '../shared/codex-lighting.mjs';
 import {Store,defaultSettings,validateSettings} from '../server/storage.mjs';
 import {translate} from '../shared/i18n.mjs';
@@ -33,6 +33,36 @@ test('light timer stays off after duration and only explicit wake restarts it',(
  now=1000;assert.equal(power.update(settings).reason,'duration');
  now=2000;power.activity();assert.equal(power.update(settings).sleeping,true);
  power.wake();assert.equal(power.update(settings).remainingMs,1000);
+});
+test('two-hour duration and one-hour idle remain awake for minutes and idle activity cannot extend the duration',()=>{
+ let now=0;const power=new LightingPower(()=>now),settings={lightDurationMs:7200000,lightIdleMs:3600000};
+ for(const at of [60000,300000,3599999]){now=at;power.observeSystemIdle(at);assert.equal(power.update(settings).sleeping,false);}
+ now=3600000;const asleep=power.update(settings);
+ assert.equal(asleep.reason,'idle');assert.equal(asleep.remainingMs,3600000);
+ now+=10000;power.activity();const resumed=power.update(settings);
+ assert.equal(resumed.sleeping,false);assert.equal(resumed.remainingMs,3590000,'app activity keeps the original duration deadline');
+ now=7200000;assert.equal(power.update(settings).reason,'duration');
+ power.activity();assert.equal(power.update(settings).reason,'duration','typing cannot renew an expired session');
+ power.wake();assert.equal(power.update(settings).remainingMs,7200000);
+});
+test('system activity resumes idle lights without renewing duration, which also expires while idle',()=>{
+ let now=0;const power=new LightingPower(()=>now),settings={lightDurationMs:7200000,lightIdleMs:3600000};
+ now=3600000;assert.equal(power.update(settings).reason,'idle');
+ now=3601000;power.observeSystemIdle(10);assert.equal(power.update(settings).sleeping,false);
+ assert.equal(power.snapshot(settings).remainingMs,3599000);
+ now=7200000;assert.equal(power.update(settings).reason,'duration');
+ power.observeSystemIdle(0);assert.equal(power.update(settings).reason,'duration');
+ const idle=new LightingPower(()=>now);now+=3600000;assert.equal(idle.update(settings).reason,'idle');
+ now+=3600000;assert.equal(idle.update(settings).reason,'duration','the fixed deadline expires even without an intervening wake');
+});
+test('timer diagnostics report the earliest independent deadline, including one or both timers disabled',()=>{
+ const state={sleeping:false,reason:null,remainingMs:7200000,idleMs:60000};
+ assert.deepEqual(lightingTimerDeadline(state,{lightDurationMs:7200000,lightIdleMs:3600000}),
+  {durationRemainingMs:7200000,idleRemainingMs:3540000,nextSleepInMs:3540000,nextSleepReason:'idle'});
+ assert.equal(lightingTimerDeadline(state,{lightDurationMs:7200000,lightIdleMs:0}).nextSleepReason,'duration');
+ assert.equal(lightingTimerDeadline(state,{lightDurationMs:0,lightIdleMs:3600000}).nextSleepReason,'idle');
+ assert.equal(lightingTimerDeadline(state,{lightDurationMs:0,lightIdleMs:0}).nextSleepInMs,null);
+ assert.equal(lightingTimerDeadline({...state,sleeping:true,reason:'duration'},{lightDurationMs:7200000,lightIdleMs:3600000}).nextSleepReason,'duration');
 });
 test('idle sleep uses system and app activity without polling extending the timeout',()=>{
  let now=0;const power=new LightingPower(()=>now),settings={lightIdleMs:1000};

@@ -4,5 +4,6 @@ export { DEFAULT_COLOR };
 export const heartColors = (layout: Key[], color = DEFAULT_COLOR) => createHeart(layout, color);
 export const presetCatalog = (layout: Key[]) => createPresets(layout);
 export function presets(layout: Key[]): Scene[] {
-  return presetCatalog(layout).map(({ name, colors, animation }) => ({ name, colors, animation }));
+  return presetCatalog(layout).map(({ name, colors, animation, trigger }) => ({ name, colors, animation,
+    ...(trigger?{trigger:{...trigger}}:{}) }));
 }

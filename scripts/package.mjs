@@ -6,6 +6,7 @@ import {signingIdentity,signApp,BUNDLE_ID,requireDistributionIdentity} from './s
 import {runtimePath,verifyRuntime} from './fetch-node.mjs';
 import {access} from 'node:fs/promises';
 import {constants} from 'node:fs';
+import {releaseNotes} from './release-notes.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const app = path.resolve(
     process.argv[2] ?? path.join(root, "release/NuPhy Lab.app"),
@@ -20,6 +21,7 @@ if (process.env.AIR_STUDIO_DISTRIBUTION === '1' || identity.name.startsWith('Dev
 const {version} = JSON.parse(await readFile(path.join(root,'package.json'),'utf8'));
 const updates = JSON.parse(await readFile(path.join(root,'config/updates.json'),'utf8'));
 if (!/^\d+\.\d+\.\d+$/.test(version)) throw new Error('Invalid app version.');
+const updateNotes=releaseNotes(JSON.parse(await readFile(path.join(root,`updates/release-notes/${version}.json`),'utf8')),version);
 // The bundled runtime must not depend on anything outside the .app. A package
 // manager's node links against its own libraries and would fail on another Mac.
 const runtime = await (async () => {
@@ -38,6 +40,7 @@ await rm(app, { recursive: true, force: true });
 await mkdir(path.join(contents, "MacOS"), { recursive: true });
 await mkdir(path.join(resources, "runtime"), { recursive: true });
 await mkdir(path.join(contents,'Frameworks'),{recursive:true});
+await writeFile(path.join(resources,'update-metadata.json'),JSON.stringify({version,releaseNotesVersion:updateNotes.version,releaseNotesSHA256:updateNotes.sha256},null,2)+'\n');
 // ditto preserves Sparkle's versioned symlinks and executable permissions.
 execFileSync('/usr/bin/ditto',[path.join(root,'vendor/sparkle/Sparkle.framework'),path.join(contents,'Frameworks/Sparkle.framework')]);
 // "hooks" carries the Claude Code hook scripts the app installs on request.

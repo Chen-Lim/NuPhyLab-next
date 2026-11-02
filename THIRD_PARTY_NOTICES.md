@@ -1,10 +1,8 @@
-# Third-party notices / 第三方声明
+# Third-party notices
 
-[Documentation / 文档目录](docs/README.md)
+[Documentation](docs/README.md)
 
-Original attribution, license notices and source references are retained below. The bilingual introduction does not replace or modify any license terms.
-
-下方保留第三方署名、许可声明和来源，双语导读不替代或修改任何许可条款。
+Original attribution, license notices and source references are retained below. This introduction does not replace or modify any license terms.
 
 # Third-party acknowledgements
 

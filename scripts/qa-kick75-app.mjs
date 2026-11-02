@@ -11,6 +11,8 @@ import { setTimeout as delay } from "node:timers/promises";
 import { createPresets } from "../shared/presets.mjs";
 import { kickLayout } from "../shared/layout.mjs";
 import { GAME_TYPES } from "../shared/games.mjs";
+import { applyArtworkAppearance } from "../shared/render-animation.mjs";
+import { triggerPlaybackConfig } from "../shared/trigger.mjs";
 
 const args = process.argv.slice(2);
 if (args.length < 2 || args.length > 3 || (args[2] && args[2] !== "--trigger")) {
@@ -160,10 +162,56 @@ async function run(runtimePath, reportPath, includeTrigger) {
     } });
     await command("stop");
     const catalog = createPresets(kickLayout);
-    assert.equal(catalog.length, 12, "Expected the complete twelve-preset catalog");
+    assert.equal(catalog.length, 7, "Expected the curated seven-preset catalog");
     for (const preset of catalog) {
       ensureRunning();
       const before = (await state()).playback.framesSent;
+      if (preset.trigger?.effect === "cross") {
+        // A typing preset waits for an actual key or an explicit software test;
+        // playing its thumbnail as an ordinary animation would test another path.
+        await command("triggerArm", {
+          colors: applyArtworkAppearance(preset.colors, preset.animation),
+          trigger: triggerPlaybackConfig(preset.trigger, preset.animation),
+        });
+        const armed = await state();
+        assert.equal(armed.trigger.armed, true);
+        assert.equal(armed.trigger.activeWaves, 0);
+        assert(normalize(armed.colors).every((color) => color === "#000000"), `${preset.id}: arming must wait in black`);
+        await command("triggerFire", { code: "Space" });
+        await delay(report.presetPlaybackMs);
+        ensureRunning();
+        const active = await state();
+        assert.equal(active.playback.mode, "trigger");
+        assert.equal(active.trigger.armed, true);
+        assert(active.trigger.activeWaves > 0, `${preset.id}: explicit Space did not start a wave`);
+        assert(normalize(active.colors).some((color) => color !== "#000000"), `${preset.id}: cross never reached the key output`);
+        const liveReadback = await command("verifyColors");
+        assert.equal(liveReadback.checked, 80);
+        assert.equal(liveReadback.matches, true, `${preset.id}: moving wave failed native RGB readback`);
+        assert.deepEqual(liveReadback.mismatches, []);
+        const deadline = performance.now() + 3000;
+        let finished;
+        do {
+          ensureRunning();
+          finished = await state();
+          if (!finished.trigger.flashing && finished.trigger.activeWaves === 0
+            && normalize(finished.colors).every((color) => color === "#000000")) break;
+          assert(performance.now() < deadline, `${preset.id}: wave did not fade to black`);
+          await delay(50);
+        } while (true);
+        const tail = await verifyPaused(`Preset ${preset.id} tail`);
+        assert.equal(tail.playback.mode, "trigger");
+        assert.equal(tail.trigger.armed, true, `${preset.id}: completing a wave must keep the trigger armed`);
+        const read = await command("readColors");
+        assert.equal(read.colors.length, 85);
+        assert.deepEqual(normalize(read.colors.slice(80)), Array(5).fill("#000000"), `${preset.id}: side LEDs must stay dark`);
+        assert(tail.playback.framesSent > before, `${preset.id}: no RGB frame reached the service output`);
+        report.presets.push({ id: preset.id, framesSent: tail.playback.framesSent - before, checked: 80,
+          exactReadback: true, softwareFire: "Space", remainsArmed: true, sideLEDsDark: 5 });
+        await command("triggerStop");
+        check(`Preset ${preset.id}: explicit Space trigger, exact 80-key readback and black tail while armed`);
+        continue;
+      }
       await command("play", { colors: preset.colors, animation: preset.animation });
       await delay(report.presetPlaybackMs);
       ensureRunning();
@@ -248,7 +296,8 @@ async function run(runtimePath, reportPath, includeTrigger) {
   }
   report.finishedAt = new Date().toISOString();
   report.passed = report.testCasesCompleted === true && !report.error && !interrupted
-    && report.presets.length === 12 && report.games.length === 4
+    && report.presets.length === 7 && report.presets.some((preset) => preset.id === "typing-cross" && preset.remainsArmed)
+    && report.games.length === 4
     && report.cleanup.original17BytesRestored === true && report.cleanup.errors.length === 0;
   try { await writeFile(reportPath, JSON.stringify(report, null, 2) + "\n", { mode: 0o600 }); }
   catch (error) {
@@ -256,7 +305,7 @@ async function run(runtimePath, reportPath, includeTrigger) {
     process.exitCode = 1;
     return;
   }
-  if (report.passed) console.log("Kick75 application acceptance passed: 12 presets, 4 games and complete restoration.");
+  if (report.passed) console.log("Kick75 application acceptance passed: 7 presets, 4 games and complete restoration.");
   else {
     const reason = report.error ?? (report.cleanup.errors.map((item) => item.error).join("; ") || "interrupted or incomplete");
     console.error("Kick75 application acceptance failed: " + reason);

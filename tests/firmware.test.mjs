@@ -202,7 +202,7 @@ test("known old Kick firmware receives an upgrade requirement even when the offi
   assert.equal(result.updateAvailable,false);
   assert.equal(result.upgradeRecommended,true);
   assert.equal(result.compatible,false,'the upgrade hint cannot make an unsupported protocol usable');
-  assert.equal(result.updateUrl,'https://drive.nuphy.io/?lang=zh-CN');
+  assert.equal(result.updateUrl,'https://drive.nuphyio.com/#/setting');
 });
 
 test("upgrade guidance does not recommend a downgrade or guess unknown firmware and unsupported models", async () => {
@@ -264,7 +264,7 @@ test("a failed LED-count handshake retains the identified keyboard's firmware up
   assert.equal(result.compatible,false);
   assert.equal(result.perKeyReady,false);
   assert.equal(result.functionKeysReady,false);
-  assert.equal(result.updateUrl,'https://drive.nuphy.io/?lang=zh-CN');
+  assert.equal(result.updateUrl,'https://drive.nuphyio.com/#/setting');
   const unplugged=checker.snapshot({...legacy,identified:false,firmwareDetectionAvailable:false,firmwareVersion:null});
   assert.equal(unplugged.status,'disconnected');
   assert.equal(unplugged.firmwareDetectionAvailable,false);

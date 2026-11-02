@@ -1,5 +1,7 @@
 // Connection failures are recoverable states, not permanent incompatibility.
-// Re-probe with backoff; never repeat a lighting/keymap write here.
+// Re-probe failures with backoff; never repeat a lighting/keymap write here.
+// A missing keyboard is ordinary waiting, not a failed protocol probe. Keep
+// discovery responsive after a long unplugged period instead of waiting 15 s.
 export class ConnectionRecovery {
   constructor({now = () => performance.now()} = {}) {
     this.now = now;
@@ -18,6 +20,8 @@ export class ConnectionRecovery {
     this.inFlight = false;
     if (device.connected && device.readOnly !== true) {
       this.attempts = 0; this.nextAttempt = 0;
+    } else if (!device.connected && device.errorCode === 'DEVICE_NOT_FOUND') {
+      this.attempts = 0; this.nextAttempt = this.now() + 500;
     } else this.nextAttempt = this.now() + Math.min(15000, 1000 * 2 ** Math.min(this.attempts - 1, 4));
   }
   reset() { this.attempts = 0; this.nextAttempt = 0; this.inFlight = false; }

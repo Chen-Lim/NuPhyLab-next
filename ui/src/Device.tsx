@@ -9,6 +9,7 @@ import { nativeCodexKeys } from "./codexKeys";
 import { FunctionKeyRecoveryDialog } from "./FunctionKeyRecoveryDialog";
 import type { ConnectionDisplay } from "../../shared/connection-display.mjs";
 import { connectionCopy } from "./connection-copy-v7";
+import { t } from "./i18n";
 import "./device-settings-v5.css";
 import "./settings-overlays-v6.css";
 import "./device-connection-v7.css";
@@ -111,8 +112,8 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
           ].map(([label,value],index)=><div key={index}><dt>{label}</dt><dd className={index===3?"is-unavailable":""}>{value}</dd></div>)}
         </dl>
       </>}
-      {actionError&&<div className="settings-v6-note is-error" role="alert">{actionError}</div>}
-      {Boolean(device?.storageWarning)&&<p className="lab-device-error">{String(device?.storageWarning)}</p>}
+      {actionError&&<div className="settings-v6-note is-error" role="alert">{t(actionError)}</div>}
+      {Boolean(device?.storageWarning)&&<p className="lab-device-error">{t(String(device?.storageWarning))}</p>}
       <div className="lab-device-connection-actions">
         {onOffline&&<Button kind={multipleUsb?"primary":"ghost"} onClick={onOffline}>{copy("继续离线创作","Continue offline")}</Button>}
         <Button kind={multipleUsb?"secondary":"primary"} disabled={display.devicePrimaryAction==="refreshService"?!onRefresh:!state} busy={Boolean(busy)||display.stateId==="reconnecting"} onClick={()=>run(connectionAction())}>
@@ -129,8 +130,8 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
       <h3>{copy("灯光播放需要 USB 连接", "USB connection required for lighting")}</h3>
       <ol><li>{copy("将键盘切换到有线模式。", "Switch your keyboard to wired mode.")}</li><li>{copy("使用支持数据传输的 USB 线连接电脑。", "Connect a USB data cable to your computer.")}</li><li>{copy("关闭其他正在连接键盘的软件后重试。", "Close other keyboard apps and try again.")}</li></ol>
     </div></div>
-    {connectionError && <div className="lab-device-error" role="status"><CircleAlert size={16}/><span>{connectionError}</span></div>}
-    {actionError && <div className="settings-v6-note is-error" role="alert">{actionError}</div>}
+    {connectionError && <div className="lab-device-error" role="status"><CircleAlert size={16}/><span>{t(connectionError)}</span></div>}
+    {actionError && <div className="settings-v6-note is-error" role="alert">{t(actionError)}</div>}
     {device?.errorCode === "DEVICE_AMBIGUOUS" && <p className="lab-device-error">{copy("检测到多把支持的键盘，请仅用数据线连接要使用的一把。","Multiple supported keyboards were found. Connect only the one you want to use by USB.")}</p>}
     {state?.bluetooth?.status === "ambiguous" && <p className="lab-device-error">{copy("检测到多把 Air75 V3 蓝牙键盘，请只连接要使用的一把。", "Multiple Air75 V3 keyboards found. Connect only the one you want to use.")}</p>}
     <div className="lab-device-footer">{onOffline && <Button kind="ghost" icon={<ArrowLeft size={16}/>} onClick={onOffline}>{copy("返回离线创作", "Back to offline creation")}</Button>}<Button kind="primary" icon={<RotateCcw size={16}/>} disabled={!state} busy={Boolean(busy) || phase === "reconnecting"} onClick={() => run(execute("connect"))}>{copy(phase === "reconnecting" ? "正在重新连接" : "重新连接",phase === "reconnecting" ? "Reconnecting" : "Reconnect")}</Button></div>
@@ -152,9 +153,9 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
         <div className="lab-device-restore"><Button kind="ghost" icon={<RotateCcw size={16}/>} disabled={!connected || Boolean(busy)} busy={busy === "restore"} onClick={() => run(execute("restore"))}>{copy("恢复键盘原灯效", "Restore keyboard lighting")}</Button></div>
         {recoveryPending&&<div className="function-key-recovery-entry"><p>{copy("部分按键的原功能尚未确认，可先检查当前键盘。","Some original key functions have not been confirmed. Check the connected keyboard first.")}</p><Button kind="ghost" disabled={!connected||Boolean(busy)||Boolean(serviceError)} onClick={event=>{recoveryTrigger.current=event.currentTarget;setRecoveryOpen(true);}}>{copy("检查并恢复按键","Check and restore keys")}</Button></div>}
         {wireless && !display && <p className="lab-device-note">{copy("任务键和命令键继续可用，灯光保持键盘自身的设置。", "Task and command keys remain available. The keyboard keeps its own lighting.")}</p>}
-        {connectionError && <div className={display?"lab-device-reconnect-v7":"lab-device-error"} role={display?undefined:"status"}>{!display&&<><CircleAlert size={16}/><span>{connectionError}</span></>}<Button disabled={Boolean(busy)} onClick={() => run(phase === "updateRequired" ? nativeCodexKeys({kind: "checkForUpdates"}) : execute("connect"))}>{copy(phase === "updateRequired" ? "检查更新" : "重新连接", phase === "updateRequired" ? "Check for updates" : "Reconnect")}</Button></div>}
-        {Boolean(device?.storageWarning) && <p className="lab-device-error">{String(device?.storageWarning)}</p>}
-        {actionError && <div className="settings-v6-note is-error" role="alert">{actionError}</div>}
+        {connectionError && <div className={display?"lab-device-reconnect-v7":"lab-device-error"} role={display?undefined:"status"}>{!display&&<><CircleAlert size={16}/><span>{t(connectionError)}</span></>}<Button disabled={Boolean(busy)} onClick={() => run(phase === "updateRequired" ? nativeCodexKeys({kind: "checkForUpdates"}) : execute("connect"))}>{copy(phase === "updateRequired" ? "检查更新" : "重新连接", phase === "updateRequired" ? "Check for updates" : "Reconnect")}</Button></div>}
+        {Boolean(device?.storageWarning) && <p className="lab-device-error">{t(String(device?.storageWarning))}</p>}
+        {actionError && <div className="settings-v6-note is-error" role="alert">{t(actionError)}</div>}
       </div>
       <aside className="lab-device-inspector">
         <h2>{copy(kick ? "设备信息" : "设备配置", kick ? "Device information" : "Device configuration")}</h2>
@@ -176,7 +177,7 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
           <p>{copy(firmwareUnconfirmed?"上次读取版本":"当前版本", firmwareUnconfirmed?"Last known version":"Current version")} {firmware?.current || device?.firmware || "—"}</p>
           {firmware?.latest && <p>{firmwareUnconfirmed?`${copy("上次状态","Last known state")} · `:""}{copy("官方版本", "Official version")} {firmware.latest}</p>}
           {(!(firmware?.error || firmware?.stale) || firmware?.checking) && <p role="status">{firmwareUnconfirmed?copy("上次状态","Last known state"):firmwareStatus}</p>}
-          {(firmware?.error || firmware?.stale) && !firmware?.checking && <p className="settings-v6-note is-error" role="status">{copy("暂时无法检查官方最新固件，请稍后重试。","Could not check the latest official firmware. Try again later.")}{firmware.error&&<span className="settings-v6-error-detail">{firmware.error}</span>}</p>}
+          {(firmware?.error || firmware?.stale) && !firmware?.checking && <p className="settings-v6-note is-error" role="status">{copy("暂时无法检查官方最新固件，请稍后重试。","Could not check the latest official firmware. Try again later.")}{firmware.error&&<span className="settings-v6-error-detail">{t(firmware.error)}</span>}</p>}
           <Button disabled={!connected || Boolean(busy) || firmware?.checking} busy={busy === "checkFirmware"} onClick={() => run(execute("checkFirmware"))}>{copy("检查固件", "Check firmware")}</Button>
           {outdated && <Button kind="primary" onClick={showFirmwareGuide}>{copy("前往 NuPhyIO 更新", "Update in NuPhyIO")}</Button>}
         </div></details>

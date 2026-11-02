@@ -25,6 +25,8 @@ import { Keyboard, lightingPeak } from "./Keyboard";
 import { Button, Empty, Modal, run } from "./primitives";
 import { presetCatalog } from "./presets";
 import { applyArtworkAppearance, renderAnimation } from "../../shared/render-animation.mjs";
+import { triggerPlaybackConfig } from "../../shared/trigger.mjs";
+import { TypingCross, typingCrossThumbnail } from "../../shared/typing-cross.mjs";
 import type { Preset } from "../../shared/presets.mjs";
 import type { AppState, Command, Key, Notify, Scene } from "./types";
 const effectNames: Record<string, string> = {
@@ -34,6 +36,10 @@ const effectNames: Record<string, string> = {
   wave: "波浪",
   frames: "逐帧",
 };
+const thumbnailColors=(scene:Pick<Scene,'colors'|'animation'|'trigger'>,layout:Key[])=>
+  scene.trigger?.effect==='cross'
+    ?typingCrossThumbnail(layout,triggerPlaybackConfig(scene.trigger,scene.animation).color)
+    :applyArtworkAppearance(scene.colors,scene.animation);
 export function Library({
   state,
   layout,
@@ -41,6 +47,7 @@ export function Library({
   serviceError='',
   transitionBusy=false,
   onLoad,
+  onPlay,
   onNew,
   command,
   notify,
@@ -50,7 +57,8 @@ export function Library({
   display?: ConnectionDisplay;
   serviceError?: string;
   transitionBusy?: boolean;
-  onLoad: (scene: Scene, options?:{play?:boolean}) => void;
+  onLoad: (scene: Scene) => void;
+  onPlay: (scene: Scene) => void;
   onNew: () => void;
   command: Command;
   notify: Notify;
@@ -76,14 +84,16 @@ export function Library({
   const transitionBlocked=busy||transitionBusy;
   const triggerPlayReason=(scene:Scene)=>{
     if(!scene.trigger)return '';
-    if(!layout.some(key=>scene.colors[key.index]?.toLowerCase()!=='#000000'))return tr('图案中还没有亮起的按键，先编辑图案。');
     if((scene.animation.brightness??100)===0)return tr('作品亮度为 0%，调高后可启用按键触发。');
+    if(scene.trigger.effect==='cross')return triggerPlaybackConfig(scene.trigger,scene.animation).color?.toLowerCase()==='#000000'
+      ?tr('当前设置下图案没有亮起的按键，请调整颜色或作品亮度。'):'';
+    if(!layout.some(key=>scene.colors[key.index]?.toLowerCase()!=='#000000'))return tr('图案中还没有亮起的按键，先编辑图案。');
     if(!applyArtworkAppearance(scene.colors,scene.animation).some((color,index)=>layout.some(key=>key.index===index)&&color.toLowerCase()!=='#000000'))return tr('当前设置下图案没有亮起的按键，请调整颜色或作品亮度。');
     return '';
   };
   const playFromLibrary=(scene:Scene)=>{
     if(outputBlocked||transitionBlocked||Boolean(triggerPlayReason(scene)))return;
-    setPreviewId(undefined);onLoad(scene,{play:true});
+    setPreviewId(undefined);onPlay(scene);
   };
   const catalog = useMemo(() => layout.length ? presetCatalog(layout) : [], [layout]);
   const matchingPresets = catalog.filter((preset) =>
@@ -110,7 +120,8 @@ export function Library({
     if(transitionBlocked)return;
     setPreviewId(undefined);
     // Preset identity belongs to the catalog; each saved edit gets a fresh scene ID.
-    const scene={ name: tr(preset.name), colors: preset.colors, animation: preset.animation };
+    const scene:Scene={ name: tr(preset.name), colors: preset.colors, animation: preset.animation,
+      ...(preset.trigger?{trigger:{...preset.trigger}}:{}) };
     if(play)playFromLibrary(scene);else onLoad(scene);
   };
   const fileInput = useRef<HTMLInputElement>(null),searchInput = useRef<HTMLInputElement>(null);
@@ -186,12 +197,13 @@ export function Library({
         <div className="lab-library-categories" role="group" aria-label={tr("预设分类")}>{([["all","全部"],["pattern","动态图形"],["motion","氛围灯效"]] as const).map(([id,label]) => <button key={id} aria-pressed={category === id} onClick={() => setCategory(id)}>{tr(label)}</button>)}</div>
         {!layout.length ? <Empty icon={<FolderOpen size={28}/>} title={tr("正在读取键盘布局")}>{tr("布局就绪后显示预设图案。")}</Empty> : matchingPresets.length ? <div className="lab-library-grid">{matchingPresets.map(preset => <article className="lab-library-item" key={preset.id}>
           <button className="lab-library-art" disabled={transitionBlocked} aria-label={tr(`打开预设 ${tr(preset.name)}`)} onClick={() => openPreset(preset)}><PresetKeyboard preset={preset} layout={layout} active={previewId === preset.id}/></button>
-          <div className="lab-library-item-info"><div className="lab-library-item-meta"><h3>{tr(preset.name)}</h3><p>{tr(effectNames[preset.animation.effect] || preset.animation.effect)}</p></div><div className="lab-library-item-actions"><button className="lab-library-preview" aria-pressed={previewId === preset.id} aria-label={tr(`${previewId === preset.id ? "停止页面预览" : "仅页面预览"} ${tr(preset.name)}`)} onClick={() => setPreviewId(previewId === preset.id ? undefined : preset.id)}>{previewId === preset.id ? <Pause size={14}/> : <Eye size={14}/>}<span>{tr(previewId === preset.id ? "停止页面预览" : "仅页面预览")}</span></button><Button kind="ghost" disabled={transitionBlocked} onClick={() => openPreset(preset)} aria-label={tr(`使用预设 ${tr(preset.name)}`)}>{tr("打开编辑")}</Button><Button className="lab-library-play-v8" icon={<Play size={14}/>} disabled={outputBlocked||transitionBlocked} aria-describedby={outputReason?"library-play-reason":undefined} onClick={()=>openPreset(preset,true)} aria-label={tr(`播放预设 ${tr(preset.name)} 到键盘`)}>{tr("播放到键盘")}</Button></div></div>
+          <div className="lab-library-item-info"><div className="lab-library-item-meta"><h3>{tr(preset.name)}</h3><p>{tr(preset.trigger?"按键触发":effectNames[preset.animation.effect] || preset.animation.effect)}</p></div><div className="lab-library-item-actions"><button className="lab-library-preview" aria-pressed={previewId === preset.id} aria-label={tr(`${previewId === preset.id ? "停止页面预览" : "仅页面预览"} ${tr(preset.name)}`)} onClick={() => setPreviewId(previewId === preset.id ? undefined : preset.id)}>{previewId === preset.id ? <Pause size={14}/> : <Eye size={14}/>}<span>{tr(previewId === preset.id ? "停止页面预览" : "仅页面预览")}</span></button><Button kind="ghost" disabled={transitionBlocked} onClick={() => openPreset(preset)} aria-label={tr(`使用预设 ${tr(preset.name)}`)}>{tr("打开编辑")}</Button><Button className="lab-library-play-v8" icon={<Play size={14}/>} disabled={outputBlocked||transitionBlocked||Boolean(triggerPlayReason(preset))} aria-describedby={outputReason?"library-play-reason":triggerPlayReason(preset)?`library-trigger-reason-${preset.id}`:undefined} onClick={()=>openPreset(preset,true)} aria-label={tr(preset.trigger?`启用预设 ${tr(preset.name)} 的按键触发`:`播放预设 ${tr(preset.name)} 到键盘`)}>{tr(preset.trigger?"启用按键触发":"播放到键盘")}</Button></div></div>
           <details className="lab-preset-description"><summary>{tr("效果说明")}</summary><p>{tr(preset.description)}</p></details>
+          {triggerPlayReason(preset)&&<p id={`library-trigger-reason-${preset.id}`} className="lab-library-play-reason-v8">{triggerPlayReason(preset)}</p>}
         </article>)}</div> : <div className="lab-library-empty-v6"><Empty title={tr("没有匹配的预设")} actions={<Button kind="primary" onClick={clearSearch}>{tr("清空搜索")}</Button>}>{tr("换个关键词或分类试试。")}</Empty></div>}
-        <p className="lab-library-footnote">{tr("页面预览仅在屏幕显示；播放到键盘后可继续编辑。")}</p>
+        <p className="lab-library-footnote">{tr(previewId&&catalog.some(preset=>preset.id===previewId&&preset.trigger?.effect==='cross')?'等待按键 · 每次按键产生独立光波':'页面预览仅在屏幕显示；播放到键盘后可继续编辑。')}</p>
       </section> : !state ? <Empty icon={<FolderOpen size={28}/>} title={tr("正在读取作品")}>{tr("作品库就绪后显示已保存的作品。")}</Empty> : filtered.length ? <><div className="lab-library-grid lab-saved-grid">{filtered.map(scene => <article key={scene.id} className="lab-library-item">
-        <button className="lab-library-art" disabled={transitionBlocked} onClick={() => onLoad(scene)} aria-label={tr(`打开作品 ${scene.name}`)}><Keyboard layout={layout} colors={applyArtworkAppearance(scene.colors,scene.animation)} mini/></button>
+        <button className="lab-library-art" disabled={transitionBlocked} onClick={() => onLoad(scene)} aria-label={tr(`打开作品 ${scene.name}`)}><Keyboard layout={layout} colors={thumbnailColors(scene,layout)} mini/></button>
         <div className="lab-library-item-info"><div className="lab-library-item-meta"><h3 translate="no">{scene.name}</h3><p>{tr(scene.trigger ? "按键触发" : scene.animation.effect === "static" ? "绘制" : "动画")}{!scene.trigger && scene.animation.effect === "frames" ? tr(` · ${scene.animation.frames?.length || 0} 帧`) : ""}{scene.updatedAt ? ` · ${new Date(scene.updatedAt).toLocaleDateString(dateLocale(),{month:"numeric",day:"numeric"})}` : ""}</p></div>
           <div className="lab-library-item-actions"><Button kind="ghost" disabled={transitionBlocked} onClick={() => onLoad(scene)}>{tr("打开编辑")}</Button><Button className="lab-library-play-v8" icon={<Play size={14}/>} disabled={outputBlocked||transitionBlocked||Boolean(Boolean(triggerPlayReason(scene)))} aria-describedby={outputReason?"library-play-reason":triggerPlayReason(scene)?`library-trigger-reason-${scene.id}`:undefined} onClick={()=>playFromLibrary(scene)} aria-label={tr(scene.trigger?`启用作品 ${scene.name} 的按键触发`:`播放作品 ${scene.name} 到键盘`)}>{tr(scene.trigger?"启用按键触发":"播放到键盘")}</Button><div className="lab-library-menu"><Button kind="ghost" className="icon-button" icon={<MoreHorizontal size={18}/>} aria-label={tr(`作品 ${scene.name} 的更多操作`)} aria-expanded={menu === scene.id} disabled={busy} onClick={event=>openMenu(scene.id,event.currentTarget)} onKeyDown={event=>{if(event.key==="ArrowDown"||event.key==="ArrowUp"){event.preventDefault();openMenu(scene.id,event.currentTarget,event.key==="ArrowUp");}}}/>
           {menu === scene.id && <div className="lab-library-dropdown" role="menu" data-flip={menuFlip} aria-label={tr('作品操作')} onKeyDown={event=>{
@@ -218,7 +230,9 @@ export function Library({
 }
 
 function PresetKeyboard({ preset, layout, active }: { preset: Preset; layout: Key[]; active: boolean }) {
-  const [colors, setColors] = useState(preset.colors);
+  const thumbnail=useMemo(()=>thumbnailColors(preset,layout),[preset,layout]);
+  const crossConfig=useMemo(()=>preset.trigger?.effect==='cross'?triggerPlaybackConfig(preset.trigger,preset.animation as Scene['animation']):null,[preset]);
+  const [colors, setColors] = useState(thumbnail);
   const [reducedMotion,setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   useEffect(() => {
     const media=window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -226,15 +240,31 @@ function PresetKeyboard({ preset, layout, active }: { preset: Preset; layout: Ke
     media.addEventListener('change',update);update();
     return () => media.removeEventListener('change',update);
   }, []);
-  const peak = useMemo(() => lightingPeak([preset.colors, ...preset.animation.frames.map(frame => frame.colors)]), [preset]);
+  const peak = useMemo(() => lightingPeak(crossConfig?[thumbnail]:[preset.colors, ...preset.animation.frames.map(frame => frame.colors)]), [preset,crossConfig,thumbnail]);
   useEffect(() => {
     if (!active) return;
+    if(crossConfig){
+      const cross=new TypingCross(layout);
+      let frame:number|null=null,stopped=false;
+      setColors(cross.render(window.performance.now(),crossConfig));
+      const update=(now:number)=>{
+        if(stopped)return;
+        frame=null;setColors(cross.render(now,crossConfig));
+        if(cross.activeWaves)frame=window.requestAnimationFrame(update);
+      };
+      const keydown=(event:KeyboardEvent)=>{
+        if(event.repeat||!cross.fire(event.code,window.performance.now()))return;
+        if(frame===null)frame=window.requestAnimationFrame(update);
+      };
+      window.addEventListener('keydown',keydown);
+      return()=>{stopped=true;window.removeEventListener('keydown',keydown);if(frame!==null)window.cancelAnimationFrame(frame);cross.clear();};
+    }
     const start = performance.now();
     const update = () => setColors(renderAnimation(preset.colors, preset.animation, performance.now() - start));
     update();
     if (reducedMotion) return;
     const timer = window.setInterval(update, 60);
     return () => window.clearInterval(timer);
-  }, [active, preset, reducedMotion]);
-  return <Keyboard layout={layout} colors={active ? colors : applyArtworkAppearance(preset.colors,preset.animation)} lightPreview lightPreviewPeak={peak} mini />;
+  }, [active, preset, layout, reducedMotion,crossConfig]);
+  return <Keyboard layout={layout} colors={active ? colors : thumbnail} lightPreview lightPreviewPeak={peak} mini />;
 }
