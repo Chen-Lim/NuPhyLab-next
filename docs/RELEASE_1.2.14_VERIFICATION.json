@@ -26,5 +26,6 @@
   "appNotarization": "Accepted",
   "dmgNotarization": "Accepted",
   "signedUpdateFeedVerified": true,
-  "physicalTypingAndLongIdleValidationComplete": false
+  "physicalTypingAndLongIdleValidationComplete": false,
+  "publicVersionedAndLatestDownloadsVerified": true
 }
