@@ -6,39 +6,33 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>NuPhy Lab</title>
         <item>
-            <title>1.2.14</title>
-            <pubDate>Mon, 02 Nov 2026 21:33:16 +0800</pubDate>
+            <title>1.2.15</title>
+            <pubDate>Mon, 02 Nov 2026 22:49:29 +0800</pubDate>
             <link>https://github.com/bohu8264/NuPhyLab-next</link>
-            <sparkle:version>1.2.14</sparkle:version>
-            <sparkle:shortVersionString>1.2.14</sparkle:shortVersionString>
+            <sparkle:version>1.2.15</sparkle:version>
+            <sparkle:shortVersionString>1.2.15</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.5</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
             <description sparkle:format="plain-text"><![CDATA[NUPHY-RELEASE-NOTES 1
-version:1.2.14
+version:1.2.15
 [zh-CN]
-NuPhy Lab 1.2.14
+NuPhy Lab 1.2.15
 
-• 新增一石二鸟打字灯效：每次按键从对应位置向横纵扩散，连续输入独立叠加，支持调整颜色与速度。
-• 作品库可在当前页面直接播放；打开编辑进入相应创作模式，并保留草稿保护。
-• 修正空闲唤醒重置总时长的问题；兼容的 Air75 V3 在 Lab 控灯期间临时托管设备休眠，停止控灯后恢复。
-• 补全英文界面，保留用户自定义作品与任务名称的原文。
-• 设置新增更新入口与当前键盘适用固件的提示红点，固件入口直达 NuPhyIO 设置页。
-• 软件更新窗口随应用语言显示对应版本说明，支持更新、稍后和跳过；同版稍后提醒至少间隔 24 小时。
+• 修正软件更新窗口的尺寸与排版：提示按内容收紧，操作按钮置于右下角，更新说明保留独立滚动区域。
+• 设置中的“关于”和“更新”合并为“关于与更新”，集中显示应用版本、软件与固件更新、帮助、许可和诊断。
+• 保留旧更新入口和固件提示的跳转，中英文界面及更新流程保持兼容。
 [en]
-NuPhy Lab 1.2.14
+NuPhy Lab 1.2.15
 
-• Add One stone, two birds: each keystroke sends a cross from its key, with overlapping waves, adjustable colour and speed.
-• Play artworks directly from the Library. Open edit enters the matching Studio mode and protects unsaved drafts.
-• Keep the original lighting duration deadline after idle activity. On supported Air75 V3 keyboards, temporarily manage device sleep during Lab lighting and restore it afterwards.
-• Complete the English interface while preserving user-entered artwork and task names.
-• Add Settings update controls and a dot for firmware updates verified for the connected keyboard. Open firmware settings directly in NuPhyIO.
-• Show version-specific release notes and update controls in the application language. Later pauses automatic reminders for the same version for at least 24 hours.
+• Fix the size and layout of software update windows: compact messages, actions at the lower right, and a separate scrolling area for release notes.
+• Combine About and Updates into About & updates, bringing together the app version, software and firmware updates, help, licenses and diagnostics.
+• Keep existing update links and firmware notifications working, with compatible Chinese and English interfaces and update behavior.
 ]]></description>
-            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.14/NuPhyLab-1.2.14-macOS-AppleSilicon.dmg" length="42266019" type="application/octet-stream" sparkle:edSignature="hJ6giWWGMG78s1Ek/99lFEgks0ByYncWIC34D3b6LOPahPykvmHsQTELozRpfsphgj0Pq9JTkZKYLXq5Vs+VAw=="/>
+            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.15/NuPhyLab-1.2.15-macOS-AppleSilicon.dmg" length="42276155" type="application/octet-stream" sparkle:edSignature="3vUOmVW4taP4WKe5pqxxs3+r/z7zs2KJXflTog43mVMtDh8SnxlkpM3daAXCTpXyhI2vsD47om2YOtCO5y9YDQ=="/>
         </item>
     </channel>
 </rss>
 <!-- sparkle-signatures:
-edSignature: uyhFcZc1BRaenzSWr95QPkhcbvbLwGxaKZTT9GivL3MLCKOdiS7IyRw6hTMFIYE2W4xTF/mP+anVsZRBXuEDBw==
-length: 2928
+edSignature: v1s8EzmwJVmQAHja+6wRInOVA8jTzdC/NmUJKzZ0rXU89cI0a8SqNnoXSMoHuDTUu7ZwAS8YQFQUjrksyZuyCw==
+length: 2212
 -->

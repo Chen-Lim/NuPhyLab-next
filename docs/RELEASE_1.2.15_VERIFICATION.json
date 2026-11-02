@@ -26,7 +26,7 @@
   "appNotarization": "Accepted",
   "dmgNotarization": "Accepted",
   "signedUpdateFeedVerified": true,
-  "publicVersionedAndLatestDownloadsVerified": false,
+  "publicVersionedAndLatestDownloadsVerified": true,
   "liveUpdateInstallationVerified": false,
   "physicalHardwareAcceptancePerformed": false,
   "applicationLanguageWindowGeometryVerified": true,
