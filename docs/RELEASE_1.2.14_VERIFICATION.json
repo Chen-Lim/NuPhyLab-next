@@ -27,5 +27,14 @@
   "dmgNotarization": "Accepted",
   "signedUpdateFeedVerified": true,
   "physicalTypingAndLongIdleValidationComplete": false,
-  "publicVersionedAndLatestDownloadsVerified": true
+  "publicVersionedAndLatestDownloadsVerified": true,
+  "liveUpdateVerifiedFrom": "1.2.8",
+  "liveUpdateVerifiedTo": "1.2.14",
+  "liveUpdateDownloadInstallAndRelaunchPassed": true,
+  "libraryBytesPreserved": true,
+  "draftHashesPreserved": true,
+  "settingsPreserved": true,
+  "webOriginPortPreserved": true,
+  "singleFormalAppRegistered": true,
+  "hardwareAttachedDuringLiveUpdateTest": false
 }
