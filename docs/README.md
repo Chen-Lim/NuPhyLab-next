@@ -6,3 +6,5 @@
 - [Third-party notices](../THIRD_PARTY_NOTICES.md)
 
 - [1.2.14 changes and validation scope](RELEASE_1.2.14.md)
+
+- [1.2.15 changes and validation scope](RELEASE_1.2.15.md)

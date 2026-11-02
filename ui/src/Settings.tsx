@@ -4,7 +4,6 @@ import { Button, Modal, run, Switch } from "./primitives";
 import { DurationField } from "./DurationField";
 import { DEFAULT_LIGHT_TIME_MS, lightingTimerDeadline } from "../../shared/lighting-power.mjs";
 import { requestAppPermission, refreshAppPermissions, useStartupCopy, OFFICIAL_DRIVER_URL } from "./StartupGuide";
-import { nativeCodexKeys } from "./codexKeys";
 import { useLanguage, t } from "./i18n";
 import type { AppState, Command } from "./types";
 import packageInfo from "../../package.json";
@@ -162,14 +161,12 @@ function PermissionPreferences({ state, command }: {state: AppState | null; comm
   </div>;
 }
 
-function AboutPreferences({ state }: {state: AppState | null}) {
+function AboutPreferences({ state, command }: {state: AppState | null; command: Command}) {
   const copy = useStartupCopy();
   const [open, setOpen] = useState<"help" | "licenses" | "diagnostics" | null>(null);
   const [licenseText, setLicenseText] = useState<string|null>(null);
   const [licenseError,setLicenseError] = useState(false);
   const [licenseAttempt,setLicenseAttempt] = useState(0);
-  const [updateMessage, setUpdateMessage] = useState("");
-  const [checking, setChecking] = useState(false);
   const version = state?.build?.version || packageInfo.version;
   useEffect(() => {
     if (open !== "licenses" || licenseText !== null) return;
@@ -179,12 +176,6 @@ function AboutPreferences({ state }: {state: AppState | null}) {
     }).then(text => { if(active) setLicenseText(text); }).catch(() => { if(active) setLicenseError(true); });
     return () => {active=false;controller.abort();};
   }, [open,licenseAttempt,licenseText]);
-  const checkUpdates = async () => {
-    setChecking(true); setUpdateMessage("");
-    try { if (!await nativeCodexKeys({kind:"checkForUpdates"})) setUpdateMessage(copy("请在 NuPhy Lab 桌面应用中检查更新。", "Check for updates in the NuPhy Lab desktop app.")); }
-    catch {setUpdateMessage(copy("暂时无法检查更新，请稍后重试。","Could not check for updates. Try again shortly."));}
-    finally {setChecking(false);}
-  };
   const titles = {help:copy("使用帮助", "Help"), licenses:copy("开源许可", "Open-source licenses"), diagnostics:copy("诊断详情", "Diagnostics")};
   const lightingModes:Record<string,string>={idle:copy("键盘原灯效","Keyboard lighting"),native:copy("内置灯效","Built-in lighting"),static:copy("静态灯光","Static lighting"),animation:copy("动画播放","Animation"),paused:copy("已暂停","Paused"),agent:copy("AI 状态灯","AI status lights"),audio:copy("声音律动","Audio reactive"),trigger:copy("按键触发","Key trigger"),game:copy("灯光游戏","Lighting games")};
   const connectionModes:Record<string,string>={ready:copy("已连接","Connected"),paused:copy("已暂停","Paused"),waiting:copy("等待连接","Waiting for connection"),reconnecting:copy("正在重新连接","Reconnecting"),attention:copy("连接暂时中断","Connection interrupted"),updateRequired:copy("请更新 NuPhy Lab","Update NuPhy Lab")};
@@ -198,8 +189,7 @@ function AboutPreferences({ state }: {state: AppState | null}) {
   ];
   const diagnosticError=state?.device.error || state?.playback.lastError;
   return <div className="lab-about-preferences">
-    <div className="lab-about-brand"><img src="/nuphy-studio.png" alt="NuPhy Lab" width={64} height={64}/><div><h2>NuPhy Lab</h2><p>{copy("版本", "Version")} {version}</p></div><Button busy={checking} onClick={() => run(checkUpdates())}>{copy("检查更新", "Check for updates")}</Button></div>
-    {updateMessage && <p className="lab-settings-note" role="status">{updateMessage}</p>}
+    <UpdatePreferences state={state} command={command}/>
     <div className="lab-setting-panel lab-about-links">{(["help","licenses","diagnostics"] as const).map(id => <button key={id} onClick={() => setOpen(id)}>{titles[id]}<ChevronRight size={16}/></button>)}</div>
     {open && <Modal title={titles[open]} width={open === "licenses" ? 640 : 560} initialFocus="title" className="settings-overlay-v6" onClose={() => setOpen(null)} footer={<>
       {open === "licenses" && licenseError && <Button onClick={()=>setLicenseAttempt(value=>value+1)}>{copy("重试","Retry")}</Button>}
@@ -222,17 +212,17 @@ function AboutPreferences({ state }: {state: AppState | null}) {
 export function Settings({ state, command, initialTab = "general", display, onNavigateStudio }: {state: AppState | null; command: Command; initialTab?: SettingsTab; display?: ConnectionDisplay; onNavigateStudio?: () => void}) {
   const copy = useStartupCopy();
   const language = useLanguage();
-  const [tab, setTab] = useState<SettingsTab>(initialTab);
-  useEffect(() => { setTab(initialTab); }, [initialTab]);
-  const tabs: [SettingsTab,string][] = [["general",copy("通用", "General")],["lighting",copy("灯光与休眠", "Lighting and sleep")],["permissions",copy("权限", "Permissions")],["updates",copy("更新", "Updates")],["about",copy("关于", "About")]];
+  const normalizeTab = (value: SettingsTab): SettingsTab => value === "updates" ? "about" : value;
+  const [tab, setTab] = useState<SettingsTab>(normalizeTab(initialTab));
+  useEffect(() => { setTab(normalizeTab(initialTab)); }, [initialTab]);
+  const tabs: [SettingsTab,string][] = [["general",copy("通用", "General")],["lighting",copy("灯光与休眠", "Lighting and sleep")],["permissions",copy("权限", "Permissions")],["about",copy("关于与更新", "About & updates")]];
   return <section className="lab-settings-page">
-    <div className="lab-settings-tabs" role="tablist" aria-label={copy("设置分类", "Settings categories")}>{tabs.map(([id,label]) => <button key={id} id={`settings-tab-${id}`} role="tab" aria-selected={tab === id} aria-controls={`settings-panel-${id}`} onClick={() => setTab(id)}>{label}{id==='updates'&&availableFirmwareUpdate(state)&&<i className="settings-update-dot" aria-label={copy('键盘固件有可用更新','Keyboard firmware update available')}/>}</button>)}</div>
+    <div className="lab-settings-tabs" role="tablist" aria-label={copy("设置分类", "Settings categories")}>{tabs.map(([id,label]) => <button key={id} id={`settings-tab-${id}`} role="tab" aria-selected={tab === id} aria-controls={`settings-panel-${id}`} onClick={() => setTab(id)}>{label}{id==='about'&&availableFirmwareUpdate(state)&&<i className="settings-update-dot" aria-label={copy('键盘固件有可用更新','Keyboard firmware update available')}/>}</button>)}</div>
     <div className="lab-settings-content" id={`settings-panel-${tab}`} role="tabpanel" aria-labelledby={`settings-tab-${tab}`}>
       {tab === "general" && <div className="lab-setting-panel lab-general-panel"><div className="lab-setting-row"><h3>{copy("语言 / Language", "Language")}</h3><select aria-label={copy("Language / 语言", "Language")} disabled={!state} value={language} onChange={event => run(command({op: "settings", settings: {language:event.target.value}}))}><option value="zh-CN">{copy("简体中文", "Simplified Chinese")}</option><option value="en">English</option></select></div><div className="lab-setting-row"><Switch label={copy("插线后自动连接", "Connect automatically when plugged in")} disabled={!state} checked={Boolean(state?.settings.autoConnect)} onChange={autoConnect => run(command({op:"settings",settings:{autoConnect}}))}/></div></div>}
       {tab === "lighting" && <LightingPreferences state={state} command={command} display={display} onNavigateStudio={onNavigateStudio}/>}
       {tab === "permissions" && <PermissionPreferences state={state} command={command}/>}
-      {tab === "updates" && <UpdatePreferences state={state} command={command}/>}
-      {tab === "about" && <AboutPreferences state={state}/>}
+      {tab === "about" && <AboutPreferences state={state} command={command}/>}
     </div>
   </section>;
 }

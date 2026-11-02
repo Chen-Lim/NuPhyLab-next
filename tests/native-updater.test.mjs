@@ -35,7 +35,8 @@ if !CommandLine.arguments.contains("--update-ui-qa") {print("{\\"checks\\":13,\\
  assert.deepEqual(JSON.parse((await run(binary)).stdout.trim()),{checks:13,network:false,hardware:false});
  // An argument-domain locale only affects this temporary child process. No
  // defaults command or persisted AppleLanguages preference is ever written.
- const simulated=JSON.parse((await run(binary,['--update-ui-qa','-AppleLanguages','(zh-Hans)','-AppleLocale','zh_CN'])).stdout.trim());
+ const snapshotArgs=process.env.NUPHY_UPDATE_QA_SCREENSHOTS?['--update-layout-snapshots',process.env.NUPHY_UPDATE_QA_SCREENSHOTS]:[];
+ const simulated=JSON.parse((await run(binary,['--update-ui-qa',...snapshotArgs,'-AppleLanguages','(zh-Hans)','-AppleLocale','zh_CN'])).stdout.trim());
  assert.equal(simulated.simulatedSystemChinese,true);assert.equal(simulated.appEnglish,true);assert.equal(simulated.presentations,32);
  assert.equal(simulated.GUIOpened,false);assert.equal(simulated.network,false);assert.equal(simulated.hardware,false);
 });

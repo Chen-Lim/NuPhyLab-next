@@ -31,9 +31,8 @@ export function UpdatePreferences({state,command}:{state:AppState|null;command:C
     :firmwareMatches&&fw?.latestConfirmed&&['current','newer'].includes(fw.status)?copy('当前键盘固件已是最新版本。','This keyboard firmware is up to date.')
     :copy('尚未确认这把键盘的最新固件，可手动重新检查。','The latest firmware for this keyboard is not confirmed. Check again manually.');
   return <div className="lab-update-preferences">
-    <div className="lab-settings-intro"><h2>{copy('软件与固件更新','Software and firmware updates')}</h2><p>{copy('软件更新在 NuPhy Lab 中完成；键盘固件在官方 NuPhyIO 中更新。','Update the app in NuPhy Lab and keyboard firmware in the official NuPhyIO.')}</p></div>
     <section className="lab-setting-panel lab-update-panel" aria-label={copy('软件更新','Software updates')}>
-      <div className="lab-setting-row"><div><h3>NuPhy Lab</h3><p>{copy('当前版本','Installed version')} {state?.build?.version||packageInfo.version}</p></div><Button busy={checking} onClick={()=>run(checkApp())}>{copy('检查软件更新','Check app updates')}</Button></div>
+      <div className="lab-setting-row lab-app-update-row"><div className="lab-app-update-brand"><img src="/nuphy-studio.png" alt="" width={48} height={48}/><div><h2>NuPhy Lab</h2><p>{copy('当前版本','Installed version')} {state?.build?.version||packageInfo.version}</p></div></div><Button busy={checking} onClick={()=>run(checkApp())}>{copy('检查软件更新','Check app updates')}</Button></div>
       <p>{copy('发现新版本时会显示版本号和该版更新说明，可选择更新或稍后。选择稍后后，同一版本 24 小时内不再自动提醒；手动检查仍可打开。选择跳过此版本后，只会自动提醒更新的版本。','New versions show their version number and release notes, with Update or Later. Later pauses automatic reminders for that version for 24 hours; manual checks remain available. Skip This Version silences that version until a newer one is available.')}</p>
     </section>
     <section className="lab-setting-panel lab-update-panel" aria-label={copy('键盘固件','Keyboard firmware')}>

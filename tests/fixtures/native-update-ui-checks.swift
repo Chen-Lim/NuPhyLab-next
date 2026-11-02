@@ -75,6 +75,48 @@ if CommandLine.arguments.contains("--update-ui-qa") {
     offscreen.showFound(item){nativeChoices.append($0)}
     let updatePanel=offscreen.panel!
     precondition(!updatePanel.isVisible && updatePanel.title == "NuPhy Lab Software Update")
+    func findView(_ id:String,in view:NSView)->NSView? {
+        if view.identifier?.rawValue == id {return view}
+        for child in view.subviews {if let result=findView(id,in:child) {return result}}
+        return nil
+    }
+    func checkGeometry(primary:String,compact:Bool) {
+        let content=updatePanel.contentView!;content.layoutSubtreeIfNeeded()
+        precondition(content.bounds.width >= 440 && content.bounds.width <= 580)
+        precondition(content.bounds.height >= 160 && content.bounds.height <= (compact ? 260 : 540))
+        let heading=findView("lab-update-title",in:content)!,message=findView("lab-update-message",in:content)!
+        let headingRect=heading.convert(heading.bounds,to:content),messageRect=message.convert(message.bounds,to:content)
+        precondition(headingRect.minY > messageRect.maxY)
+        precondition(headingRect.minX >= 20 && headingRect.maxX <= content.bounds.maxX-20)
+        let action=findView(primary,in:content)!
+        let actionRect=action.convert(action.bounds,to:content)
+        precondition(actionRect.maxX >= content.bounds.maxX-36 && actionRect.maxX <= content.bounds.maxX-10)
+        precondition(actionRect.minY >= 12 && actionRect.minY <= 32)
+        precondition(actionRect.maxY+16 <= messageRect.minY)
+    }
+    func snapshot(_ name:String) {
+        guard let index=CommandLine.arguments.firstIndex(of:"--update-layout-snapshots"),index+1<CommandLine.arguments.count else{return}
+        let directory=URL(fileURLWithPath:CommandLine.arguments[index+1]);try! FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+        let view=updatePanel.contentView!.superview ?? updatePanel.contentView!
+        view.layoutSubtreeIfNeeded()
+        guard let bitmap=view.bitmapImageRepForCachingDisplay(in:view.bounds) else {preconditionFailure("No AppKit bitmap")}
+        view.cacheDisplay(in:view.bounds,to:bitmap)
+        try! bitmap.representation(using:.png,properties:[:])!.write(to:directory.appendingPathComponent(name+".png"))
+    }
+    checkGeometry(primary:"install",compact:false)
+    let notesError=NSError(domain:"SUSparkleErrorDomain",code:1001,userInfo:[SPUNoUpdateFoundReasonKey:NSNumber(value:0)])
+    offscreen.showUpdateNotFoundWithError(notesError,acknowledgement:{})
+    checkGeometry(primary:"ok",compact:true);snapshot("no-update-en")
+    appEnglish=false;offscreen.refreshLanguage();checkGeometry(primary:"ok",compact:true);snapshot("no-update-zh")
+    let longNotes="NUPHY-RELEASE-NOTES 1\nversion:2.0.0\n[zh-CN]\n"+Array(repeating:"• 更新窗口会按内容调整尺寸，操作按钮清晰显示。",count:14).joined(separator:"\n")+"\n[en]\n"+Array(repeating:"• The update window fits its content, keeps release notes scrollable, and preserves your artwork and settings.",count:14).joined(separator:"\n")
+    let longItem=SUAppcastItem(dictionary:["sparkle:version":"2.0.0","sparkle:shortVersionString":"2.0.0","description":longNotes,"enclosure":["url":"https://example.invalid/NuPhyLab-2.0.0.dmg","length":"100","sparkle:edSignature":"fixture"]])!
+    offscreen.showFound(longItem){_ in};checkGeometry(primary:"install",compact:false);snapshot("update-found-zh")
+    appEnglish=true;offscreen.refreshLanguage();checkGeometry(primary:"install",compact:false);snapshot("update-found-en")
+    let expandedHeight=updatePanel.contentView!.bounds.height
+    offscreen.showUpdateNotFoundWithError(notesError,acknowledgement:{})
+    checkGeometry(primary:"ok",compact:true)
+    precondition(updatePanel.contentView!.bounds.height+100 < expandedHeight,"Hidden release notes must not reserve their old space")
+    offscreen.showFound(item){nativeChoices.append($0)}
     checkNoChinese(visibleStrings(updatePanel.contentView!))
     let nativeButtons=updatePanel.contentView!.subviews.flatMap{visibleStrings($0)}
     precondition(nativeButtons.contains("Update") && nativeButtons.contains("Later") && nativeButtons.contains("Skip This Version") && nativeButtons.contains("Release notes"))
@@ -93,6 +135,7 @@ if CommandLine.arguments.contains("--update-ui-qa") {
     checkNoChinese(visibleStrings(updatePanel.contentView!))
     precondition(!offscreen.windowShouldClose(updatePanel));precondition(!offscreen.windowShouldClose(updatePanel));precondition(nativeChoices == [.dismiss,.dismiss])
     offscreen.showUpdaterError(NSError(domain:"SUSparkleErrorDomain",code:3001,userInfo:[NSLocalizedDescriptionKey:"中文系统验证错误"]),acknowledgement:{})
+    checkGeometry(primary:"ok",compact:true)
     checkNoChinese(visibleStrings(updatePanel.contentView!))
     offscreen.showFound(item){nativeChoices.append($0)}
     appEnglish=false;offscreen.refreshLanguage();precondition(visibleStrings(updatePanel.contentView!).contains("更新"))

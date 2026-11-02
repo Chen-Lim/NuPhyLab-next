@@ -1,0 +1,37 @@
+{
+  "version": "1.2.15",
+  "appAndDmgStapled": true,
+  "strictSignaturesVerified": true,
+  "gatekeeperAssessmentsEnabled": true,
+  "gatekeeperAppAndDmgAccepted": true,
+  "syspolicyDistributionPassed": true,
+  "runtime": "v24.21.0",
+  "runtimeSelfContained": true,
+  "nativeSelfTest": {
+    "checks": 6679,
+    "hardwareOpened": false,
+    "inputMonitorOpened": false,
+    "ok": true,
+    "selfTest": "passed"
+  },
+  "sourceRuntimeFilesMatched": 80,
+  "separateCleanMacFirstLaunchVerified": false,
+  "bytes": 42276155,
+  "sha256": "399ded26e82c51cf95709ab928165ab7ec7ee21b28b318b944722ef2fa584634",
+  "regressionPass": 875,
+  "regressionFail": 0,
+  "regressionSkipped": 0,
+  "architecture": "arm64",
+  "minimumMacOS": "13.5",
+  "appNotarization": "Accepted",
+  "dmgNotarization": "Accepted",
+  "signedUpdateFeedVerified": true,
+  "publicVersionedAndLatestDownloadsVerified": false,
+  "liveUpdateInstallationVerified": false,
+  "physicalHardwareAcceptancePerformed": false,
+  "applicationLanguageWindowGeometryVerified": true,
+  "mergedSettingsVisuallyVerified": [
+    "zh-CN",
+    "en"
+  ]
+}

@@ -4,9 +4,9 @@ A macOS lighting studio for **NuPhy AIR75 V3 and Kick75 (ANSI)**. Connect USB to
 
 Includes drawing, animation, key-triggered effects, games, audio reactive lighting, a local artwork library, and Codex / Claude Code task shortcuts and status lights. AIR75 V3 also supports Bluetooth shortcut control; lighting requires USB.
 
-## Version 1.2.14
+## Version 1.2.15
 
-Add One stone, two birds typing waves, direct Library playback with draft protection, independent duration and idle timers, complete English system text, and localized software update controls. This release also includes the white Air75 V3 USB wake animation and seven curated built-in artworks. See [changes and verification scope](docs/RELEASE_1.2.14.md).
+Fix software update window proportions, size prompts to their content, and keep actions at the lower right. Merge Settings About and Updates into **About & updates**, with the app version, software and firmware updates, help, licenses and diagnostics together. See [changes and verification scope](docs/RELEASE_1.2.15.md).
 
 ## Install
 
@@ -14,7 +14,7 @@ Download the signed and Apple-notarized DMG using the [latest version download](
 
 Allow Input Monitoring and Accessibility when prompted. Audio permissions are requested when using audio reactive lighting. Switch the keyboard to wired mode. If its firmware needs updating, follow the NuPhyIO reminder, close the website after the upgrade, then return to the app.
 
-NuPhy Lab includes signed in-app updates. New releases appear automatically, or choose **Check for Updates** in the app menu or Device page. Artwork and settings remain intact. Users on 1.1.x need to install the current version once manually.
+NuPhy Lab includes signed in-app updates. New releases appear automatically, or choose **Check for Updates** in the app menu or Settings → About & updates. Artwork and settings remain intact. Users on 1.1.x need to install the current version once manually.
 
 ## Build
 

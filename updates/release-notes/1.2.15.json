@@ -1,0 +1,13 @@
+{
+  "version": "1.2.15",
+  "zh-CN": [
+    "修正软件更新窗口的尺寸与排版：提示按内容收紧，操作按钮置于右下角，更新说明保留独立滚动区域。",
+    "设置中的“关于”和“更新”合并为“关于与更新”，集中显示应用版本、软件与固件更新、帮助、许可和诊断。",
+    "保留旧更新入口和固件提示的跳转，中英文界面及更新流程保持兼容。"
+  ],
+  "en": [
+    "Fix the size and layout of software update windows: compact messages, actions at the lower right, and a separate scrolling area for release notes.",
+    "Combine About and Updates into About & updates, bringing together the app version, software and firmware updates, help, licenses and diagnostics.",
+    "Keep existing update links and firmware notifications working, with compatible Chinese and English interfaces and update behavior."
+  ]
+}

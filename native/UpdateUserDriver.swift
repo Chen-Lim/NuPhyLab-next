@@ -16,6 +16,11 @@ struct LabUpdatePresentation {
     var buttons: [LabUpdateButton] = []
 }
 
+private final class LabUpdatePanel: NSPanel {
+    var cancel: (() -> Void)?
+    override func cancelOperation(_ sender: Any?) { cancel?() }
+}
+
 // SPUUserDriver is Sparkle's public UI boundary. The standard driver provides
 // deprecated compatibility methods; every current visible callback is owned
 // here, so framework or OS locale never chooses this app's update copy.
@@ -37,6 +42,11 @@ final class LabUpdateUserDriver: SPUStandardUserDriver, NSWindowDelegate {
     private var notesScroll: NSScrollView?
     private var progressView: NSProgressIndicator?
     private var buttonStack: NSStackView?
+    private var bodyHeight: NSLayoutConstraint?
+    private var titleHeight: NSLayoutConstraint?
+    private var messageHeight: NSLayoutConstraint?
+    private var notesHeight: NSLayoutConstraint?
+    private var actionsHeight: NSLayoutConstraint?
     private var received: UInt64 = 0
     private var expected: UInt64 = 0
     private var extraction: Double = 0
@@ -74,39 +84,84 @@ final class LabUpdateUserDriver: SPUStandardUserDriver, NSWindowDelegate {
     private func render(_ value: LabUpdatePresentation) {
         let wasVisible=panel?.isVisible == true
         if panel == nil {
-            let window=NSPanel(contentRect:NSRect(x:0,y:0,width:560,height:480),styleMask:[.titled,.closable],backing:.buffered,defer:false)
-            window.isReleasedWhenClosed=false;window.delegate=self;window.center()
+            let window=LabUpdatePanel(contentRect:NSRect(x:0,y:0,width:480,height:196),styleMask:[.titled,.closable],backing:.buffered,defer:false)
+            window.isReleasedWhenClosed=false;window.delegate=self
+            window.cancel={ [weak self] in if let id=self?.closeAction {self?.performAction(id)} }
             let content=NSView();window.contentView=content
             let title=NSTextField(wrappingLabelWithString:"");title.font = .boldSystemFont(ofSize:19)
             let message=NSTextField(wrappingLabelWithString:"");message.font = .systemFont(ofSize:13);message.textColor = .secondaryLabelColor
-            let scroll=NSScrollView();scroll.hasVerticalScroller=true;scroll.drawsBackground=false
+            title.identifier=NSUserInterfaceItemIdentifier("lab-update-title")
+            message.identifier=NSUserInterfaceItemIdentifier("lab-update-message")
+            let scroll=NSScrollView();scroll.hasVerticalScroller=true;scroll.autohidesScrollers=true;scroll.drawsBackground=false
+            scroll.identifier=NSUserInterfaceItemIdentifier("lab-update-notes")
             let notes=NSTextView();notes.isEditable=false;notes.isSelectable=true;notes.drawsBackground=false;notes.font = .systemFont(ofSize:13)
             notes.frame=NSRect(x:0,y:0,width:512,height:210)
             notes.textContainerInset=NSSize(width:4,height:8);notes.autoresizingMask=[.width];notes.isVerticallyResizable=true;notes.isHorizontallyResizable=false
             notes.textContainer?.widthTracksTextView=true;scroll.documentView=notes
             let progress=NSProgressIndicator();progress.style = .bar
-            let buttons=NSStackView();buttons.orientation = .horizontal;buttons.spacing=10;buttons.alignment = .centerY
-            let stack=NSStackView(views:[title,message,scroll,progress,buttons]);stack.orientation = .vertical;stack.alignment = .leading;stack.spacing=16;stack.translatesAutoresizingMaskIntoConstraints=false
-            content.addSubview(stack)
-            NSLayoutConstraint.activate([stack.leadingAnchor.constraint(equalTo:content.leadingAnchor,constant:24),stack.trailingAnchor.constraint(equalTo:content.trailingAnchor,constant:-24),stack.topAnchor.constraint(equalTo:content.topAnchor,constant:22),stack.bottomAnchor.constraint(equalTo:content.bottomAnchor,constant:-22),scroll.widthAnchor.constraint(equalTo:stack.widthAnchor),scroll.heightAnchor.constraint(greaterThanOrEqualToConstant:210),progress.widthAnchor.constraint(equalTo:stack.widthAnchor)])
+            let buttons=NSStackView();buttons.orientation = .horizontal;buttons.spacing=10;buttons.alignment = .centerY;buttons.distribution = .fill
+            buttons.identifier=NSUserInterfaceItemIdentifier("lab-update-actions")
+            let stack=NSStackView(views:[title,message,scroll,progress]);stack.orientation = .vertical;stack.alignment = .leading;stack.spacing=16;stack.detachesHiddenViews=true;stack.distribution = .fill
+            for view in [stack,title,message,scroll,progress,buttons] {view.translatesAutoresizingMaskIntoConstraints=false}
+            content.addSubview(stack);content.addSubview(buttons)
+            titleHeight=title.heightAnchor.constraint(equalToConstant:26)
+            messageHeight=message.heightAnchor.constraint(equalToConstant:20)
+            notesHeight=scroll.heightAnchor.constraint(equalToConstant:160)
+            bodyHeight=stack.heightAnchor.constraint(equalToConstant:62)
+            actionsHeight=buttons.heightAnchor.constraint(equalToConstant:28)
+            NSLayoutConstraint.activate([stack.leadingAnchor.constraint(equalTo:content.leadingAnchor,constant:24),stack.trailingAnchor.constraint(equalTo:content.trailingAnchor,constant:-24),stack.topAnchor.constraint(equalTo:content.topAnchor,constant:22),title.widthAnchor.constraint(equalTo:stack.widthAnchor),message.widthAnchor.constraint(equalTo:stack.widthAnchor),scroll.widthAnchor.constraint(equalTo:stack.widthAnchor),progress.widthAnchor.constraint(equalTo:stack.widthAnchor),progress.heightAnchor.constraint(equalToConstant:6),buttons.leadingAnchor.constraint(equalTo:content.leadingAnchor,constant:24),buttons.trailingAnchor.constraint(equalTo:content.trailingAnchor,constant:-24),buttons.bottomAnchor.constraint(equalTo:content.bottomAnchor,constant:-22),titleHeight!,messageHeight!,notesHeight!,bodyHeight!,actionsHeight!])
             titleLabel=title;messageLabel=message;notesView=notes;notesScroll=scroll;progressView=progress;buttonStack=buttons;panel=window
         }
+        let width:CGFloat=value.notes.isEmpty ? 480 : 560
+        let textWidth=width-48
+        let paragraph=NSMutableParagraphStyle();paragraph.lineSpacing=3
+        let titleFont=NSFont.boldSystemFont(ofSize:19),messageFont=NSFont.systemFont(ofSize:13)
+        func textHeight(_ text:String,font:NSFont,width:CGFloat,paragraph:NSParagraphStyle?=nil)->CGFloat {
+            var attributes:[NSAttributedString.Key:Any]=[.font:font]
+            if let paragraph=paragraph {attributes[.paragraphStyle]=paragraph}
+            return ceil((text as NSString).boundingRect(with:NSSize(width:width,height:100000),options:[.usesLineFragmentOrigin,.usesFontLeading],attributes:attributes).height)+4
+        }
         panel?.title=copy("NuPhy Lab 软件更新","NuPhy Lab Software Update")
-        titleLabel?.stringValue=value.title;messageLabel?.stringValue=value.message
+        titleLabel?.preferredMaxLayoutWidth=textWidth;messageLabel?.preferredMaxLayoutWidth=textWidth
+        titleLabel?.stringValue=value.title
+        messageLabel?.attributedStringValue=NSAttributedString(string:value.message,attributes:[.font:messageFont,.foregroundColor:NSColor.secondaryLabelColor,.paragraphStyle:paragraph])
+        let headingHeight=textHeight(value.title,font:titleFont,width:textWidth)
+        let detailHeight=textHeight(value.message,font:messageFont,width:textWidth,paragraph:paragraph)
+        titleHeight?.constant=headingHeight;messageHeight?.constant=detailHeight
         notesView?.string=value.notes;notesScroll?.isHidden=value.notes.isEmpty
+        let releaseNotesHeight=min(240,max(120,textHeight(value.notes,font:messageFont,width:textWidth-24)+16))
+        notesHeight?.constant=releaseNotesHeight
+        notesView?.frame.size=NSSize(width:textWidth,height:max(releaseNotesHeight,textHeight(value.notes,font:messageFont,width:textWidth-24)+16))
         progressView?.isHidden = !value.busy && value.progress == nil
         progressView?.isIndeterminate=value.progress == nil
         if let progress=value.progress {progressView?.stopAnimation(nil);progressView?.doubleValue=max(0,min(1,progress))*100}
         else if value.busy {progressView?.startAnimation(nil)} else {progressView?.stopAnimation(nil)}
         if let buttons=buttonStack {
             for child in buttons.arrangedSubviews {buttons.removeArrangedSubview(child);child.removeFromSuperview()}
-            for item in value.buttons {
+            let spacer=NSView();spacer.setContentHuggingPriority(.defaultLow,for:.horizontal)
+            buttons.addArrangedSubview(spacer)
+            for item in value.buttons.reversed() {
                 let button=NSButton(title:item.title,target:self,action:#selector(clicked));button.bezelStyle = .rounded;button.identifier=NSUserInterfaceItemIdentifier(item.id)
                 button.isEnabled=actions[item.id] != nil
-                if item.id == "install" || item.id == "ok" {button.keyEquivalent="\r"}
-                if item.id == closeAction {button.keyEquivalent="\u{1b}"}
+                button.setContentHuggingPriority(.required,for:.horizontal);button.setContentCompressionResistancePriority(.required,for:.horizontal)
+                if ["install","ok","allow","info"].contains(item.id) {button.keyEquivalent="\r"}
+                else if item.id == closeAction {button.keyEquivalent="\u{1b}"}
                 buttons.addArrangedSubview(button)
             }
+            buttons.isHidden=value.buttons.isEmpty
+        }
+        let hasProgress=value.busy || value.progress != nil
+        let contentHeight=headingHeight+detailHeight+16+(value.notes.isEmpty ? 0 : releaseNotesHeight+16)+(hasProgress ? 22 : 0)
+        bodyHeight?.constant=contentHeight
+        let footerHeight:CGFloat=value.buttons.isEmpty ? 0 : 28
+        actionsHeight?.constant=footerHeight
+        let height=max(196,22+contentHeight+(value.buttons.isEmpty ? 0 : 24+footerHeight)+22)
+        if let panel=panel {
+            let previous=panel.frame
+            panel.setContentSize(NSSize(width:width,height:height))
+            panel.contentView?.layoutSubtreeIfNeeded()
+            if wasVisible {panel.setFrameOrigin(NSPoint(x:previous.midX-panel.frame.width/2,y:previous.maxY-panel.frame.height))}
+            else if presentsWindows {panel.center()}
         }
         panel?.standardWindowButton(.closeButton)?.isEnabled=closeAction != nil
         if presentsWindows && !wasVisible {panel?.makeKeyAndOrderFront(nil)}
