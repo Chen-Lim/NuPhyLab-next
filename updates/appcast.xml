@@ -6,33 +6,33 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>NuPhy Lab</title>
         <item>
-            <title>1.2.15</title>
-            <pubDate>Mon, 02 Nov 2026 22:49:29 +0800</pubDate>
+            <title>1.2.39</title>
+            <pubDate>Thu, 05 Nov 2026 13:20:55 +0800</pubDate>
             <link>https://github.com/bohu8264/NuPhyLab-next</link>
-            <sparkle:version>1.2.15</sparkle:version>
-            <sparkle:shortVersionString>1.2.15</sparkle:shortVersionString>
+            <sparkle:version>1.2.39</sparkle:version>
+            <sparkle:shortVersionString>1.2.39</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.5</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
             <description sparkle:format="plain-text"><![CDATA[NUPHY-RELEASE-NOTES 1
-version:1.2.15
+version:1.2.39
 [zh-CN]
-NuPhy Lab 1.2.15
+NuPhy Lab 1.2.39
 
-• 修正软件更新窗口的尺寸与排版：提示按内容收紧，操作按钮置于右下角，更新说明保留独立滚动区域。
-• 设置中的“关于”和“更新”合并为“关于与更新”，集中显示应用版本、软件与固件更新、帮助、许可和诊断。
-• 保留旧更新入口和固件提示的跳转，中英文界面及更新流程保持兼容。
+• 修正 Codex 命令键读取界面控件的路径，保留普通/极速、批准、拒绝、新聊天、听写和发送的默认分配。
+• 重新检查首次授权，系统已允许但旧进程未生效时，安全恢复键盘后自动重新打开 NuPhy Lab 一次。
+• 保留 Air75 V3 连接动画；此版本用于验证首次授权和实体按键。
 [en]
-NuPhy Lab 1.2.15
+NuPhy Lab 1.2.39
 
-• Fix the size and layout of software update windows: compact messages, actions at the lower right, and a separate scrolling area for release notes.
-• Combine About and Updates into About & updates, bringing together the app version, software and firmware updates, help, licenses and diagnostics.
-• Keep existing update links and firmware notifications working, with compatible Chinese and English interfaces and update behavior.
+• Correct Codex control traversal while preserving the default command key assignments.
+• Check newly granted permissions in a fresh process and safely reopen NuPhy Lab once if the old process has stale authorization.
+• Preserve the Air75 V3 connection animation. This build is for permission and physical-key testing.
 ]]></description>
-            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.15/NuPhyLab-1.2.15-macOS-AppleSilicon.dmg" length="42276155" type="application/octet-stream" sparkle:edSignature="3vUOmVW4taP4WKe5pqxxs3+r/z7zs2KJXflTog43mVMtDh8SnxlkpM3daAXCTpXyhI2vsD47om2YOtCO5y9YDQ=="/>
+            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.39/NuPhyLab-1.2.39-macOS-AppleSilicon.dmg" length="43101465" type="application/octet-stream" sparkle:edSignature="clSHyiKhBQLqFtQTWleaYLsKtjLvrKgbzShWqgxvp2+pgST1D+DthDD7UiBcTE5DJJYb+zvo/YNR6iqdylNTAQ=="/>
         </item>
     </channel>
 </rss>
 <!-- sparkle-signatures:
-edSignature: v1s8EzmwJVmQAHja+6wRInOVA8jTzdC/NmUJKzZ0rXU89cI0a8SqNnoXSMoHuDTUu7ZwAS8YQFQUjrksyZuyCw==
-length: 2212
+edSignature: iXaz6nAjkKoHa9uJMM8CZLCfLwCqO8pviC29HON3F7kt6+aCqkFLcSS+dC9YtrbL2k3uc6N2do2TpfxrHVw5DQ==
+length: 2067
 -->
