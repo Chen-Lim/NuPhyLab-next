@@ -1,13 +1,13 @@
 # 软件更新 / Software updates
 
-本目录保存签名的 Sparkle 更新源。只有对应正式版的公开下载验证通过后，才会更新这里的文件。
+NuPhy Lab 会自动检查软件更新，也可在应用菜单或 **设置 → 关于与更新 → 检查更新** 中手动检查。
 
-Signed Sparkle update feeds are published here only after the corresponding release downloads have been verified.
+NuPhy Lab checks for software updates automatically. You can also check from the application menu or **Settings → About & updates → Check for Updates**.
 
 - [下载最新版安装包 / Download the latest installer](https://github.com/bohu8264/NuPhyLab-next/releases/latest/download/NuPhyLab-macOS-AppleSilicon.dmg)
 - [最新发行说明 / Latest release notes](https://github.com/bohu8264/NuPhyLab-next/releases/latest)
-- [发布流程（中文）](../docs/RELEASING.md) · [Release workflow (English)](../docs/RELEASING.en.md)
+- [中文使用指南](../README.zh-CN.md) · [English guide](../README.en.md)
 
-安装新版后，可在应用菜单或「设置 → 关于与更新」中检查更新；软件也会自动检查。不要手动编辑签名后的 `appcast.xml` 或包内更新说明。
+更新保留作品、草稿和设置。旧 1.1.x 用户需要先手动安装一次新版。
 
-After installation, use the application menu or Settings → About & updates to check for updates. The app also checks automatically. Do not hand-edit signed `appcast.xml` files or embedded release notes.
+Updates retain artwork, drafts and settings. Users on 1.1.x need to install a current version manually first.

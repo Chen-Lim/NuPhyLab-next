@@ -2,7 +2,7 @@
 
 [简体中文](RELEASING.md) · [Documentation index](README.md)
 
-GitHub repository: `bohu8264/NuPhyLab-next`. The old `bohu8264/NuPhyLab` repository is not used for new releases.
+[NuPhy Lab releases](https://github.com/bohu8264/NuPhyLab-next/releases)
 
 1. Increase the version in `package.json` and add `updates/release-notes/<version>.json`. Its `version` must match exactly. Both `zh-CN` and `en` arrays must describe changes actually completed for this version, without generic or placeholder text. Run `npm run build` and `npm test`.
 2. Package with a valid NuPhy Developer ID identity. Do not distribute ad-hoc-signed builds. `scripts/signing.mjs` signs Sparkle's nested code individually.
@@ -18,7 +18,6 @@ GitHub repository: `bohu8264/NuPhyLab-next`. The old `bohu8264/NuPhyLab` reposit
 
 GitHub resolves this link through the Latest stable release. Do not mark preview releases as Latest. Before switching a stable release to Latest, confirm its draft contains the fixed-name asset to avoid a broken link.
 
-Keep user-facing entry points consistent: the bilingual home page, Chinese guide, English guide and marketing page use this fixed download URL and `releases/latest`. Update both languages of release notes and the documentation index with each stable release; do not present old release notes as the current version. GitHub page text may be maintained separately. Embedded app notes and the signed feed remain subject to the freeze and re-signing requirements above.
 
 ## Update behavior and verification
 

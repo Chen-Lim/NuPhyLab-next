@@ -10,9 +10,9 @@ NuPhy Lab 是适用于 macOS 的 **NuPhy AIR75 V3 / Kick75（ANSI）** 灯光创
 
 **[直接下载最新版 Mac 安装包](https://github.com/bohu8264/NuPhyLab-next/releases/latest/download/NuPhyLab-macOS-AppleSilicon.dmg)**
 
-适用于 **Apple Silicon 和 macOS 13.5 及以上版本**。安装包使用 NuPhy 公司 Developer ID 签名并经过 Apple 公证。后续正式版继续使用同一下载地址。
+适用于 **Apple Silicon 和 macOS 13.5 及以上版本**。安装包使用 NuPhy 公司 Developer ID 签名并经过 Apple 公证。
 
-[最新版本与验证范围](https://github.com/bohu8264/NuPhyLab-next/releases/latest) · [历史版本](https://github.com/bohu8264/NuPhyLab-next/releases)
+[最新版本与更新说明](https://github.com/bohu8264/NuPhyLab-next/releases/latest) · [历史版本](https://github.com/bohu8264/NuPhyLab-next/releases)
 
 1. 安装前先退出旧版 NuPhy Lab。
 2. 打开 DMG，将 **NuPhy Lab** 拖入「应用程序」。如提示则替换旧应用，只保留一个已安装副本。保留本机应用数据，继续使用原有作品、草稿和设置。
@@ -43,11 +43,11 @@ F8、F9 需要当前存在审批请求；F12 需要聚焦聊天输入框。命�
 
 灯效需要 USB 连接；AIR75 V3 蓝牙另支持快捷键控制。当前键盘布局为 ANSI。
 
-原有本机数据目录和 bundle ID 保持兼容。诊断记录仅保存在本机；更新检查不上传任务内容、作品或键盘输入。固件必须通过型号、几何结构、灯位数量、会话和读回验证才能启用写入。
+诊断记录仅保存在本机；更新检查不上传任务内容、作品或键盘输入。
 
 ## 源码与开发
 
-[当前维护的源码](https://github.com/bohu8264/NuPhyLab-next/tree/main)。需要与某个安装包一致的源码时，请使用对应发行页的 **Source code**。[市场入口仓库](https://github.com/NuPhyLab/Air75-V3-RGB-Lab)中的早期 AIR 专用源码为历史资料。
+[项目源码](https://github.com/bohu8264/NuPhyLab-next/tree/main) · [发行版本](https://github.com/bohu8264/NuPhyLab-next/releases)
 
 需要 macOS、Xcode 命令行工具和 Node.js 22 以上版本。
 

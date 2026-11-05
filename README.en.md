@@ -10,9 +10,9 @@ It includes drawing, animation, key-triggered effects, games, audio-reactive lig
 
 **[Download the latest macOS installer](https://github.com/bohu8264/NuPhyLab-next/releases/latest/download/NuPhyLab-macOS-AppleSilicon.dmg)**
 
-Requires **Apple Silicon and macOS 13.5 or later**. The DMG is signed with NuPhy's Developer ID and notarized by Apple. This download address stays the same for future stable releases.
+Requires **Apple Silicon and macOS 13.5 or later**. The DMG is signed with NuPhy's Developer ID and notarized by Apple.
 
-[Latest release and verification scope](https://github.com/bohu8264/NuPhyLab-next/releases/latest) · [Previous versions](https://github.com/bohu8264/NuPhyLab-next/releases)
+[Latest release and notes](https://github.com/bohu8264/NuPhyLab-next/releases/latest) · [Previous versions](https://github.com/bohu8264/NuPhyLab-next/releases)
 
 1. Quit the old NuPhy Lab app before installing.
 2. Open the DMG and drag **NuPhy Lab** to Applications. Replace the existing app if prompted, and keep one installed copy. Keep the app-data folder to retain your artwork, drafts and settings.
@@ -43,11 +43,11 @@ NuPhy Lab includes signed in-app updates. It checks for new releases automatical
 
 Lighting requires USB. AIR75 V3 also supports Bluetooth shortcut control. The current keyboard layouts are ANSI.
 
-The existing bundle identifier and local data directory remain compatible. Diagnostics stay on the Mac. Update checks do not upload task contents, artwork or keyboard input. Keyboard writes require model, geometry, LED-count, session and readback verification.
+Diagnostics stay on the Mac. Update checks do not upload task contents, artwork or keyboard input.
 
 ## Source and development
 
-[Current maintained source](https://github.com/bohu8264/NuPhyLab-next/tree/main). For source matching an installer, use **Source code** on its release page. Early AIR-only files in the [marketing repository](https://github.com/NuPhyLab/Air75-V3-RGB-Lab) are historical.
+[Source code](https://github.com/bohu8264/NuPhyLab-next/tree/main) · [Releases](https://github.com/bohu8264/NuPhyLab-next/releases)
 
 Building requires macOS, Xcode command line tools and Node.js 22 or newer.
 

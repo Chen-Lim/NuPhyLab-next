@@ -22,18 +22,8 @@ A brief automatic close and reopen during first authorization is expected. Appro
 
 For Apple Silicon on macOS 13.5 or later.
 
-## 验证范围
+## 兼容性 / Compatibility
 
-本次发布复用本机测试过的同一份 1.2.39 R2 签名、公证安装包。应用和 DMG 均已通过 Apple 公证并完成 staple。R1 冻结源码通过 904 项回归和 6679 项原生离线检查；R2 补正权限结果日志，并通过 3 项原生宿主检查和 54 项包内运行时检查。以上属于不同验证范围，不能合并视为一次 R2 全量验收。
+支持环境的兼容性验证尚未全部完成。不同 Mac、系统、键盘和 Codex 版本，以及 F8／F9／F12 的操作效果、应用内升级与旋钮媒体键的配合仍需进一步验证。
 
-测试 Mac 已确认实体 F7 切换、F11 按住／松开听写、正常退出、数据保留，以及授予辅助功能权限后自动恢复。独立 Mac 验收、最低系统／两款键盘覆盖、完整签名更新安装、F8／F9／F12 逐项动作效果，以及旋钮与共享媒体键的独立性仍未完成验证。正式发布不会改变这些测试结果。
-
-应用内置更新说明保留原候选措辞，以确保经过测试和签名的安装包字节完全不变。
-
-## Verification
-
-This release reuses the exact signed and notarized 1.2.39 R2 package tested locally. Both app and DMG passed Apple notarization and were stapled. The R1 frozen source passed 904 regressions and 6679 native offline checks; R2 adds fixed permission-result logging and passed 3 native host checks and 54 packaged-runtime checks. These counts are separate validation scopes.
-
-Physical F7 switching and F11 hold/release dictation, clean exit, data retention and Accessibility grant automatic recovery were confirmed on the test Mac. Independent-Mac acceptance, minimum-OS/two-keyboard coverage, a complete signed update installation, action-specific F8/F9/F12 verification and rotary/shared-media-key independence remain unverified. Publication does not change those test results.
-
-The app's embedded release notes retain their original candidate wording so the tested, signed package remains byte-for-byte identical.
+Compatibility verification is not yet complete across supported environments. Further checks are needed across Macs, OS versions, keyboards and Codex versions, including F8/F9/F12 behavior, in-app upgrades and interaction with rotary media controls.

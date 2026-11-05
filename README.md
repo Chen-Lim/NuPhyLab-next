@@ -13,12 +13,12 @@ A macOS lighting studio for **NuPhy AIR75 V3 and Kick75 (ANSI)**, with keyboard 
 **Apple Silicon · macOS 13.5 或以上 / macOS 13.5 or later**
 
 - [最新版本与更新说明 / Latest release and notes](https://github.com/bohu8264/NuPhyLab-next/releases/latest)
-- [当前维护的源码 / Current maintained source](https://github.com/bohu8264/NuPhyLab-next/tree/main)
+- [项目源码 / Source code](https://github.com/bohu8264/NuPhyLab-next/tree/main)
 - [历史版本 / Previous releases](https://github.com/bohu8264/NuPhyLab-next/releases)
 
-安装包使用 NuPhy 公司 Developer ID 签名并完成 Apple 公证。上方下载链接始终指向最新正式版，后续更新无需更换分享地址。
+安装包使用 NuPhy 公司 Developer ID 签名并完成 Apple 公证。
 
-The installer is signed with NuPhy's Developer ID and notarized by Apple. The download link always points to the latest stable release, so it can be reused for future updates.
+The installer is signed with NuPhy's Developer ID and notarized by Apple.
 
 ## 安装与更新 / Install and update
 
@@ -69,7 +69,3 @@ Approval commands require a current request. Sending requires the chat composer 
 - [发布流程（中文）](docs/RELEASING.md) · [Release workflow (English)](docs/RELEASING.en.md)
 - [第三方声明 / Third-party notices](THIRD_PARTY_NOTICES.md)
 - [问题反馈 / Report an issue](https://github.com/bohu8264/NuPhyLab-next/issues)
-
-本仓库维护当前版本。[市场分享页](https://github.com/NuPhyLab/Air75-V3-RGB-Lab)继续作为固定入口；其中的早期 AIR 专用源码属于历史资料。需要与某个安装包一致的源码时，请使用对应发行页的 **Source code**。
-
-This repository maintains the current app. The [marketing page](https://github.com/NuPhyLab/Air75-V3-RGB-Lab) remains a permanent entry point; its early AIR-only source is historical. For source matching an installer, use **Source code** on that release's page.
