@@ -568,10 +568,13 @@ test("actions are data only, exact-ID links are restricted, and approval needs e
   });
   assert.equal(link.url, "codex://threads/task-123");
   const approve = describeAction("approve");
-  assert.equal(approve.available, false);
+  assert.equal(approve.available, true);
+  assert.equal(approve.requiresPhysicalPress,true);
+  assert.equal(approve.requiresDedicatedShortcut,true);
   assert.equal(approve.requiresUserGesture, true);
   assert.equal(approve.requiresVerifiedApprovalContext, true);
-  assert.equal(describeAction("toggleFastMode").available, false);
+  assert.equal(describeAction("toggleFastMode").available, true);
+  assert.equal(describeAction("toggleFastMode").requiresPhysicalPress,true);
 });
 
 test('live writer keeps a silent current turn stable, but process exit cannot leave a false blue light',async t=>{

@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import path from 'node:path';
 import {fakeService,until} from './helpers/fake-service.mjs';
 import {FACTORY_MAC_ROW} from '../shared/keycap-functions.mjs';
 
@@ -98,4 +100,16 @@ test('a failed USB release never returns an updater URL or re-enables keyboard c
   assert.equal(result.result?.url,undefined);
   assert.equal((await service.state()).codex.keys.enabled,false);
   assert.equal((await service.state()).device.driverHandoff,true);
+});
+
+// Ordinary Finder launch has no CODEX_HOME. Keep HOME isolated but exercise
+// the product default path, not the explicit override used by older fixtures.
+test('ordinary app launch without CODEX_HOME prepares controls without creating Codex bindings',async t=>{
+  const service=await fakeService(t,{freshLibrary:true},{defaultCodexHome:true});
+  const initial=await service.state();
+  assert.deepEqual(initial.settings.codexCommandIds,['toggleFastMode','approve','decline','newTask','dictation','sendPrompt']);
+  assert.equal((await service.command({op:'settings',settings:{codexEnabled:true}})).ok,true);
+  await until(service.state,s=>s.codex.keys.commandBridge.status==='prepared','ordinary home control preparation did not finish');
+  await assert.rejects(readFile(path.join(path.dirname(service.dataDir),'.codex/keybindings.json')),{code:'ENOENT'});
+  assert.equal((await service.operations()).filter(row=>['shortcut','codexControl'].includes(row.op)).length,0);
 });

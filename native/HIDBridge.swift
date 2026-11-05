@@ -2,6 +2,7 @@
 // The sole keymap write is a journaled factory F4 lease with verified restoration.
 // Build: swiftc -O native/HIDBridge.swift -o native/air75-hid-bridge
 import Foundation
+import CryptoKit
 import IOKit
 import IOKit.hid
 import CoreGraphics
@@ -244,8 +245,15 @@ final class KeyAdaptation {
 struct BridgeError: Error, CustomStringConvertible {
     let code: String
     let message: String
+    var controlDiagnostic: [String:Any]? = nil
+    var rotaryDiagnostic: [String:Any]? = nil
     var description: String { "\(code): \(message)" }
-    var json: [String: Any] { ["code": code, "message": message] }
+    var json: [String: Any] {
+        var value: [String:Any] = ["code":code,"message":message]
+        if let controlDiagnostic=controlDiagnostic {value["controlDiagnostic"]=controlDiagnostic}
+        if let rotaryDiagnostic=rotaryDiagnostic {value["rotaryDiagnostic"]=rotaryDiagnostic}
+        return value
+    }
 }
 
 func failure(_ code: String, _ message: String) -> BridgeError {
@@ -2299,6 +2307,1301 @@ enum TaskOpenDiagnostics {
     }
 }
 
+// BEGIN CODEX CONTROLS
+import CryptoKit
+enum CodexControlAction: String { case toggleFastMode, dictation, approve, decline, sendPrompt
+    var momentary:Bool {[.approve,.decline,.sendPrompt].contains(self)}
+}
+struct CodexControlContext: Equatable {
+    let bundleID: String
+    let pid: Int32
+    let window: Int
+}
+struct CodexControlNode {
+    let role: String
+    var title: String? = nil
+    var description: String? = nil
+    var help: String? = nil
+    var enabled = false
+    var actions = [String]()
+    var children = [Int]()
+    var url: URL? = nil
+}
+struct CodexControlDecision {
+    let node: Int
+    let state: String
+    let expectedState: String?
+    let actionable: Bool
+    var menu: Int? = nil
+}
+// This optional opener only opens the model menu. It must never become a
+// general shortcut fallback when an exact speed control cannot be identified.
+struct CodexModelPickerOpener {
+    let keyCode: Int
+    let modifiers: [String]
+    static func parse(_ raw: Any?) -> CodexModelPickerOpener? {
+        guard let raw=raw as? [String:Any],let code=raw["keyCode"] as? Int,
+              let modifiers=raw["modifiers"] as? [String],!modifiers.isEmpty,
+              Set(modifiers).count == modifiers.count,
+              modifiers.allSatisfy({["control","shift","option","command","fn"].contains($0)}) else{return nil}
+        let standard=code == 46 && Set(modifiers) == Set(["control","shift"])
+        let dedicated=[105,107,113,106,64,79,80,90].contains(code) && modifiers.contains(where:{$0 != "fn"})
+        guard standard || dedicated else{return nil}
+        return CodexModelPickerOpener(keyCode:code,modifiers:modifiers)
+    }
+}
+// Only fixed enums, counts and a bounded duration leave this adapter. No AX
+// labels, values, titles, URLs, process IDs or element IDs are diagnostics.
+final class CodexControlDiagnostics {
+    let started: Double
+    let now: () -> Double
+    var enableStatus = "failed"
+    var visitedNodes=0,webAreasSeen=0,trustedWebAreas=0,missingURLWebAreas=0,rejectedURLWebAreas=0
+    var buttonCount=0,menuCount=0,matchCount=0
+    var scanLimited=false
+    var limitReason="none"
+    var actionReadiness="unknown",activationResponse="not-requested",scopeKind="none"
+    var warmupRemainingMs=0
+    var focusSource="none",focusStage="unknown",focusRole="none",focusDepth=0
+    var focusHasDocument=false,focusHasWindow=false
+    var focusAction="none"
+    init(now: @escaping () -> Double) {self.now=now;started=now()}
+    func beginScan() {
+        visitedNodes=0;webAreasSeen=0;trustedWebAreas=0;missingURLWebAreas=0;rejectedURLWebAreas=0
+        buttonCount=0;menuCount=0;matchCount=0
+    }
+    func record(_ node: CodexControlNode) {
+        visitedNodes+=1
+        if node.role == "AXWebArea" {
+            webAreasSeen+=1
+            if node.url == nil {missingURLWebAreas+=1}
+            else if CodexControlSelection.mainWebArea(node.url) {trustedWebAreas+=1}
+            else {rejectedURLWebAreas+=1}
+        }
+        if node.role == "AXButton" {buttonCount+=1}
+        if node.role == "AXMenu" {menuCount+=1}
+    }
+    func limitError(_ reason: String = "nodes") -> BridgeError {
+        scanLimited=true
+        limitReason=["nodes","depth","children","time"].contains(reason) ? reason:"nodes"
+        return failure("CONTROL_SCAN_LIMIT","目标界面检查已达到上限，请在 Codex 中手动操作。")
+    }
+    var snapshot: [String:Any] {
+        func count(_ value: Int) -> Int {min(4096,max(0,value))}
+        let elapsed=(now()-started)*1000
+        return ["enableStatus":["already-enabled","requested","unsupported","failed"].contains(enableStatus) ? enableStatus:"failed",
+            "visitedNodes":count(visitedNodes),"webAreasSeen":count(webAreasSeen),"trustedWebAreas":count(trustedWebAreas),
+            "missingURLWebAreas":count(missingURLWebAreas),"rejectedURLWebAreas":count(rejectedURLWebAreas),
+            "buttonCount":count(buttonCount),"menuCount":count(menuCount),"matchCount":count(matchCount),
+            "elapsedMs":elapsed.isFinite ? Int(min(2000,max(0,elapsed))):2000,"scanLimited":scanLimited,"limitReason":limitReason,
+            "actionReadiness":["warming","ready","unavailable","unknown"].contains(actionReadiness) ? actionReadiness:"unknown",
+            "warmupRemainingMs":min(3000,max(0,warmupRemainingMs)),
+            "activationResponse":["not-requested","accepted","unsupported","denied","failed"].contains(activationResponse) ? activationResponse:"failed",
+            "scopeKind":["none","document","focused-input","owned-input"].contains(scopeKind) ? scopeKind:"none",
+            "focusSource":["none","application","document","owned"].contains(focusSource) ? focusSource:"none",
+            "focusStage":["unknown","missing","outside-document","container","editable-missing","scope-rejected","ready"].contains(focusStage) ? focusStage:"unknown",
+            "focusRole":["none","text-area","text-field","web-area","group","scroll-area","window","button","search-field","secure-field","other"].contains(focusRole) ? focusRole:"other",
+            "focusDepth":min(64,max(0,focusDepth)),"focusHasDocument":focusHasDocument,"focusHasWindow":focusHasWindow,
+            "focusAction":["none","requested","confirmed","failed","cancelled"].contains(focusAction) ? focusAction:"failed"]
+    }
+}
+struct CodexAccessibilityActivationIdentity: Hashable {
+    let pid: Int32
+    let launch: Date
+}
+// Chromium's complete AT mode is debounced for two seconds. An initiating
+// gesture only requests readiness; no action or PTT start is scheduled here.
+// Even an unsupported AX setter response can have requested the mode, because
+// Chromium handles this attribute before forwarding it to its superclass.
+final class CodexAccessibilityActivation {
+    static let maximumProcesses=8
+    private struct Request {let at:Double;var response:String}
+    private var requests=[CodexAccessibilityActivationIdentity:Request]()
+    func retainOnly(_ identities: Set<CodexAccessibilityActivationIdentity>) {
+        requests=requests.filter{identities.contains($0.key)}
+    }
+    func retryFailedPreparation(identity:CodexAccessibilityActivationIdentity,now:Double) {
+        if let request=requests[identity],!["accepted","unsupported"].contains(request.response),now-request.at>=5 {
+            requests.removeValue(forKey:identity)
+        }
+    }
+    func require(identity current: CodexAccessibilityActivationIdentity, now: Double,
+                 diagnostics: CodexControlDiagnostics, activate: () throws -> String) throws {
+        if requests[current] == nil {
+            guard requests.count < Self.maximumProcesses else {
+                diagnostics.actionReadiness="unavailable";diagnostics.activationResponse="failed";diagnostics.warmupRemainingMs=0
+                throw failure("CONTROL_NOT_OPERABLE","Codex 命令键初始化记录已达到上限，请先关闭多余的 Codex 实例。")
+            }
+            // Store the attempt before the setter: thrown errors and an
+            // unsupported superclass response must not cause repeated opt-ins.
+            requests[current]=Request(at:now,response:"failed")
+            diagnostics.actionReadiness="unavailable";diagnostics.activationResponse="failed";diagnostics.warmupRemainingMs=0
+            let response=try activate()
+            requests[current]?.response=["accepted","unsupported","denied","failed"].contains(response) ? response:"failed"
+        }
+        guard let request=requests[current] else {throw failure("CONTROL_NOT_OPERABLE","Codex 命令键初始化状态不可用。")}
+        diagnostics.activationResponse=request.response
+        let remaining=max(0,2.0-(now-request.at))
+        diagnostics.warmupRemainingMs=remaining.isFinite ? Int(min(3000,ceil(remaining*1000))):0
+        if ["accepted","unsupported"].contains(request.response),remaining > 0 {
+            diagnostics.actionReadiness="warming"
+            throw failure("CONTROL_INITIALIZING","Codex 正在准备辅助功能控件。")
+        }
+        diagnostics.actionReadiness="unavailable";diagnostics.warmupRemainingMs=0
+        throw failure("CONTROL_NOT_OPERABLE","Codex 控件尚未提供可执行操作，请在 Codex 中手动检查；本次没有执行命令。")
+    }
+}
+struct CodexComposerScope {let node:Int;let editable:Int}
+enum CodexPhysicalHoldProof {
+    struct Expected {let gestureId:String;let sourceKeyCode:Int;let bindingEpoch:Int}
+    static let maximumBytes=2048
+    static let maximumInteger=9007199254740991
+    static func integer(_ value:Any?,minimum:Int=0,maximum:Int=maximumInteger) -> Int? {
+        guard let value=value as? NSNumber,CFGetTypeID(value) != CFBooleanGetTypeID(),
+              value.doubleValue.isFinite,value.doubleValue.rounded(.towardZero)==value.doubleValue,
+              value.doubleValue>=Double(minimum),value.doubleValue<=Double(maximum) else{return nil}
+        return value.intValue
+    }
+    static func request(_ command:[String:Any]) throws -> Expected {
+        guard let id=command["gestureId"] as? String,!id.isEmpty,id.count<=160,
+              id.range(of:"^[A-Za-z0-9:._-]+$",options:.regularExpression) != nil,
+              let code=integer(command["sourceKeyCode"],maximum:127),!(54...63).contains(code),
+              let epoch=integer(command["bindingEpoch"]) else {throw released()}
+        return Expected(gestureId:id,sourceKeyCode:code,bindingEpoch:epoch)
+    }
+    static func released() -> BridgeError {
+        failure("CONTROL_PRESS_RELEASED","实体按键已松开或本次手势已失效，没有启动听写。")
+    }
+    static func verify(_ bytes:Data,expected:Expected,secret:Data,nowMs:Double) -> Bool {
+        guard !bytes.isEmpty,bytes.count<=maximumBytes,secret.count==32,nowMs.isFinite,
+              let value=(try? JSONSerialization.jsonObject(with:bytes)) as? [String:Any],
+              Set(value.keys)==["gestureId","sourceKeyCode","bindingEpoch","held","recordedAtMs","signature"],
+              let id=value["gestureId"] as? String,id==expected.gestureId,
+              integer(value["sourceKeyCode"],maximum:127)==expected.sourceKeyCode,
+              integer(value["bindingEpoch"])==expected.bindingEpoch,
+              let held=value["held"] as? NSNumber,CFGetTypeID(held)==CFBooleanGetTypeID(),held.boolValue,
+              let recorded=integer(value["recordedAtMs"]),nowMs-Double(recorded)>=0,nowMs-Double(recorded)<=2000,
+              let signature=value["signature"] as? String,signature.count==64,
+              signature.range(of:"^[a-fA-F0-9]{64}$",options:.regularExpression) != nil,
+              let canonical=try? JSONSerialization.data(withJSONObject:["nuphylab-native-hold-v1",id,expected.sourceKeyCode,expected.bindingEpoch,true,recorded],options:[.fragmentsAllowed,.withoutEscapingSlashes]) else{return false}
+        var mac=[UInt8]();mac.reserveCapacity(32)
+        var index=signature.startIndex
+        for _ in 0..<32 {
+            let end=signature.index(index,offsetBy:2)
+            guard let byte=UInt8(signature[index..<end],radix:16) else{return false}
+            mac.append(byte);index=end
+        }
+        // CryptoKit performs the authentication-code comparison in constant time.
+        return HMAC<SHA256>.isValidAuthenticationCode(mac,authenticating:canonical,using:SymmetricKey(data:secret))
+    }
+    static func require(expected:Expected,secret:Data,read:() throws -> Data,nowMs:() -> Double) throws {
+        guard let bytes=try? read(),verify(bytes,expected:expected,secret:secret,nowMs:nowMs()) else{throw released()}
+    }
+    static func privateFile(_ path:String) throws -> Data {
+        let url=URL(fileURLWithPath:path).standardizedFileURL
+        guard path.hasPrefix("/"),url.lastPathComponent != ".",url.lastPathComponent != ".." else{throw released()}
+        let parent=Darwin.open(url.deletingLastPathComponent().path,O_RDONLY|O_CLOEXEC|O_DIRECTORY|O_NOFOLLOW)
+        guard parent>=0 else{throw released()};defer{Darwin.close(parent)}
+        var directory=stat()
+        guard fstat(parent,&directory)==0,directory.st_uid==getuid(),directory.st_mode&S_IFMT==S_IFDIR,directory.st_mode&0o777==0o700 else{throw released()}
+        let fd=openat(parent,url.lastPathComponent,O_RDONLY|O_CLOEXEC|O_NOFOLLOW)
+        guard fd>=0 else{throw released()};defer{Darwin.close(fd)}
+        var before=stat()
+        guard fstat(fd,&before)==0,before.st_uid==getuid(),before.st_mode&S_IFMT==S_IFREG,before.st_mode&0o777==0o600,
+              before.st_size>0,before.st_size<=maximumBytes else{throw released()}
+        var buffer=[UInt8](repeating:0,count:maximumBytes+1),count=0
+        while count<buffer.count {
+            let amount=buffer.withUnsafeMutableBytes { raw in Darwin.read(fd,raw.baseAddress!.advanced(by:count),raw.count-count) }
+            if amount<0,errno==EINTR {continue}
+            guard amount>=0 else{throw released()}
+            if amount==0 {break};count+=amount
+        }
+        var current=stat(),directoryAfter=stat()
+        guard count>0,count<=maximumBytes,fstat(parent,&directoryAfter)==0,
+              directoryAfter.st_dev==directory.st_dev,directoryAfter.st_ino==directory.st_ino,
+              directoryAfter.st_uid==getuid(),directoryAfter.st_mode&S_IFMT==S_IFDIR,directoryAfter.st_mode&0o777==0o700,
+              fstatat(parent,url.lastPathComponent,&current,AT_SYMLINK_NOFOLLOW)==0,
+              current.st_dev==before.st_dev,current.st_ino==before.st_ino,current.st_uid==getuid(),
+              current.st_mode&S_IFMT==S_IFREG,current.st_mode&0o777==0o600,current.st_size==count else{throw released()}
+        return Data(buffer.prefix(count))
+    }
+    static func checker(_ command:[String:Any],environment:[String:String]=ProcessInfo.processInfo.environment) throws -> () throws -> Void {
+        let expected=try request(command)
+        // The helper receives a dedicated hold-proof key. The main native-key
+        // signing key stays inside the host/server verifier boundary.
+        guard let encoded=environment["AIR_STUDIO_NATIVE_HOLD_SECRET"],let secret=Data(base64Encoded:encoded),secret.count==32,
+              secret.base64EncodedString()==encoded,let path=environment["AIR_STUDIO_NATIVE_HOLD_PATH"],!path.isEmpty else{throw released()}
+        return {try require(expected:expected,secret:secret,read:{try privateFile(path)},nowMs:{ProcessInfo.processInfo.systemUptime*1000})}
+    }
+}
+enum CodexForegroundActivation {
+    static func prepare(requireHeld:() throws -> Void,sameProcess:() throws -> Void,isForeground:() -> Bool,
+                        allowActivation:Bool,existingCount:Int,activate:() -> Bool,now:() -> Double,deadline:Double,settle:() -> Void) throws {
+        try requireHeld();try sameProcess()
+        if isForeground() {return}
+        guard allowActivation,existingCount==1 else {throw failure("TARGET_NOT_FOREGROUND","请先打开唯一的 Codex 聊天窗口，再按住听写键。")}
+        try requireHeld();try sameProcess()
+        guard now().isFinite,now()<=deadline else {throw failure("CONTROL_TARGET_CHANGED","Codex 聊天窗口尚未就绪，本次没有启动听写。")}
+        guard activate() else {throw failure("CONTROL_TARGET_CHANGED","无法切换到原 Codex 聊天窗口，请先打开聊天后重试。")}
+        while true {
+            try requireHeld();try sameProcess()
+            if isForeground() {return}
+            guard now().isFinite,now()<=deadline else {throw failure("CONTROL_TARGET_CHANGED","Codex 聊天窗口尚未就绪，本次没有启动听写。")}
+            settle()
+        }
+    }
+}
+enum CodexComposerSelection {
+    static let editableRoles: Set<String> = ["AXTextArea","AXTextField"]
+    static let containerRoles: Set<String> = ["AXWebArea","AXGroup","AXScrollArea","AXSplitGroup"]
+    static func roleKind(_ role:String) -> String {
+        switch role {
+        case "AXTextArea":return "text-area"
+        case "AXTextField":return "text-field"
+        case "AXWebArea":return "web-area"
+        case "AXGroup","AXSplitGroup":return "group"
+        case "AXScrollArea":return "scroll-area"
+        case "AXWindow":return "window"
+        case "AXButton":return "button"
+        case "AXSearchField":return "search-field"
+        case "AXSecureTextField":return "secure-field"
+        default:return "other"
+        }
+    }
+    static func uniqueEditable(root: Int, expected: Int, read: (Int) throws -> CodexControlNode,
+                               check: () throws -> Void, diagnostics: CodexControlDiagnostics?) throws -> Bool {
+        var queue=[(root,0)],offset=0,seen=Set<Int>(),found=false
+        while offset < queue.count {
+            try check()
+            let (id,depth)=queue[offset];offset+=1
+            if !seen.insert(id).inserted {continue}
+            guard seen.count <= CodexControlSelection.maximumNodes else {throw diagnostics?.limitError("nodes") ?? failure("CONTROL_SCAN_LIMIT","输入区域检查已达到上限。")}
+            guard depth <= CodexControlSelection.maximumDepth else {throw diagnostics?.limitError("depth") ?? failure("CONTROL_SCAN_LIMIT","输入区域检查已达到上限。")}
+            let node=try read(id)
+            if node.role == "AXWebArea",!CodexControlSelection.mainWebArea(node.url) {continue}
+            if ["AXSearchField","AXSecureTextField"].contains(node.role) {return false}
+            if editableRoles.contains(node.role) {
+                guard id == expected,!found else {return false}
+                found=true
+            }
+            // Only roles and child structure are inspected. Static text is a
+            // leaf, and no text, AXValue, title or description is requested.
+            if node.role == "AXStaticText" {continue}
+            guard node.children.count <= CodexControlSelection.maximumNodes,
+                  queue.count + node.children.count <= CodexControlSelection.maximumNodes * 2 else {throw diagnostics?.limitError("children") ?? failure("CONTROL_SCAN_LIMIT","输入区域检查已达到上限。")}
+            queue.append(contentsOf:node.children.map{($0,depth+1)})
+        }
+        return found
+    }
+    static func ancestry(from start: Int, through document: Int, window: Int,
+                         read: (Int) throws -> CodexControlNode, parent: (Int) throws -> Int?,
+                         check: () throws -> Void, diagnostics: CodexControlDiagnostics?,forFocus:Bool=false) throws -> [Int] {
+        var chain=[Int](),seen=Set<Int>(),current: Int?=start
+        func record() {
+            guard forFocus else{return}
+            diagnostics?.focusDepth=min(64,chain.count)
+            diagnostics?.focusHasDocument=chain.contains(document);diagnostics?.focusHasWindow=chain.contains(window)
+        }
+        defer {record()}
+        while let id=current {
+            try check()
+            guard seen.insert(id).inserted else {throw failure("CONTROL_TARGET_CHANGED","输入区域的归属已改变，请重新点击 Codex 输入框。")}
+            guard chain.count <= CodexControlSelection.maximumDepth else {throw diagnostics?.limitError("depth") ?? failure("CONTROL_SCAN_LIMIT","输入区域检查已达到上限。")}
+            let node=try read(id)
+            if (node.role == "AXWebArea" && id != document) ||
+                (id == document && (node.role != "AXWebArea" || !CodexControlSelection.mainWebArea(node.url))) {
+                throw failure("CONTROL_FOCUS_REQUIRED","请先点击当前 Codex 聊天的输入框，再按住听写键。")
+            }
+            chain.append(id)
+            if id == window {break}
+            current=try parent(id)
+        }
+        guard chain.contains(document),chain.last == window,
+              let docPosition=chain.firstIndex(of:document),let windowPosition=chain.firstIndex(of:window),docPosition < windowPosition else {
+            throw failure("CONTROL_FOCUS_REQUIRED","请先点击当前 Codex 聊天的输入框，再按住听写键。")
+        }
+        return chain
+    }
+    // An application-level AX focus can be the native web container rather
+    // than the renderer's actual focused input. Chromium exposes the focused
+    // renderer element through the trusted WebArea's public focus getter.
+    // Only a proven non-window ancestor container may use this route; a native search,
+    // button, unrelated editable, or generic in-document group never may.
+    static func focusedChain(document:Int,window:Int,focused:Int?,read:(Int) throws -> CodexControlNode,
+                             parent:(Int) throws -> Int?,check:() throws -> Void,
+                             diagnostics:CodexControlDiagnostics?,documentFocused:(() throws -> Int?)?=nil) throws -> [Int] {
+        diagnostics?.focusSource="application";diagnostics?.focusStage="missing";diagnostics?.focusRole="none"
+        diagnostics?.focusDepth=0;diagnostics?.focusHasDocument=false;diagnostics?.focusHasWindow=false
+        guard let focused=focused else {throw failure("CONTROL_FOCUS_REQUIRED","请先点击当前 Codex 聊天的输入框，再按住听写键。")}
+        let appNode=try read(focused)
+        diagnostics?.focusRole=roleKind(appNode.role)
+        var resolved=focused
+        if focused != window,containerRoles.contains(appNode.role),let documentFocused=documentFocused {
+            let documentChain=try ancestry(from:document,through:document,window:window,read:read,parent:parent,check:check,diagnostics:diagnostics)
+            if documentChain.contains(focused) {
+                diagnostics?.focusStage="container";diagnostics?.focusSource="document"
+                guard let actual=try documentFocused() else {
+                    diagnostics?.focusStage="missing";diagnostics?.focusRole="none"
+                    throw failure("CONTROL_FOCUS_REQUIRED","请先点击当前 Codex 聊天的输入框，再按住听写键。")
+                }
+                resolved=actual;diagnostics?.focusRole=roleKind(try read(actual).role)
+            }
+        }
+        diagnostics?.focusStage="outside-document"
+        return try ancestry(from:resolved,through:document,window:window,read:read,parent:parent,check:check,diagnostics:diagnostics,forFocus:true)
+    }
+    static func select(document: Int, window: Int, focused: Int?, read: (Int) throws -> CodexControlNode,
+                       parent: (Int) throws -> Int?, check: () throws -> Void,
+                       diagnostics: CodexControlDiagnostics? = nil,
+                       metadata: ((Int) throws -> CodexControlNode)? = nil,
+                       structure: ((Int) throws -> CodexControlNode)? = nil,
+                       documentFocused: (() throws -> Int?)? = nil) throws -> CodexComposerScope {
+        func structuralRead(_ id: Int) throws -> CodexControlNode {
+            if let metadata=metadata {return try metadata(id)}
+            return try read(id)
+        }
+        let chain=try focusedChain(document:document,window:window,focused:focused,read:structuralRead,parent:parent,check:check,
+            diagnostics:diagnostics,documentFocused:documentFocused)
+        diagnostics?.focusStage="editable-missing"
+        guard let editable=try chain.first(where:{try editableRoles.contains(structuralRead($0).role)}),
+              let editablePosition=chain.firstIndex(of:editable),let documentPosition=chain.firstIndex(of:document),editablePosition < documentPosition else {
+            throw failure("CONTROL_FOCUS_REQUIRED","请先点击当前 Codex 聊天的输入框，再按住听写键。")
+        }
+        // Closest enclosing scope wins only when it contains the actual
+        // focused editable and one exact microphone. Never pick a window's
+        // first microphone or follow focus on an owned release.
+        diagnostics?.focusStage="scope-rejected"
+        for scope in chain[(editablePosition+1)...documentPosition] {
+            try check()
+            guard try CodexControlSelection.contains(root:scope,target:editable,read:read,check:check,diagnostics:diagnostics) else {continue}
+            func structureRead(_ id: Int) throws -> CodexControlNode {
+                if let structure=structure {return try structure(id)}
+                return try read(id)
+            }
+            guard try uniqueEditable(root:scope,expected:editable,read:structureRead,check:check,diagnostics:diagnostics) else {
+                throw failure("CONTROL_FOCUS_REQUIRED","无法确认当前输入区域，请先点击 Codex 聊天输入框，再按住听写键。")
+            }
+            do {
+                _ = try CodexControlSelection.select(root:scope,action:.dictation,read:read,check:check,diagnostics:diagnostics,dictationPhase:"down")
+                diagnostics?.focusStage="ready"
+                return CodexComposerScope(node:scope,editable:editable)
+            } catch let error as BridgeError where error.code == "CONTROL_NOT_FOUND" {continue}
+        }
+        throw failure("CONTROL_FOCUS_REQUIRED","无法确认当前输入框的听写控件，请重新点击 Codex 聊天输入框。")
+    }
+    static func automatic(document:Int,window:Int,read:(Int) throws -> CodexControlNode,
+                          metadata:@escaping (Int) throws -> CodexControlNode,structure:@escaping (Int) throws -> CodexControlNode,
+                          parent:(Int) throws -> Int?,check:() throws -> Void,diagnostics:CodexControlDiagnostics?) throws -> CodexComposerScope {
+        var queue=[(document,0)],offset=0,seen=Set<Int>(),selected:CodexComposerScope?
+        while offset<queue.count {
+            try check()
+            let(id,depth)=queue[offset];offset+=1
+            if !seen.insert(id).inserted {continue}
+            guard seen.count<=CodexControlSelection.maximumNodes,depth<=CodexControlSelection.maximumDepth else {
+                throw diagnostics?.limitError(depth>CodexControlSelection.maximumDepth ? "depth":"nodes") ?? failure("CONTROL_SCAN_LIMIT","输入区域检查已达到上限。")
+            }
+            let node=try structure(id)
+            if node.role=="AXWebArea",id != document {continue}
+            if node.role=="AXStaticText" {continue}
+            // The installed composer is a multiline ProseMirror textbox.
+            // Generic single-line fields, search and secure inputs are never
+            // automatic destinations, even when keyboard focus is elsewhere.
+            if node.role=="AXTextArea" {
+                do {
+                    let candidate=try select(document:document,window:window,focused:id,read:read,parent:parent,check:check,
+                        diagnostics:diagnostics,metadata:metadata,structure:structure)
+                    let microphone=try CodexControlSelection.select(root:candidate.node,action:.dictation,read:read,check:check,
+                        diagnostics:diagnostics,dictationPhase:"down")
+                    if ["idle","not-operable"].contains(microphone.state) {
+                        guard selected == nil else {throw failure("CONTROL_AMBIGUOUS","当前有多个可听写的聊天输入框，请先选择要操作的聊天。")}
+                        selected=candidate
+                    }
+                } catch let error as BridgeError where error.code=="CONTROL_FOCUS_REQUIRED" || error.code=="CONTROL_NOT_FOUND" { }
+            }
+            guard node.children.count<=CodexControlSelection.maximumNodes,
+                  queue.count+node.children.count<=CodexControlSelection.maximumNodes*2 else {
+                throw diagnostics?.limitError("children") ?? failure("CONTROL_SCAN_LIMIT","输入区域检查已达到上限。")
+            }
+            queue.append(contentsOf:node.children.map{($0,depth+1)})
+        }
+        guard let selected=selected else {throw failure("CONTROL_FOCUS_REQUIRED","没有找到唯一可听写的聊天输入框，请先打开 Codex 聊天。")}
+        return selected
+    }
+    static func focusAutomatically(document:Int,window:Int,read:(Int) throws -> CodexControlNode,
+                                   metadata:@escaping (Int) throws -> CodexControlNode,structure:@escaping (Int) throws -> CodexControlNode,
+                                   parent:(Int) throws -> Int?,check:() throws -> Void,diagnostics:CodexControlDiagnostics?,
+                                   requireHeld:() throws -> Void,sameTarget:() throws -> Void,canFocus:(Int) throws -> Bool,
+                                   focus:(Int) throws -> Void,focused:() throws -> Int?,documentFocused:(() throws -> Int?)?,
+                                   settle:() -> Void) throws -> CodexComposerScope {
+        do {
+            try requireHeld();try sameTarget()
+            let candidate=try automatic(document:document,window:window,read:read,metadata:metadata,structure:structure,
+                parent:parent,check:check,diagnostics:diagnostics)
+            try requireHeld();try sameTarget()
+            let current=try automatic(document:document,window:window,read:read,metadata:metadata,structure:structure,
+                parent:parent,check:check,diagnostics:diagnostics)
+            guard current.node==candidate.node,current.editable==candidate.editable,try canFocus(candidate.editable) else {
+                throw failure("CONTROL_FOCUS_REQUIRED","当前聊天输入框暂时无法聚焦，本次没有启动听写。")
+            }
+            try requireHeld();try sameTarget();try check()
+            diagnostics?.focusAction="requested"
+            try focus(candidate.editable)
+            try requireHeld();try sameTarget()
+            for attempt in 0..<3 {
+                try requireHeld();try sameTarget();try check()
+                do {
+                    let confirmed=try select(document:document,window:window,focused:focused(),read:read,parent:parent,check:check,
+                        diagnostics:diagnostics,metadata:metadata,structure:structure,documentFocused:documentFocused)
+                    guard confirmed.node==candidate.node,confirmed.editable==candidate.editable else {
+                        throw failure("CONTROL_TARGET_CHANGED","输入焦点已改变，本次没有启动听写。")
+                    }
+                    diagnostics?.focusAction="confirmed"
+                    return confirmed
+                } catch let error as BridgeError where error.code=="CONTROL_FOCUS_REQUIRED" && attempt<2 {settle()}
+            }
+            throw failure("CONTROL_FOCUS_REQUIRED","无法确认聊天输入框已聚焦，本次没有启动听写。")
+        } catch let error as BridgeError {
+            diagnostics?.focusAction=error.code=="CONTROL_PRESS_RELEASED" ? "cancelled":"failed"
+            throw error
+        }
+    }
+}
+enum CodexControlSelection {
+    static let maximumNodes = 4096
+    static let maximumDepth = 64
+    static let maximumSeconds = 1.5
+    static let controlRoles: Set<String> = ["AXButton","AXMenuItem","AXCheckBox"]
+    static let textRoles: Set<String> = ["AXStaticText","AXTextArea","AXTextField","AXSearchField","AXSecureTextField"]
+    static func mainWebArea(_ url: URL?) -> Bool {
+        guard let url=url,let parts=URLComponents(url:url,resolvingAgainstBaseURL:false) else{return false}
+        // These are the installed app's main and detached renderer documents.
+        // In particular app://fs and embedded http(s) pages are not trusted UI.
+        return parts.scheme == "app" && parts.host == "-" && parts.port == nil && parts.user == nil && parts.password == nil &&
+            ["/index.html","/detached-window.html"].contains(parts.path)
+    }
+    static func decision(_ node: CodexControlNode, id: Int, action: CodexControlAction, dictationPhase: String? = nil) throws -> CodexControlDecision? {
+        guard action == .dictation ? node.role == "AXButton" : controlRoles.contains(node.role) else{return nil}
+        let labels=Set([node.title,node.description].compactMap{$0})
+        if action.momentary {
+            guard node.role == "AXButton" else{return nil}
+            let exact:Set<String>
+            switch action {
+            case .approve:exact=["Allow once","允许一次"]
+            case .decline:exact=["Deny","拒绝"]
+            case .sendPrompt:exact=["Send","发送","Queue","排队"]
+            default:return nil
+            }
+            guard !labels.isDisjoint(with:exact) else{return nil}
+            // Reject conflicting labels, expanded grants, and stop/resume.
+            guard labels.allSatisfy({$0.isEmpty || exact.contains($0)}) else {throw failure("CONTROL_AMBIGUOUS","当前操作按钮含义不明确，本次未执行。")}
+            return CodexControlDecision(node:id,state:node.enabled ? (node.actions.contains("AXPress") ? "available":"not-operable"):"disabled",
+                expectedState:nil,actionable:node.enabled && node.actions.contains("AXPress"))
+        }
+        let states: Set<String>
+        if action == .dictation {
+            states=Set(labels.compactMap { label in
+                switch label {
+                case "Dictate","听写": return "idle"
+                case "Stop dictation","停止听写": return "recording"
+                case "Starting dictation; click to cancel","正在启动听写；点击可取消": return "starting"
+                case "Finishing dictation","正在完成听写": return "finishing"
+                default: return nil
+                }
+            })
+        } else {
+            states=Set(labels.compactMap { label in
+                switch label {
+                case "Enable fast mode","启用快速模式": return "standard"
+                case "Enable standard mode","启用标准模式": return "fast"
+                default: return nil
+                }
+            })
+        }
+        guard !states.isEmpty else{return nil}
+        guard states.count == 1,let state=states.first else {throw failure("CONTROL_AMBIGUOUS","目标控件的状态不明确，请在 Codex 中手动检查。")}
+        if action == .dictation,let phase=dictationPhase {
+            let wanted=phase == "down" ? state == "idle" : ["recording","starting"].contains(state)
+            if !wanted {return CodexControlDecision(node:id,state:state,expectedState:nil,actionable:false)}
+        } else if ["starting","finishing"].contains(state) {return CodexControlDecision(node:id,state:state,expectedState:nil,actionable:false)}
+        guard node.enabled else{return CodexControlDecision(node:id,state:"disabled",expectedState:nil,actionable:false)}
+        guard node.actions.contains("AXPress") else{return CodexControlDecision(node:id,state:"not-operable",expectedState:nil,actionable:false)}
+        let expected=action == .dictation ? (state == "idle" ? "recording":"idle") : (state == "standard" ? "fast":"standard")
+        return CodexControlDecision(node:id,state:state,expectedState:expected,actionable:true)
+    }
+    static func modelPicker(_ node: CodexControlNode, id: Int) -> CodexControlDecision? {
+        guard node.role == "AXButton",[node.title,node.description,node.help].compactMap({$0}).contains(where:{["Select model","选择模型","Select effort","选择推理强度"].contains($0)}) else{return nil}
+        return CodexControlDecision(node:id,state:node.enabled ? "model-picker":"disabled",expectedState:nil,actionable:node.enabled && node.actions.contains("AXPress"))
+    }
+    static func scan(root: Int, read: (Int) throws -> CodexControlNode, check: () throws -> Void,
+                     diagnostics: CodexControlDiagnostics? = nil, stopAtFirstMatch: Bool = false, stopAtDocuments: Bool = false,
+                     match: (CodexControlNode,Int) throws -> CodexControlDecision?) throws -> CodexControlDecision {
+        diagnostics?.beginScan()
+        var queue: [(Int,Int,Int?)]=[(root,0,nil)],offset=0,seen=Set<Int>(),matches=[CodexControlDecision]()
+        while offset < queue.count {
+            try check()
+            let (id,depth,parentMenu)=queue[offset];offset+=1
+            if !seen.insert(id).inserted {continue}
+            guard seen.count <= maximumNodes else {throw diagnostics?.limitError("nodes") ?? failure("CONTROL_SCAN_LIMIT","目标界面检查已达到上限，请在 Codex 中手动操作。")}
+            guard depth <= maximumDepth else {throw diagnostics?.limitError("depth") ?? failure("CONTROL_SCAN_LIMIT","目标界面检查已达到上限，请在 Codex 中手动操作。")}
+            let node=try read(id)
+            diagnostics?.record(node)
+            if node.role == "AXWebArea" && !mainWebArea(node.url) {continue}
+            let menu=node.role == "AXMenu" ? id:parentMenu
+            if var candidate=try match(node,id) {
+                candidate.menu=menu;matches.append(candidate);diagnostics?.matchCount+=1
+                // Readiness probes may stop early because no element is
+                // acted on. Action selection scans fully to reject duplicates.
+                if stopAtFirstMatch {return candidate}
+            }
+            if stopAtDocuments && node.role == "AXWebArea" {continue}
+            if textRoles.contains(node.role) {continue}
+            guard node.children.count <= maximumNodes,queue.count + node.children.count <= maximumNodes * 2 else {throw diagnostics?.limitError("children") ?? failure("CONTROL_SCAN_LIMIT","目标界面检查已达到上限，请在 Codex 中手动操作。")}
+            queue.append(contentsOf:node.children.map{($0,depth+1,menu)})
+        }
+        guard !matches.isEmpty else {throw failure("CONTROL_NOT_FOUND","未找到可确认的目标控件，请在 Codex 中手动操作。")}
+        // A disabled or starting duplicate is still ambiguous context. Never
+        // choose the first apparent microphone or speed option in the window.
+        guard matches.count == 1 else {throw failure("CONTROL_AMBIGUOUS","存在多个目标控件，请在 Codex 中手动选择。")}
+        return matches[0]
+    }
+    static func select(root: Int, action: CodexControlAction, read: (Int) throws -> CodexControlNode,
+                       check: () throws -> Void, diagnostics: CodexControlDiagnostics? = nil, dictationPhase: String? = nil) throws -> CodexControlDecision {
+        try scan(root:root,read:read,check:check,diagnostics:diagnostics,match:{try decision($0,id:$1,action:action,dictationPhase:dictationPhase)})
+    }
+    static func documentRoot(root: Int, read: (Int) throws -> CodexControlNode,
+                             check: () throws -> Void, diagnostics: CodexControlDiagnostics? = nil) throws -> Int {
+        try scan(root:root,read:read,check:check,diagnostics:diagnostics,stopAtDocuments:true,
+            match:{node,id in node.role == "AXWebArea" && mainWebArea(node.url)
+                ? CodexControlDecision(node:id,state:"document",expectedState:nil,actionable:false):nil}).node
+    }
+    static func selectModelPicker(root: Int, read: (Int) throws -> CodexControlNode, check: () throws -> Void, diagnostics: CodexControlDiagnostics? = nil) throws -> CodexControlDecision {
+        try scan(root:root,read:read,check:check,diagnostics:diagnostics,match:{modelPicker($0,id:$1)})
+    }
+    static func actionReadinessWitness(root: Int, read: (Int) throws -> CodexControlNode,
+                                       check: () throws -> Void, diagnostics: CodexControlDiagnostics? = nil) throws -> Bool {
+        do {
+            _ = try scan(root:root,read:read,check:check,diagnostics:diagnostics,stopAtFirstMatch:true,match:{node,id in
+                guard let candidate=try decision(node,id:id,action:.dictation),candidate.actionable,
+                      ["idle","recording"].contains(candidate.state) else {return nil}
+                return candidate
+            })
+            return true
+        } catch let error as BridgeError where error.code == "CONTROL_NOT_FOUND" {return false}
+    }
+    static func contains(root: Int, target: Int, read: (Int) throws -> CodexControlNode, check: () throws -> Void, diagnostics: CodexControlDiagnostics? = nil) throws -> Bool {
+        do {
+            _ = try scan(root:root,read:read,check:check,diagnostics:diagnostics,match:{_,id in id == target ? CodexControlDecision(node:id,state:"present",expectedState:nil,actionable:false):nil})
+            return true
+        } catch let error as BridgeError where error.code == "CONTROL_NOT_FOUND" {return false}
+    }
+}
+enum CodexApprovalSelection {
+    // One visible, compact pair. Never combine a permanent permission selector
+    // with a Cancel button elsewhere, nor choose an expanded/always grant.
+    static func scope(document:Int,read:(Int) throws -> CodexControlNode,parent:(Int) throws -> Int?,check:() throws -> Void) throws -> Int {
+        let yes=try CodexControlSelection.select(root:document,action:.approve,read:read,check:check)
+        let no=try CodexControlSelection.select(root:document,action:.decline,read:read,check:check)
+        var current=yes.node,ancestors=Set<Int>()
+        for _ in 0..<7 {
+            try check()
+            guard let next=try parent(current),next != document,ancestors.insert(next).inserted else{break}
+            current=next
+            var queue=[current],seen=Set<Int>(),found=Set<Int>(),overflow=false
+            while let id=queue.popLast() {
+                try check()
+                if !seen.insert(id).inserted {continue}
+                if seen.count>96 {overflow=true;break}
+                let node=try read(id)
+                if ["AXWindow","AXWebArea","AXMenu","AXTextArea","AXTextField","AXSearchField","AXSecureTextField"].contains(node.role) {overflow=true;break}
+                if id==yes.node || id==no.node {found.insert(id)}
+                if node.role=="AXStaticText" {continue}
+                if queue.count+node.children.count>192 {overflow=true;break}
+                queue.append(contentsOf:node.children)
+            }
+            if overflow {break}
+            if found==Set([yes.node,no.node]) {return current}
+        }
+        throw failure("CONTROL_NOT_FOUND","当前没有可确认的批准请求，本次未执行。")
+    }
+}
+enum CodexControlPreparation {
+    static func applicationRoot(readRole: () throws -> String?, sameTarget: () throws -> Void) throws {
+        try sameTarget()
+        guard try readRole() == "AXApplication" else {
+            throw failure("CONTROL_NOT_FOUND","无法确认 Codex 的应用辅助功能入口，请在 Codex 中手动操作。")
+        }
+        try sameTarget()
+    }
+    static func prepare(root: Int, read: (Int) throws -> CodexControlNode,
+                        check: () throws -> Void, sameTarget: () throws -> Void,
+                        enable: () throws -> String, settle: () -> Void,
+                        diagnostics: CodexControlDiagnostics) throws {
+        func inspect() throws {
+            try sameTarget()
+            do {
+                _ = try CodexControlSelection.scan(root:root,read:read,check:check,diagnostics:diagnostics,stopAtFirstMatch:true,
+                    match:{node,id in node.role == "AXWebArea" && CodexControlSelection.mainWebArea(node.url)
+                        ? CodexControlDecision(node:id,state:"tree-ready",expectedState:nil,actionable:false):nil})
+            }
+            catch let error as BridgeError where error.code == "CONTROL_NOT_FOUND" {}
+            try sameTarget()
+        }
+        try inspect()
+        if diagnostics.trustedWebAreas > 0 {diagnostics.enableStatus="already-enabled";return}
+        try sameTarget()
+        diagnostics.enableStatus=try enable()
+        try sameTarget()
+        // Chromium exposes its renderer tree asynchronously after this opt-in.
+        // Never open a menu or press a control until a trusted tree is present.
+        for _ in 0..<4 {
+            settle();try inspect()
+            if diagnostics.trustedWebAreas > 0 {return}
+        }
+        throw failure("CONTROL_NOT_FOUND","Codex 的辅助功能界面尚未就绪，请稍后再按实体命令键。")
+    }
+}
+// AXVisibleChildren is only a viewport subset (and may be empty on window
+// containers). It cannot replace AXChildren when locating a renderer document.
+// Keep one bounded reader for the complete accessibility hierarchy.
+enum CodexControlChildren {
+    static func read<Element>(count: (String) -> (AXError,Int),
+                              values: (String,Int) -> (AXError,[Element]?),
+                              check: () throws -> Void, diagnostics: CodexControlDiagnostics) throws -> [Element] {
+        try check()
+        let attribute=kAXChildrenAttribute
+        let (status,size)=count(attribute)
+        if status == .attributeUnsupported || status == .noValue {return []}
+        guard status == .success,size>=0 else {throw failure("CONTROL_READ_FAILED","暂时无法读取目标控件，请在 Codex 中手动操作。")}
+        guard size<=CodexControlSelection.maximumNodes else {throw diagnostics.limitError("children")}
+        if size==0 {return []}
+        try check()
+        let (readStatus,children)=values(attribute,size)
+        guard readStatus == .success,let children=children,children.count==size else {
+            throw failure("CONTROL_READ_FAILED","暂时无法读取目标控件，请在 Codex 中手动操作。")
+        }
+        return children
+    }
+}
+enum CodexControlRunner {
+    // A delivered owned stop is asynchronous. Observe, never press it again;
+    // keep both a sample cap and the existing whole-operation deadline.
+    static let maximumReleaseObservations = 40
+    static func run(action: CodexControlAction, initial: CodexControlContext, root: Int,
+                    context: () throws -> CodexControlContext?, read: (Int) throws -> CodexControlNode,
+                    press: (Int) throws -> Void, now: () -> Double, settle: () -> Void,
+                    openModelPicker: (() throws -> Void)? = nil, cancelMenu: ((Int) throws -> Bool)? = nil,
+                    deadline suppliedDeadline: Double? = nil, diagnostics: CodexControlDiagnostics? = nil,
+                    prepareAccessibility: (() throws -> String)? = nil,
+                    readApplicationRole: (() throws -> String?)? = nil,
+                    readDocumentNode: ((Int) throws -> CodexControlNode)? = nil, dictationPhase: String? = nil,
+                    resolveDictationScope: ((Int) throws -> Int)? = nil,
+                    resolveCommandScope: ((Int) throws -> Int)? = nil,
+                    ensureActionReadiness: ((Bool) throws -> Void)? = nil) throws -> [String:Any] {
+        guard initial.bundleID == "com.openai.codex",initial.pid > 0 else {throw failure("TARGET_NOT_FOREGROUND","请先把 Codex 切到前台，再按实体命令键。")}
+        let deadline=suppliedDeadline ?? now()+CodexControlSelection.maximumSeconds
+        func check() throws {
+            guard now().isFinite,now() <= deadline else {throw diagnostics?.limitError("time") ?? failure("CONTROL_SCAN_LIMIT","目标界面检查已达到上限，请在 Codex 中手动操作。")}
+        }
+        func sameTarget() throws {
+            try check()
+            guard try context() == initial else {throw failure("CONTROL_TARGET_CHANGED","前台窗口已改变，请确认 Codex 当前窗口后重试。")}
+        }
+        try sameTarget()
+        if let readApplicationRole=readApplicationRole {
+            try CodexControlPreparation.applicationRoot(readRole:readApplicationRole,sameTarget:sameTarget)
+        }
+        func documentRead(_ id: Int) throws -> CodexControlNode {
+            if let readDocumentNode=readDocumentNode {return try readDocumentNode(id)}
+            return try read(id)
+        }
+        if let prepareAccessibility=prepareAccessibility,let diagnostics=diagnostics {
+            try CodexControlPreparation.prepare(root:root,read:documentRead,check:check,sameTarget:sameTarget,
+                enable:prepareAccessibility,settle:settle,diagnostics:diagnostics)
+        }
+        let documentRoot=try readDocumentNode.map { try CodexControlSelection.documentRoot(root:root,read:$0,check:check,diagnostics:diagnostics) } ?? root
+        if readDocumentNode != nil {diagnostics?.scopeKind="document"}
+        func sameDocument() throws {
+            try sameTarget()
+            if readDocumentNode != nil {
+                let document=try documentRead(documentRoot)
+                guard document.role == "AXWebArea",CodexControlSelection.mainWebArea(document.url) else {
+                    throw failure("CONTROL_TARGET_CHANGED","Codex 当前文档已改变，请重新点击聊天输入框后按键。")
+                }
+            }
+        }
+        let contentRoot:Int
+        if action == .dictation {contentRoot=try resolveDictationScope?(documentRoot) ?? documentRoot}
+        else if action.momentary {
+            guard let resolveCommandScope=resolveCommandScope else {throw failure("CONTROL_NOT_FOUND","当前没有可确认的操作区域。")}
+            contentRoot=try resolveCommandScope(documentRoot)
+        } else {contentRoot=documentRoot}
+        var openedMenu=false
+        let selected: CodexControlDecision
+        do {selected=try CodexControlSelection.select(root:contentRoot,action:action,read:read,check:check,diagnostics:diagnostics,dictationPhase:dictationPhase)}
+        catch let error as BridgeError where error.code == "CONTROL_NOT_FOUND" && action == .toggleFastMode {
+            try sameTarget()
+            do {
+                let picker=try CodexControlSelection.selectModelPicker(root:contentRoot,read:read,check:check,diagnostics:diagnostics)
+                if picker.state != "disabled" {try sameDocument();try ensureActionReadiness?(picker.actionable)}
+                guard picker.actionable else {throw failure("CONTROL_NOT_OPERABLE","模型选择控件当前不可操作，请在 Codex 中手动检查。")}
+                guard let refreshed=CodexControlSelection.modelPicker(try read(picker.node),id:picker.node),refreshed.actionable else {throw failure("CONTROL_TARGET_CHANGED","目标控件已改变，请在 Codex 中确认后重试。")}
+                try sameDocument();try press(picker.node);openedMenu=true
+            } catch let pickerError as BridgeError where pickerError.code == "CONTROL_NOT_FOUND" {
+                guard let openModelPicker=openModelPicker else {throw error}
+                // A shortcut may expose a menu only after action readiness is
+                // established. It is never a fallback for missing AT metadata.
+                try sameDocument()
+                var ready=false
+                if readDocumentNode != nil {ready=try CodexControlSelection.actionReadinessWitness(root:documentRoot,read:read,check:check,diagnostics:diagnostics)}
+                try sameDocument();try ensureActionReadiness?(ready)
+                try sameDocument();try openModelPicker();openedMenu=true
+            }
+            var found: CodexControlDecision?
+            for _ in 0..<4 {
+                settle();try sameTarget()
+                do {found=try CodexControlSelection.select(root:contentRoot,action:action,read:read,check:check,diagnostics:diagnostics,dictationPhase:dictationPhase);break}
+                catch let waiting as BridgeError where waiting.code == "CONTROL_NOT_FOUND" {continue}
+            }
+            guard let found=found else {throw failure("CONTROL_NOT_FOUND","未找到可确认的两态速度控件，请在 Codex 中手动操作。")}
+            selected=found
+        }
+        try sameDocument()
+        if selected.actionable || selected.state == "not-operable" {
+            diagnostics?.actionReadiness=selected.actionable ? "ready":"unavailable"
+            try ensureActionReadiness?(selected.actionable)
+        }
+        func result(performed: Bool, state: String, confirmation: String) -> [String:Any] {
+            var output: [String:Any] = ["performed":performed,"observedState":state,"confirmation":confirmation]
+            if action == .dictation,let phase=dictationPhase {output["released"]=phase == "up" && (performed || ["idle","finishing"].contains(state))}
+            if action == .toggleFastMode {
+                var dismissed=false
+                if openedMenu,let menu=selected.menu,let cancelMenu=cancelMenu {
+                    do {
+                        try sameTarget()
+                        if try cancelMenu(menu) {
+                            settle();try sameTarget()
+                            dismissed = try !CodexControlSelection.contains(root:contentRoot,target:menu,read:read,check:check,diagnostics:diagnostics)
+                        }
+                    } catch {dismissed=false}
+                }
+                output["menuOpened"]=openedMenu;output["menuDismissed"]=dismissed
+            }
+            if let diagnostics=diagnostics {output["controlDiagnostic"]=diagnostics.snapshot}
+            return output
+        }
+        guard selected.actionable else {return result(performed:false,state:selected.state,confirmation:"not-performed")}
+        // Recheck the exact element and focus immediately before the one press.
+        let refreshed=try CodexControlSelection.decision(read(selected.node),id:selected.node,action:action,dictationPhase:dictationPhase)
+        guard let refreshed=refreshed,refreshed.actionable,refreshed.state == selected.state else {throw failure("CONTROL_TARGET_CHANGED","目标控件已改变，请在 Codex 中确认后重试。")}
+        try sameDocument()
+        if action.momentary {
+            guard try resolveCommandScope?(documentRoot)==contentRoot,
+                  try CodexControlSelection.select(root:contentRoot,action:action,read:read,check:check).node==selected.node else {
+                throw failure("CONTROL_TARGET_CHANGED","当前请求或输入区域已改变，本次未执行。")
+            }
+        }
+        try press(selected.node)
+        if action.momentary {return result(performed:true,state:"unknown",confirmation:"delivered")}
+        var observed="unknown"
+        let observingOwnedStop = action == .dictation && dictationPhase == "up"
+        for _ in 0..<(observingOwnedStop ? maximumReleaseObservations:2) {
+            settle()
+            do {
+                if observingOwnedStop {try sameDocument()} else {try sameTarget()}
+                let next=try CodexControlSelection.select(root:contentRoot,action:action,read:read,check:check,diagnostics:diagnostics,dictationPhase:dictationPhase)
+                if observingOwnedStop {try sameDocument()}
+                observed=next.state
+                if observed == selected.expectedState || observingOwnedStop && ["idle","finishing"].contains(observed) {
+                    return result(performed:true,state:observed,confirmation:"observed")
+                }
+            } catch let waiting as BridgeError where observingOwnedStop && waiting.code == "CONTROL_NOT_FOUND" {
+                // React may briefly remove the recording button while stop is
+                // pending. Only its exact owned document/scope is re-read.
+                observed="unknown"
+            } catch {
+                // A delivered AXPress cannot be undone. Do not report a failed
+                // action that would invite an automatic retry or a second press.
+                return result(performed:true,state:"unknown",confirmation:"delivered")
+            }
+        }
+        return result(performed:true,state:observed,confirmation:"delivered")
+    }
+}
+// Ownership is local to the helper, not a target preference or a public token.
+// A late release can never consume a newer physical press's capture.
+final class CodexDictationOwnership {
+    private var capture: (owner:String,context:CodexControlContext)?
+    var activeOwner: String? {capture?.owner}
+    static func request(_ command: [String:Any]) throws -> (phase:String,owner:String) {
+        guard let phase=command["phase"] as? String,["down","up"].contains(phase),
+              let owner=command["owner"] as? String,owner.count == 36,
+              let uuid=UUID(uuidString:owner),uuid.uuidString.lowercased() == owner.lowercased() else {
+            throw failure("INVALID_CONTROL","听写需要本人按住命令键，松开后结束。")
+        }
+        return (phase,owner)
+    }
+    func claim(owner:String,context:CodexControlContext,performed:Bool) -> Bool {
+        guard performed,capture == nil else{return false}
+        capture=(owner,context);return true
+    }
+    func take(owner:String) -> CodexControlContext? {
+        guard capture?.owner == owner else{return nil}
+        let context=capture?.context;capture=nil;return context
+    }
+    func clear() {capture=nil}
+    static func releaseConfirmed(_ result:[String:Any]) -> Bool {
+        result["released"] as? Bool == true && ["idle","finishing"].contains(result["observedState"] as? String ?? "unknown")
+    }
+}
+enum CodexControlTargetIdentity {
+    static func valid(expected:CodexControlContext,current:CodexControlContext,expectedLaunch:Date?,currentLaunch:Date?,
+                      sameWindow:Bool,isForeground:Bool,requiresForeground:Bool) -> Bool {
+        guard expected.bundleID == "com.openai.codex",current == expected,sameWindow,
+              expectedLaunch == currentLaunch,requiresForeground || expectedLaunch != nil else{return false}
+        return !requiresForeground || isForeground
+    }
+}
+enum CodexControls {
+    private struct OwnedTarget {
+        let process: NSRunningApplication
+        let application: AXUIElement
+        let window: AXUIElement
+        let context: CodexControlContext
+        let scope: AXUIElement
+        let document: AXUIElement
+    }
+    private static let dictation=CodexDictationOwnership()
+    private static var ownedTarget: OwnedTarget?
+    private static let activation=CodexAccessibilityActivation()
+    // Retain the process object associated with the one-shot AT request. A
+    // reused PID or a different launch date never inherits its readiness.
+    private static var activationProcesses=[CodexAccessibilityActivationIdentity:NSRunningApplication]()
+    private static func enableManual(_ application:AXUIElement) -> String {
+        let status=AXUIElementSetAttributeValue(application,"AXManualAccessibility" as CFString,kCFBooleanTrue)
+        switch status {
+        case .success:return "requested"
+        case .attributeUnsupported,.notImplemented:return "unsupported"
+        default:return "failed"
+        }
+    }
+    private static func enableComplete(_ application:AXUIElement) -> String {
+        let status=AXUIElementSetAttributeValue(application,"AXEnhancedUserInterface" as CFString,kCFBooleanTrue)
+        switch status {
+        case .success:return "accepted"
+        case .attributeUnsupported,.notImplemented:return "unsupported"
+        case .apiDisabled:return "denied"
+        default:return "failed"
+        }
+    }
+    private static func retainActivationProcesses() {
+        activationProcesses=activationProcesses.filter{!$0.value.isTerminated && $0.value.processIdentifier == $0.key.pid && $0.value.launchDate == $0.key.launch}
+        activation.retainOnly(Set(activationProcesses.keys))
+    }
+    // Proactive public AT opt-in, scoped to a unique installed Codex process.
+    // No window/tree inspection, activation, key posting or control press.
+    static func prepare() throws -> [String:Any] {
+        guard AXIsProcessTrusted() else {
+            activationProcesses.removeAll();activation.retainOnly([])
+            return ["status":"permission-required"]
+        }
+        retainActivationProcesses()
+        let running=NSRunningApplication.runningApplications(withBundleIdentifier:"com.openai.codex").filter{!$0.isTerminated}
+        guard running.count==1,let process=running.first,let launch=process.launchDate else {
+            return ["status":running.isEmpty ? "open-app":"ambiguous"]
+        }
+        let identity=CodexAccessibilityActivationIdentity(pid:process.processIdentifier,launch:launch)
+        guard activationProcesses[identity] != nil || activationProcesses.count<CodexAccessibilityActivation.maximumProcesses else{return ["status":"ambiguous"]}
+        activationProcesses[identity]=process
+        let diagnostics=CodexControlDiagnostics(now:{ProcessInfo.processInfo.systemUptime})
+        activation.retryFailedPreparation(identity:identity,now:ProcessInfo.processInfo.systemUptime)
+        do {
+            try activation.require(identity:identity,now:ProcessInfo.processInfo.systemUptime,diagnostics:diagnostics,activate:{
+                func sameProcess() throws {
+                    guard !process.isTerminated,let current=NSRunningApplication(processIdentifier:identity.pid),
+                          !current.isTerminated,current.bundleIdentifier=="com.openai.codex",current.launchDate==launch else {
+                        throw failure("CONTROL_TARGET_CHANGED","Codex 进程已改变。")
+                    }
+                }
+                try sameProcess()
+                let application=AXUIElementCreateApplication(identity.pid)
+                AXUIElementSetMessagingTimeout(application,0.08)
+                _ = enableManual(application)
+                try sameProcess()
+                let result=enableComplete(application)
+                try sameProcess();return result
+            })
+        } catch let error as BridgeError where ["CONTROL_INITIALIZING","CONTROL_NOT_OPERABLE"].contains(error.code) {
+            let accepted=["accepted","unsupported"].contains(diagnostics.activationResponse)
+            return ["status":accepted ? (diagnostics.warmupRemainingMs>0 ? "warming":"prepared"):"unavailable"]
+        }
+        return ["status":"prepared"]
+    }
+    private static func noCapture(released:Bool=false) -> [String:Any] {
+        ["performed":false,"released":released,"observedState":"unknown","confirmation":"not-performed"]
+    }
+    static func perform(_ command: [String:Any], openModelPicker: (() throws -> Void)? = nil) throws -> [String:Any] {
+        let diagnostics=CodexControlDiagnostics(now:{ProcessInfo.processInfo.systemUptime})
+        let deadline=diagnostics.started+CodexControlSelection.maximumSeconds
+        do {
+            guard let name=command["action"] as? String,let action=CodexControlAction(rawValue:name) else {throw failure("INVALID_CONTROL","这个实体命令键操作暂不支持。")}
+            let gesture=action == .dictation ? try CodexDictationOwnership.request(command):nil
+            let physicalHold: (() throws -> Void)?
+            if gesture?.phase=="down" {
+                let validate=try CodexPhysicalHoldProof.checker(command)
+                physicalHold={
+                    do {try validate()}
+                    catch {diagnostics.focusAction="cancelled";throw CodexPhysicalHoldProof.released()}
+                }
+                try physicalHold?()
+            } else {physicalHold=nil}
+            var releaseTarget: OwnedTarget?
+            if let gesture=gesture {
+                if gesture.phase == "up" {
+                    guard let capture=dictation.take(owner:gesture.owner) else{return noCapture()}
+                    releaseTarget=ownedTarget;ownedTarget=nil
+                    guard releaseTarget?.context == capture else {throw failure("CONTROL_TARGET_CHANGED","原听写窗口已改变，请在 Codex 中手动结束听写。")}
+                } else if dictation.activeOwner != nil {return noCapture()}
+            }
+            guard AXIsProcessTrusted() else {throw failure("ACCESSIBILITY_REQUIRED","请先允许 NuPhy Lab 使用辅助功能。")}
+            let application: AXUIElement,window: AXUIElement,process: NSRunningApplication
+            let requiresForeground: Bool
+            if let target=releaseTarget {
+                // Releasing a capture started by this hold may end it in the
+                // background, but never activates or retargets another window.
+                application=target.application;window=target.window;process=target.process;requiresForeground=false
+            } else {
+                let front: NSRunningApplication
+                if let current=NSWorkspace.shared.frontmostApplication,current.bundleIdentifier=="com.openai.codex",!current.isTerminated {
+                    front=current
+                } else if let requireHeld=physicalHold,gesture?.phase=="down",command["activateTarget"] as? Bool==true {
+                    let running=NSRunningApplication.runningApplications(withBundleIdentifier:"com.openai.codex").filter{!$0.isTerminated}
+                    guard running.count==1,let target=running.first,let launch=target.launchDate else {
+                        throw failure("TARGET_NOT_FOREGROUND","请先打开唯一的 Codex 聊天窗口，再按住听写键。")
+                    }
+                    try CodexForegroundActivation.prepare(requireHeld:requireHeld,sameProcess:{
+                        guard !target.isTerminated,let current=NSRunningApplication(processIdentifier:target.processIdentifier),
+                              !current.isTerminated,current.bundleIdentifier=="com.openai.codex",current.launchDate==launch else {
+                            throw failure("CONTROL_TARGET_CHANGED","原 Codex 进程已改变，本次没有启动听写。")
+                        }
+                    },isForeground:{
+                        let active=NSWorkspace.shared.frontmostApplication
+                        return active?.processIdentifier==target.processIdentifier && active?.bundleIdentifier=="com.openai.codex"
+                    },allowActivation:true,existingCount:running.count,activate:{target.activate(options:[])},now:{ProcessInfo.processInfo.systemUptime},
+                        deadline:deadline,settle:{RunLoop.current.run(until:Date().addingTimeInterval(0.02))})
+                    front=target
+                } else {throw failure("TARGET_NOT_FOREGROUND","请先把 Codex 切到前台，再按实体命令键。")}
+                process=front;requiresForeground=true
+                application=AXUIElementCreateApplication(front.processIdentifier)
+                AXUIElementSetMessagingTimeout(application,0.08)
+                var focused: CFTypeRef?
+                guard AXUIElementCopyAttributeValue(application,kAXFocusedWindowAttribute as CFString,&focused) == .success,
+                      let focused=focused,CFGetTypeID(focused) == AXUIElementGetTypeID() else {throw failure("CONTROL_NOT_FOUND","无法确认 Codex 当前窗口，请在 Codex 中手动操作。")}
+                window=focused as! AXUIElement
+            }
+            if action == .dictation,process.launchDate == nil {throw failure("CONTROL_TARGET_CHANGED","无法确认原听写进程，请在 Codex 中手动结束听写。")}
+            let session=Session(application:application,window:window,pid:process.processIdentifier,
+                deadline:deadline,diagnostics:diagnostics,process:process,requiresForeground:requiresForeground,requireHeld:physicalHold)
+            let initial=CodexControlContext(bundleID:"com.openai.codex",pid:process.processIdentifier,window:0)
+            let result=try CodexControlRunner.run(action:action,initial:initial,root:0,context:session.context,read:session.read,
+                press:session.press,now:{ProcessInfo.processInfo.systemUptime},settle:{Thread.sleep(forTimeInterval:0.04)},
+                openModelPicker:openModelPicker,cancelMenu:session.cancel,deadline:deadline,diagnostics:diagnostics,
+                prepareAccessibility:{
+                    guard try session.context() == initial else {throw failure("CONTROL_TARGET_CHANGED","前台窗口已改变，请确认 Codex 当前窗口后重试。")}
+                    // Electron's documented AT opt-in. Only a verified physical
+                    // request reaches this adapter; no preferences are written.
+                    // https://github.com/electron/electron/blob/main/docs/tutorial/accessibility.md
+                    return enableManual(application)
+                },readApplicationRole:session.applicationRole,readDocumentNode:session.documentNode,dictationPhase:gesture?.phase,
+                resolveDictationScope:{document in
+                    try session.dictationScope(document:document,ownedScope:releaseTarget?.scope,ownedDocument:releaseTarget?.document)
+                },resolveCommandScope:{document in
+                    try session.commandScope(document:document,action:action)
+                },ensureActionReadiness:gesture?.phase == "up" ? nil:{ready in
+                    try physicalHold?()
+                    if ready {diagnostics.actionReadiness="ready";diagnostics.warmupRemainingMs=0;return}
+                    guard try session.context() == initial,let launch=process.launchDate else {throw failure("CONTROL_TARGET_CHANGED","无法确认 Codex 当前进程，请重新打开聊天输入框。")}
+                    let identity=CodexAccessibilityActivationIdentity(pid:process.processIdentifier,launch:launch)
+                    retainActivationProcesses()
+                    guard activationProcesses[identity] != nil || activationProcesses.count < CodexAccessibilityActivation.maximumProcesses else {throw failure("CONTROL_NOT_OPERABLE","Codex 实例过多，请先关闭多余实例后重新按键。")}
+                    activationProcesses[identity]=process
+                    try activation.require(identity:identity,
+                        now:ProcessInfo.processInfo.systemUptime,diagnostics:diagnostics,activate:{
+                            guard try session.context() == initial else {throw failure("CONTROL_TARGET_CHANGED","前台窗口已改变，请重新按实体命令键。")}
+                            // Chromium handles this application AT attribute
+                            // before its superclass, whose response can still
+                            // be unsupported. Request once; never sleep here,
+                            // disable another AT, or replay this gesture later.
+                            // https://github.com/chromium/chromium/blob/156.0.8078.79/chrome/browser/chrome_browser_application_mac.mm
+                            let response=enableComplete(application)
+                            guard try session.context() == initial else {throw failure("CONTROL_TARGET_CHANGED","前台窗口已改变，请重新按实体命令键。")}
+                            return response
+                        })
+                })
+            if let gesture=gesture,gesture.phase == "down",
+               let scope=session.scope,let document=session.document,
+               dictation.claim(owner:gesture.owner,context:initial,performed:result["performed"] as? Bool == true) {
+                ownedTarget=OwnedTarget(process:process,application:application,window:window,context:initial,scope:scope,document:document)
+            }
+            return result
+        } catch var error as BridgeError {
+            error.controlDiagnostic=diagnostics.snapshot
+            throw error
+        }
+    }
+    static func finishOwnedDictation() -> Bool {
+        guard let owner=dictation.activeOwner else{return true}
+        do {return CodexDictationOwnership.releaseConfirmed(try perform(["action":"dictation","phase":"up","owner":owner]))}
+        catch {dictation.clear();ownedTarget=nil;return false}
+    }
+    private final class Session {
+        let application: AXUIElement
+        let window: AXUIElement
+        let pid: pid_t
+        let deadline: Double
+        let diagnostics: CodexControlDiagnostics
+        let process: NSRunningApplication
+        let requiresForeground: Bool
+        let requireHeld: (() throws -> Void)?
+        var elements: [AXUIElement]
+        var elementBuckets: [CFHashCode:[Int]]
+        private var scopeID: Int?,documentID: Int?,scopeEditableID: Int?
+        var scope: AXUIElement? {scopeID.map{elements[$0]}}
+        var document: AXUIElement? {documentID.map{elements[$0]}}
+        init(application: AXUIElement, window: AXUIElement, pid: pid_t, deadline: Double, diagnostics: CodexControlDiagnostics,
+             process: NSRunningApplication, requiresForeground: Bool,requireHeld:(() throws -> Void)?=nil) {
+            self.application=application;self.window=window;self.pid=pid;self.deadline=deadline;self.diagnostics=diagnostics
+            self.process=process;self.requiresForeground=requiresForeground
+            self.requireHeld=requireHeld
+            elements=[window]
+            elementBuckets=[CFHash(window):[0]]
+        }
+        func check() throws {
+            guard ProcessInfo.processInfo.systemUptime <= deadline else {throw diagnostics.limitError("time")}
+        }
+        func value(_ element: AXUIElement, _ attribute: String) throws -> CFTypeRef? {
+            try check()
+            var result: CFTypeRef?
+            let status=AXUIElementCopyAttributeValue(element,attribute as CFString,&result)
+            if status == .attributeUnsupported || status == .noValue {return nil}
+            guard status == .success else {throw failure("CONTROL_READ_FAILED","暂时无法读取目标控件，请在 Codex 中手动操作。")}
+            return result
+        }
+        func applicationRole() throws -> String? {
+            // Chromium first enables NativeAPIs when an AT asks the application
+            // for AXRole. Descending and reading its web container's AXRole then
+            // enables basic WebContents support. No private flag is needed here.
+            // https://github.com/chromium/chromium/blob/156.0.8078.79/chrome/browser/chrome_browser_application_mac.mm
+            return try value(application,kAXRoleAttribute) as? String
+        }
+        func context() throws -> CodexControlContext? {
+            try check()
+            guard !process.isTerminated,process.bundleIdentifier == "com.openai.codex",process.processIdentifier == pid,
+                  let current=NSRunningApplication(processIdentifier:pid),!current.isTerminated,
+                  let focused=try value(application,kAXFocusedWindowAttribute),CFGetTypeID(focused) == AXUIElementGetTypeID() else{return nil}
+            let expected=CodexControlContext(bundleID:"com.openai.codex",pid:pid,window:0)
+            let actual=CodexControlContext(bundleID:current.bundleIdentifier ?? "",pid:current.processIdentifier,window:0)
+            let front=NSWorkspace.shared.frontmostApplication
+            return CodexControlTargetIdentity.valid(expected:expected,current:actual,expectedLaunch:process.launchDate,currentLaunch:current.launchDate,
+                sameWindow:CFEqual(focused,window),isForeground:front?.processIdentifier == pid && front?.bundleIdentifier == "com.openai.codex",
+                requiresForeground:requiresForeground) ? expected:nil
+        }
+        func index(_ element: AXUIElement) throws -> Int {
+            try check()
+            let hash=CFHash(element)
+            if let id=elementBuckets[hash]?.first(where:{CFEqual(elements[$0],element)}) {return id}
+            guard elements.count < CodexControlSelection.maximumNodes else {throw diagnostics.limitError("nodes")}
+            AXUIElementSetMessagingTimeout(element,0.08)
+            let id=elements.count
+            elements.append(element);elementBuckets[hash,default:[]].append(id);return id
+        }
+        func read(_ id: Int) throws -> CodexControlNode {
+            try readNode(id,documentOnly:false)
+        }
+        func documentNode(_ id: Int) throws -> CodexControlNode {
+            try readNode(id,documentOnly:true)
+        }
+        func ancestryNode(_ id: Int) throws -> CodexControlNode {
+            try readNode(id,documentOnly:true,metadataOnly:true)
+        }
+        func scopeStructureNode(_ id: Int) throws -> CodexControlNode {
+            try readNode(id,documentOnly:true,editableStructure:true)
+        }
+        func parent(_ id: Int) throws -> Int? {
+            try check()
+            guard elements.indices.contains(id) else {throw failure("CONTROL_TARGET_CHANGED","输入区域的归属已改变，请重新点击 Codex 输入框。")}
+            guard let raw=try value(elements[id],kAXParentAttribute),CFGetTypeID(raw) == AXUIElementGetTypeID() else {return nil}
+            let parent=raw as! AXUIElement
+            var owner: pid_t=0
+            guard AXUIElementGetPid(parent,&owner) == .success,owner == pid else {throw failure("CONTROL_TARGET_CHANGED","输入区域的归属已改变，请重新点击 Codex 输入框。")}
+            return try index(parent)
+        }
+        func focusedElement(in source:AXUIElement?=nil) throws -> Int? {
+            guard let raw=try value(source ?? application,kAXFocusedUIElementAttribute),CFGetTypeID(raw) == AXUIElementGetTypeID() else {return nil}
+            let focused=raw as! AXUIElement
+            var owner: pid_t=0
+            guard AXUIElementGetPid(focused,&owner) == .success,owner == pid else {return nil}
+            return try index(focused)
+        }
+        func documentFocusedElement(_ document:Int) throws -> Int? {
+            guard try context() != nil,elements.indices.contains(document) else {throw failure("CONTROL_TARGET_CHANGED","Codex 当前窗口已改变，请重新点击聊天输入框。")}
+            let node=try ancestryNode(document)
+            guard node.role == "AXWebArea",CodexControlSelection.mainWebArea(node.url) else {throw failure("CONTROL_TARGET_CHANGED","Codex 当前文档已改变，请重新点击聊天输入框。")}
+            // Standard Chromium BrowserAccessibilityCocoa focus getter:
+            // https://github.com/chromium/chromium/blob/156.0.8078.79/ui/accessibility/platform/browser_accessibility_cocoa.mm
+            return try focusedElement(in:elements[document])
+        }
+        func dictationScope(document foundDocument: Int,ownedScope: AXUIElement?,ownedDocument: AXUIElement?) throws -> Int {
+            guard try context() != nil else {throw failure("CONTROL_TARGET_CHANGED","原听写窗口已改变，请在 Codex 中手动结束听写。")}
+            let chosen: Int
+            if let ownedScope=ownedScope,let ownedDocument=ownedDocument {
+                diagnostics.focusSource="owned";diagnostics.focusStage="scope-rejected"
+                guard CFEqual(elements[foundDocument],ownedDocument) else {throw failure("CONTROL_TARGET_CHANGED","原听写文档已改变，请在 Codex 中手动结束听写。")}
+                chosen=try index(ownedScope)
+                _ = try CodexComposerSelection.ancestry(from:chosen,through:foundDocument,window:0,
+                    read:ancestryNode,parent:parent,check:check,diagnostics:diagnostics)
+                diagnostics.focusStage="ready"
+            } else {
+                let selected:CodexComposerScope
+                do {
+                    selected=try CodexComposerSelection.select(document:foundDocument,window:0,focused:focusedElement(),
+                        read:read,parent:parent,check:check,diagnostics:diagnostics,metadata:ancestryNode,structure:scopeStructureNode,
+                        documentFocused:{try self.documentFocusedElement(foundDocument)})
+                } catch let error as BridgeError where error.code=="CONTROL_FOCUS_REQUIRED" {
+                    guard let requireHeld=requireHeld else {throw CodexPhysicalHoldProof.released()}
+                    selected=try CodexComposerSelection.focusAutomatically(document:foundDocument,window:0,read:read,
+                        metadata:ancestryNode,structure:scopeStructureNode,parent:parent,check:check,diagnostics:diagnostics,
+                        requireHeld:requireHeld,sameTarget:{try self.sameDocument(foundDocument)},canFocus:canFocus,
+                        focus:{try self.focus($0,document:foundDocument)},focused:{try self.focusedElement()},
+                        documentFocused:{try self.documentFocusedElement(foundDocument)},settle:{Thread.sleep(forTimeInterval:0.02)})
+                }
+                chosen=selected.node;scopeEditableID=selected.editable
+            }
+            scopeID=chosen;documentID=foundDocument
+            diagnostics.scopeKind=ownedScope == nil ? "focused-input":"owned-input"
+            return chosen
+        }
+        func commandScope(document:Int,action:CodexControlAction) throws -> Int {
+            try sameDocument(document)
+            if action == .sendPrompt {
+                let selected=try CodexComposerSelection.select(document:document,window:0,focused:focusedElement(),read:read,
+                    parent:parent,check:check,diagnostics:diagnostics,metadata:ancestryNode,structure:scopeStructureNode,
+                    documentFocused:{try self.documentFocusedElement(document)})
+                scopeID=selected.node;scopeEditableID=selected.editable;documentID=document
+                return selected.node
+            }
+            return try CodexApprovalSelection.scope(document:document,read:read,parent:parent,check:check)
+        }
+        func sameDocument(_ document:Int) throws {
+            guard try context() != nil else {throw failure("CONTROL_TARGET_CHANGED","Codex 当前窗口已改变，本次没有启动听写。")}
+            let node=try ancestryNode(document)
+            guard node.role=="AXWebArea",CodexControlSelection.mainWebArea(node.url) else {throw failure("CONTROL_TARGET_CHANGED","Codex 当前文档已改变，本次没有启动听写。")}
+        }
+        func canFocus(_ editable:Int) throws -> Bool {
+            try check()
+            guard elements.indices.contains(editable),try ancestryNode(editable).role=="AXTextArea",
+                  (try value(elements[editable],kAXEnabledAttribute) as? NSNumber)?.boolValue==true else{return false}
+            var settable=DarwinBoolean(false)
+            return AXUIElementIsAttributeSettable(elements[editable],kAXFocusedAttribute as CFString,&settable) == .success && settable.boolValue
+        }
+        func focus(_ editable:Int,document:Int) throws {
+            try requireHeld?();try sameDocument(document)
+            _ = try CodexComposerSelection.ancestry(from:editable,through:document,window:0,read:ancestryNode,parent:parent,check:check,diagnostics:diagnostics)
+            guard try canFocus(editable) else {throw failure("CONTROL_FOCUS_REQUIRED","当前聊天输入框暂时无法聚焦。")}
+            try requireHeld?();try sameDocument(document);try check()
+            guard AXUIElementSetAttributeValue(elements[editable],kAXFocusedAttribute as CFString,kCFBooleanTrue) == .success else {
+                throw failure("CONTROL_FOCUS_REQUIRED","当前聊天输入框未接受聚焦，本次没有启动听写。")
+            }
+            try requireHeld?();try sameDocument(document)
+        }
+        func validateScope() throws {
+            guard let scopeID=scopeID,let documentID=documentID else {return}
+            let doc=try documentNode(documentID)
+            guard doc.role == "AXWebArea",CodexControlSelection.mainWebArea(doc.url) else {throw failure("CONTROL_TARGET_CHANGED","原听写文档已改变，请在 Codex 中手动结束听写。")}
+            _ = try CodexComposerSelection.ancestry(from:scopeID,through:documentID,window:0,
+                read:ancestryNode,parent:parent,check:check,diagnostics:diagnostics)
+            if requiresForeground {
+                diagnostics.focusStage="scope-rejected"
+                guard let expectedEditable=scopeEditableID,
+                      try CodexComposerSelection.uniqueEditable(root:scopeID,expected:expectedEditable,read:scopeStructureNode,check:check,diagnostics:diagnostics) else {
+                    throw failure("CONTROL_FOCUS_REQUIRED","输入区域已改变，请重新点击 Codex 聊天输入框，再按住听写键。")
+                }
+                let chain=try CodexComposerSelection.focusedChain(document:documentID,window:0,focused:focusedElement(),
+                    read:ancestryNode,parent:parent,check:check,diagnostics:diagnostics,
+                    documentFocused:{try self.documentFocusedElement(documentID)})
+                diagnostics.focusStage="scope-rejected"
+                guard chain.contains(scopeID),chain.contains(expectedEditable) else {
+                    throw failure("CONTROL_FOCUS_REQUIRED","输入焦点已改变，请重新点击 Codex 聊天输入框，再按住听写键。")
+                }
+                diagnostics.focusStage="ready"
+            }
+        }
+        private func readNode(_ id: Int,documentOnly:Bool,metadataOnly:Bool=false,editableStructure:Bool=false) throws -> CodexControlNode {
+            try check()
+            guard elements.indices.contains(id) else {throw failure("CONTROL_READ_FAILED","暂时无法读取目标控件，请在 Codex 中手动操作。")}
+            let element=elements[id]
+            AXUIElementSetMessagingTimeout(element,0.08)
+            guard let role=try value(element,kAXRoleAttribute) as? String else {throw failure("CONTROL_READ_FAILED","暂时无法读取目标控件，请在 Codex 中手动操作。")}
+            var node=CodexControlNode(role:role)
+            if role == "AXWebArea" {
+                let raw=try value(element,kAXURLAttribute)
+                node.url=(raw as? URL) ?? (raw as? String).flatMap{URL(string:$0)}
+                if !CodexControlSelection.mainWebArea(node.url) || (documentOnly && !editableStructure) {return node}
+            }
+            var owner: pid_t=0
+            guard AXUIElementGetPid(element,&owner) == .success,owner == pid else {throw failure("CONTROL_TARGET_CHANGED","目标控件已改变，请在 Codex 中确认后重试。")}
+            if metadataOnly {return node}
+            if CodexControlSelection.textRoles.contains(role) && !(editableStructure && CodexComposerSelection.editableRoles.contains(role)) {return node}
+            if !documentOnly && CodexControlSelection.controlRoles.contains(role) {
+                // Never read AXValue, editable text, static text or window
+                // titles. Unmatched control labels are never returned/logged.
+                func label(_ attribute: String) throws -> String? {
+                    guard let string=try value(element,attribute) as? String,string.utf8.count <= 160 else{return nil}
+                    return string
+                }
+                node.title=try label(kAXTitleAttribute);node.description=try label(kAXDescriptionAttribute)
+                if role == "AXButton" {node.help=try label(kAXHelpAttribute)}
+                node.enabled=(try value(element,kAXEnabledAttribute) as? NSNumber)?.boolValue == true
+            }
+            if !documentOnly && (CodexControlSelection.controlRoles.contains(role) || role == "AXMenu") {
+                var names: CFArray?
+                try check()
+                let status=AXUIElementCopyActionNames(element,&names)
+                guard status == .success || status == .actionUnsupported || status == .attributeUnsupported else {throw failure("CONTROL_READ_FAILED","暂时无法读取目标控件，请在 Codex 中手动操作。")}
+                if let names=names as? [String] {
+                    guard names.count <= 32 else {throw diagnostics.limitError("children")}
+                    node.actions=names.filter{[kAXPressAction,kAXCancelAction].contains($0)}
+                }
+            }
+            let children:[AXUIElement]=try CodexControlChildren.read(count:{attribute in
+                var count:CFIndex=0
+                let status=AXUIElementGetAttributeValueCount(element,attribute as CFString,&count)
+                return (status,count)
+            },values:{attribute,count in
+                var values:CFArray?
+                let status=AXUIElementCopyAttributeValues(element,attribute as CFString,0,count,&values)
+                return (status,values as? [AXUIElement])
+            },check:check,diagnostics:diagnostics)
+            node.children=try children.map{try index($0)}
+            return node
+        }
+        func press(_ id: Int) throws {
+            try requireHeld?()
+            guard try context() != nil,elements.indices.contains(id) else {throw failure("CONTROL_TARGET_CHANGED","前台窗口已改变，请确认 Codex 当前窗口后重试。")}
+            try validateScope()
+            try requireHeld?();try check()
+            guard AXUIElementPerformAction(elements[id],kAXPressAction as CFString) == .success else {throw failure("CONTROL_PRESS_FAILED","目标控件未接受操作，请在 Codex 中手动检查。")}
+        }
+        func cancel(_ id: Int) throws -> Bool {
+            guard try context() != nil else{return false}
+            let node=try read(id)
+            guard node.role == "AXMenu",node.actions.contains(kAXCancelAction) else{return false}
+            try check()
+            return AXUIElementPerformAction(elements[id],kAXCancelAction as CFString) == .success
+        }
+    }
+}
+// END CODEX CONTROLS
+
 final class KeyHooks {
     private struct HeldShortcut {
         let code: CGKeyCode
@@ -2444,6 +3747,13 @@ final class KeyHooks {
         }
         guard let targetApp = NSWorkspace.shared.frontmostApplication, targetApp.bundleIdentifier == target else {
             throw failure("TARGET_NOT_FRONTMOST", "Codex did not become the foreground application; no shortcut was sent.")
+        }
+        if command["expectedPID"] != nil || command["expectedLaunchMs"] != nil {
+            guard let pid=command["expectedPID"] as? Int,let launch=command["expectedLaunchMs"] as? Double,
+                  targetApp.processIdentifier==Int32(pid),let actual=targetApp.launchDate,
+                  abs(actual.timeIntervalSince1970*1000-launch)<1,!targetApp.isTerminated else {
+                throw failure("CONTROL_TARGET_CHANGED","Codex 已重新打开，请松开按键后重试。")
+            }
         }
         guard IOHIDCheckAccess(kIOHIDRequestTypePostEvent) == kIOHIDAccessTypeGranted else { throw failure("ACCESSIBILITY_REQUIRED", "Enable Accessibility for the parent application to send shortcuts.") }
         releaseShortcut()
@@ -2713,12 +4023,36 @@ final class JSONServer {
             return result
         case "keyMonitor": return try keys.configure(command)
         case "triggerMonitor": return try trigger.configure(command)
+        case "codexProcess":
+            // Public process metadata; no AX tree, chat text or private IPC.
+            let processes = NSRunningApplication.runningApplications(withBundleIdentifier:"com.openai.codex").filter{!$0.isTerminated}
+            let applicationURL = processes.first?.bundleURL ?? NSWorkspace.shared.urlForApplication(withBundleIdentifier:"com.openai.codex")
+            var result: [String: Any] = ["installed":applicationURL != nil,"running":!processes.isEmpty,"processCount":processes.count]
+            if let url=applicationURL, let bundle=Bundle(url:url) {
+                result["version"] = bundle.object(forInfoDictionaryKey:"CFBundleShortVersionString") as? String ?? ""
+            }
+            if processes.count == 1, let process=processes.first, let launch=process.launchDate {
+                result["pid"] = Int(process.processIdentifier)
+                result["launchedAtMs"] = launch.timeIntervalSince1970 * 1000
+            }
+            return result
+        case "codexPrepare": return try CodexControls.prepare()
         case "shortcut": return try keys.shortcut(command)
+        case "codexControl":
+            var opener: (() throws -> Void)? = nil
+            if command["action"] as? String == "toggleFastMode",let shortcut=CodexModelPickerOpener.parse(command["opener"]) {
+                opener = { [self] in
+                    _ = try keys.shortcut(["keyCode":shortcut.keyCode,"modifiers":shortcut.modifiers,
+                        "phase":"tap","target":"com.openai.codex","activateTarget":false])
+                }
+            }
+            return try CodexControls.perform(command,openModelPicker:opener)
         case "quit": stopping = true; return ["quitting": true]
         default: throw failure("UNKNOWN_OPERATION", "Unknown operation: \(op)")
         }
     }
     func shutdown() {
+        _ = CodexControls.finishOwnedDictation()
         stopping = true
         if !processing { finishShutdown() }
     }

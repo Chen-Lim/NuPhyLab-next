@@ -1,3 +1,5 @@
+import {helperProcessEnvironment} from './native-hold-env.mjs';
+import {controlDiagnostic} from './control-diagnostic.mjs';
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
 import { EventEmitter } from "node:events";
@@ -46,8 +48,11 @@ export function hardwareErrorMessage(code, detail) {
   return message + (detail.includes("Original lighting was restored and verified.") ? "已恢复原有灯效。" : "");
 }
 export class Hardware extends EventEmitter {
-  constructor(binary, backup) {
+  #nativeHoldEnvironment;
+  constructor(binary, backup, {nativeHoldEnvironment=null}={}) {
+    
     super();
+    this.#nativeHoldEnvironment=nativeHoldEnvironment;
     this.binary = binary;
     this.backup = backup;
     this.requests = new Map();
@@ -78,6 +83,7 @@ export class Hardware extends EventEmitter {
     this.diagnostics = "";
     const child = spawn(this.binary, ["--backup", this.backup], {
       stdio: ["pipe", "pipe", "pipe"],
+      env:helperProcessEnvironment(this.#nativeHoldEnvironment),
     });
     this.child = child;
     createInterface({ input: child.stdout }).on("line", (line) => {
@@ -132,6 +138,7 @@ export class Hardware extends EventEmitter {
         const error = new Error(hardwareErrorMessage(msg.error?.code, detail));
         error.protocolDetail = detail;
         if (typeof msg.error?.code === "string") error.code = msg.error.code;
+        error.controlDiagnostic=controlDiagnostic(msg.error?.controlDiagnostic);
         req.reject(error);
       }
     });

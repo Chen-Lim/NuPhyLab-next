@@ -58,7 +58,7 @@ test('new retired-key requests are rejected atomically instead of using load-onl
 
 test('retired-key API batches reject before releasing held input or changing hardware, file or playback',async t=>{
   const service=await fakeService(t,{tasks:[{id:'running',title:'Fixture',status:'running'}],codexKeybindings:[{command:'globalDictationHold',key:'Ctrl+Shift+D'},{command:'globalDictationSingleTap',key:null}]});
-  const ok=async body=>{const r=await service.command(body);assert.equal(r.ok,true,JSON.stringify(r));return r.result;};
+  const ok=async body=>{const r=await (body.op==='codexKey'&&body.code==='F9'?service.nativeKey(body):service.command(body));assert.equal(r.ok,true,JSON.stringify(r));return r.result;};
   await ok({op:'settings',settings:{codexEnabled:true,codexSelectedPulse:false,codexAmbient:false,quotaSideEnabled:false}});
   await ok({op:'codexKey',code:'F9',phase:'down'});await new Promise(resolve=>setTimeout(resolve,80));
   const before=await service.state(),file=path.join(service.dataDir,'library.json'),bytes=await readFile(file,'utf8'),start=(await service.operations()).length;

@@ -1,0 +1,13 @@
+{
+  "version": "1.2.39",
+  "zh-CN": [
+    "修正 Codex 命令键读取界面控件的路径，保留普通/极速、批准、拒绝、新聊天、听写和发送的默认分配。",
+    "重新检查首次授权，系统已允许但旧进程未生效时，安全恢复键盘后自动重新打开 NuPhy Lab 一次。",
+    "保留 Air75 V3 连接动画；此版本用于验证首次授权和实体按键。"
+  ],
+  "en": [
+    "Correct Codex control traversal while preserving the default command key assignments.",
+    "Check newly granted permissions in a fresh process and safely reopen NuPhy Lab once if the old process has stale authorization.",
+    "Preserve the Air75 V3 connection animation. This build is for permission and physical-key testing."
+  ]
+}

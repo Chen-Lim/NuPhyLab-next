@@ -8,8 +8,8 @@ import {fakeService,until} from './helpers/fake-service.mjs';
 const tasks=[{id:'codex-a',title:'Isolated A',status:'running'},{id:'codex-b',title:'Isolated B',status:'running'}];
 const gesture=(code,id,phase='down')=>({op:'codexKey',code,phase,gestureId:id,eventSource:'eventTap',eventTime:23.456});
 const mode=source=>({agentSource:source,codexEnabled:source==='codex',claudeEnabled:source==='claude'});
-const ok=async(service,body)=>{const result=await service.command(body);assert.equal(result.ok,true,JSON.stringify(result));return result.result;};
-const shortcuts=async service=>(await service.operations()).filter(x=>['shortcut','claudeExternalAction'].includes(x.op));
+const ok=async(service,body)=>{const result=await (body.op==='codexKey'&&body.code==='F9'?service.nativeKey(body):service.command(body));assert.equal(result.ok,true,JSON.stringify(result));return result.result;};
+const shortcuts=async service=>(await service.operations()).filter(x=>['shortcut','codexControl','claudeExternalAction'].includes(x.op));
 
 async function fixture(t,source,extra={}) {
   const service=await fakeService(t,{tasks,codexKeybindings:[{command:'globalDictationHold',key:'Ctrl+Shift+D'}],...extra});

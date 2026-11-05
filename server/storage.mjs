@@ -134,7 +134,7 @@ export const defaultSettings = {
   codexBrightness: 100,
   codexSelectedPulse: true,
   codexAmbient: false,
-  codexCommandIds: ["modelPicker", "newTask", "dictation", "voice", "toggleTerminal", "settings"],
+  codexCommandIds: ["toggleFastMode", "approve", "decline", "newTask", "dictation", "sendPrompt"],
   agentSource: "codex",
   claudeEnabled: false,
   claudeTaskKeys: [...DEFAULT_CLAUDE_TASK_KEYS],
@@ -272,14 +272,22 @@ export class Store {
       const settings = { ...data.settings };
       delete settings.appearanceStyle;
       delete settings.glassStrength;
+      if(JSON.stringify(settings.codexCommandIds)===JSON.stringify(["modelPicker","newTask","dictation","voice","toggleTerminal","settings"]))
+        settings.codexCommandIds=[...defaultSettings.codexCommandIds];
+      const futureSettings={};
+      if(Object.hasOwn(settings,'codexRotaryDepth')) {
+        if(typeof settings.codexRotaryDepth!=='boolean')throw new Error('旧实验开关格式无效');
+        futureSettings.codexRotaryDepth=settings.codexRotaryDepth;
+      }
+      for(const key of Object.keys(futureSettings))delete settings[key];
       this.data = {
         version: 1,
         scenes: data.scenes.map((s) => validateScene(s, s.updatedAt)),
-        settings: validateSettings({
+        settings: {...futureSettings,...validateSettings({
           ...settings,
           ...(!settings.codexTaskSource && settings.slotIds?.some(Boolean)
             ? {codexTaskSource:"custom"} : {}),
-        }),
+        })},
         bestScore: gameBestScores.snake,
         gameBestScores,
       };

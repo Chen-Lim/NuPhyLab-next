@@ -1,0 +1,32 @@
+{
+  "version": "1.2.39",
+  "revision": "r2",
+  "sha256": "c4d7b18614c6b7b6114e18f6bfebc54805096933b889bb173d97b3708aa4340b",
+  "bytes": 43101465,
+  "companySigned": true,
+  "appNotarizedAndStapled": true,
+  "dmgNotarizedAndStapled": true,
+  "r1FullRegression": {
+    "pass": 904,
+    "fail": 0
+  },
+  "r2NativeHostChecks": {
+    "pass": 3,
+    "fail": 0
+  },
+  "r2PackagedRuntimeChecks": {
+    "pass": 54,
+    "fail": 0
+  },
+  "nativeOfflineChecks": 6679,
+  "localPhysicalF7AndF11": "passed by user",
+  "localAccessibilityGrantAutomaticRecovery": "passed after reset",
+  "unverified": [
+    "independent Mac",
+    "minimum OS and both keyboard models",
+    "signed updater installation from public old version",
+    "F8/F9/F12 action-specific results",
+    "rotary/shared-media-key independence"
+  ],
+  "sameCandidateBytes": true
+}

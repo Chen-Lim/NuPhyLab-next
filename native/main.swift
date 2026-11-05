@@ -1,14 +1,26 @@
 import AppKit
+PermissionProbe.runIfRequested()
 PendingAppUpdate.finishRelaunchIfNeeded()
 let instanceDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Air Studio")
 let instanceLock: AppInstanceLock
 do {
-    switch try AppInstanceLock.acquire(directory: instanceDirectory,
+    let handoff=PermissionAppRelaunch.validatedHandoff()
+    let deadline=ProcessInfo.processInfo.systemUptime+8
+    func acquire() throws -> AppInstanceLock.Acquisition {
+        while true {
+            let result=try AppInstanceLock.acquire(directory: instanceDirectory,
                                       bundleIdentifier: Bundle.main.bundleIdentifier ?? "local.airstudio.desktop",
-                                      executableURL: Bundle.main.executableURL ?? URL(fileURLWithPath: CommandLine.arguments[0])) {
+                                      executableURL: Bundle.main.executableURL ?? URL(fileURLWithPath: CommandLine.arguments[0]))
+            if case .existing(let owner)=result,let handoff=handoff,owner?.pid==handoff.sourcePID,
+               ProcessInfo.processInfo.systemUptime<deadline {Thread.sleep(forTimeInterval:0.05);continue}
+            return result
+        }
+    }
+    switch try acquire() {
     case .acquired(let lock):
         instanceLock = lock
         PendingAppUpdate.acknowledgeGUIRelaunch()
+        if handoff != nil {try? FileManager.default.removeItem(at:PermissionAppRelaunch.file)}
     case .existing(let owner):
         // Activate only the exact recorded owner. A development copy sharing a
         // bundle identifier must not choose or terminate an unrelated process.

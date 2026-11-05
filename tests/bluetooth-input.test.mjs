@@ -57,11 +57,11 @@ test('Bluetooth runs task/custom keys and all command routes without USB; duplic
   assert.equal((await s.command({op:'codexKey',code:'F1',phase:'down'})).ok,true);
   await s.command({op:'codexKey',code:'F1',phase:'up'});
   for(const code of keys.slice(6)) {
-    assert.equal((await s.command({op:'codexKey',code,phase:'down'})).ok,true,code);
-    if(code==='F11')assert.equal((await s.command({op:'codexKey',code,phase:'down'})).result.ignored,true);
-    await s.command({op:'codexKey',code,phase:'up'});
+    assert.equal((await s.nativeKey({op:'codexKey',code,phase:'down'})).ok,true,code);
+    if(code==='F11')assert.equal((await s.nativeKey({op:'codexKey',code,phase:'down'})).result.ignored,true);
+    await s.nativeKey({op:'codexKey',code,phase:'up'});
   }
-  const sent=(await s.operations()).filter(x=>x.op==='shortcut');
+  const sent=(await s.operations()).filter(x=>['shortcut','codexControl'].includes(x.op));
   assert.equal(sent.filter(x=>x.action==='task'&&x.threadId===task.id).length,1);
   assert.equal(sent.filter(x=>x.keyCode===50&&x.phase==='tap').length,1,'terminal toggles exactly once');
   assert.equal(sent.filter(x=>x.phase==='down').length,1);assert.equal(sent.filter(x=>x.phase==='up').length,1);
@@ -116,12 +116,12 @@ test('Bluetooth disconnection releases held dictation, suspends shortcuts, and r
   const s=await fakeService(t,{skipInitialConnect:true,present:false,bluetoothDevices:[device],permissions,tasks:[task]});
   await s.command({op:'codexAdapt'});
   await s.command({op:'codexBind',group:'command',index:5,code:'KeyZ'});
-  await s.command({op:'codexKey',code:'F9',phase:'down'});
+  await s.nativeKey({op:'codexKey',code:'F9',phase:'down'});
   assert.equal((await s.state()).codex.keys.held.source,'F9');
   await s.configure({bluetoothDevices:[]});await s.command({op:'refreshBluetooth'});
   const disconnected=await s.state();
   assert.equal(disconnected.codex.keys.held,null);assert.equal(disconnected.codex.keys.enabled,false);
-  assert.equal((await s.operations()).filter(x=>x.op==='shortcut'&&x.phase==='up').length,1);
+  assert.equal((await s.operations()).filter(x=>x.op==='codexControl'&&x.action==='dictation'&&x.phase==='up').length,1);
   await s.configure({bluetoothDevices:[{...device,id:'9000'}]});await s.command({op:'refreshBluetooth'});
   const reconnected=await s.state();assert.equal(reconnected.codex.keys.enabled,true);
   assert.ok(reconnected.codex.keys.setupRevision>disconnected.codex.keys.setupRevision);

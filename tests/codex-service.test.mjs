@@ -17,17 +17,17 @@ test('duplicate physical terminal press sends only one toggle',async t=>{
 test('dictation release survives binding changes and mode changes without an orphan keydown',async t=>{
  const service=await fakeService(t,{tasks});
  await service.command({op:'settings',settings:{codexEnabled:true}});
- assert.equal((await service.command({op:'codexKey',code:'F9',phase:'down'})).ok,true);
+ assert.equal((await service.nativeKey({op:'codexKey',code:'F9',phase:'down'})).ok,true);
  assert.equal((await service.state()).codex.keys.held.source,'F9');
- assert.equal((await service.operations()).filter(x=>x.op==='shortcut').at(-1).phase,'down');
+ assert.equal((await service.operations()).filter(x=>x.op==='codexControl').at(-1).phase,'down');
  await service.command({op:'codexBind',group:'command',index:2,code:'KeyA'});
  assert.equal((await service.state()).codex.keys.held,null);
- assert.equal((await service.operations()).filter(x=>x.op==='shortcut').at(-1).phase,'up');
- assert.equal((await service.command({op:'codexKey',code:'F9',phase:'up'})).ok,true);
- await service.command({op:'codexKey',code:'KeyA',phase:'down'});
+ assert.equal((await service.operations()).filter(x=>x.op==='codexControl').at(-1).phase,'up');
+ assert.equal((await service.nativeKey({op:'codexKey',code:'F9',phase:'up'})).ok,true);
+ await service.nativeKey({op:'codexKey',code:'KeyA',phase:'down'});
  await service.command({op:'gameStart',gameType:'snake'});
  assert.equal((await service.state()).codex.keys.held,null);
- assert.equal((await service.command({op:'codexKey',code:'KeyA',phase:'up'})).ok,true);
+ assert.equal((await service.nativeKey({op:'codexKey',code:'KeyA',phase:'up'})).ok,true);
 });
 test('native command failures return a visible localized status instead of failing silently',async t=>{
  const service=await fakeService(t,{tasks,shortcutPermissionError:true});
@@ -37,40 +37,28 @@ test('native command failures return a visible localized status instead of faili
  const event=(await service.state()).codex.keys.lastEvent;
  assert.equal(event.code,'F12');assert.equal(event.ok,false);assert.match(event.error,/辅助功能权限/);
 });
-test('current Codex global dictation receives exactly one down/up and is released when mode is disabled',async t=>{
- const service=await fakeService(t,{tasks,codexKeybindings:[
-  {command:'composer.startDictation',key:'F11'},
-  {command:'globalDictationHold',key:'Ctrl+Shift+D'},
- ]});
+test('semantic dictation receives one owned down/up despite global key settings, and disabling mode releases it',async t=>{
+ const service=await fakeService(t,{tasks,codexKeybindings:[{command:'globalDictationHold',key:'Ctrl+Shift+D'}]});
  await service.command({op:'settings',settings:{codexEnabled:true}});
- assert.equal((await service.command({op:'codexKey',code:'F9',phase:'down'})).ok,true);
- await service.command({op:'codexKey',code:'F9',phase:'down'});
- let events=(await service.operations()).filter(x=>x.op==='shortcut');
- assert.equal(events.length,1);assert.equal(events[0].delivery,'globalHold');
- assert.equal(events[0].keyCode,2);assert.equal(events[0].phase,'down');
+ assert.equal((await service.nativeKey({op:'codexKey',code:'F9',phase:'down'})).ok,true);
+ await service.nativeKey({op:'codexKey',code:'F9',phase:'down'});
+ let events=(await service.operations()).filter(x=>x.op==='codexControl');
+ assert.equal(events.length,1);assert.equal(events[0].action,'dictation');assert.equal(events[0].phase,'down');
  await service.command({op:'settings',settings:{codexEnabled:false}});
- await service.command({op:'codexKey',code:'F9',phase:'up'});
- events=(await service.operations()).filter(x=>x.op==='shortcut');
- assert.deepEqual(events.map(x=>x.phase),['down','up']);
- assert.equal((await service.state()).codex.keys.held,null);
+ await service.nativeKey({op:'codexKey',code:'F9',phase:'up'});
+ events=(await service.operations()).filter(x=>x.op==='codexControl');
+ assert.deepEqual(events.map(x=>x.phase),['down','up']);assert.equal((await service.state()).codex.keys.held,null);
 });
-test('single-tap dictation keeps key-release and repeat events from immediately stopping recording',async t=>{
- const service=await fakeService(t,{tasks,codexKeybindings:[
-  {command:'globalDictationHold',key:null},
-  {command:'globalDictationSingleTap',key:'Ctrl+Shift+D'},
- ]});
+test('physical dictation stays hold-to-talk with legacy toggle settings and direct HTTP cannot start it',async t=>{
+ const service=await fakeService(t,{tasks,codexKeybindings:[{command:'globalDictationHold',key:null},{command:'globalDictationSingleTap',key:'Ctrl+Shift+D'}]});
  await service.command({op:'settings',settings:{codexEnabled:true}});
- await until(service.state,s=>s.codex.keys.dictation.mode==='toggle','toggle UI did not follow current keymap');
- await service.command({op:'codexKey',code:'F9',phase:'down'});
- await service.command({op:'codexKey',code:'F9',phase:'down'});
- await service.command({op:'codexKey',code:'F9',phase:'up'});
- let events=(await service.operations()).filter(x=>x.op==='shortcut');
- assert.equal(events.length,1);assert.equal(events[0].delivery,'globalTap');assert.equal(events[0].phase,'tap');
+ assert.equal((await service.state()).codex.keys.dictation.mode,'hold');
+ await service.nativeKey({op:'codexKey',code:'F9',phase:'down'});await service.nativeKey({op:'codexKey',code:'F9',phase:'down'});
+ await service.nativeKey({op:'codexKey',code:'F9',phase:'up'});
  assert.equal((await service.state()).codex.keys.held,null);
- await service.command({op:'codexAction',action:'dictation',phase:'down',source:'button'});
+ assert.equal((await service.command({op:'codexAction',action:'dictation',phase:'down',source:'button'})).ok,false);
  await service.command({op:'settings',settings:{codexEnabled:false}});
- events=(await service.operations()).filter(x=>x.op==='shortcut');
- assert.deepEqual(events.map(x=>x.phase),['tap','tap']);
+ assert.deepEqual((await service.operations()).filter(x=>x.op==='codexControl').map(x=>x.phase),['down','up']);
 });
 test('Micro slot mappings and command keys use the centralized action path without inventing approval',async t=>{
  const service=await fakeService(t,{tasks});
@@ -80,7 +68,7 @@ test('Micro slot mappings and command keys use the centralized action path witho
  assert.equal((await service.operations()).filter(o=>o.op==='shortcut').at(-1).threadId,'waiting');
  assert.equal((await service.state()).codex.lighting.selectedId,'waiting');
  assert.equal((await service.command({op:'codexSelect',threadId:'missing'})).ok,false);
- for (const action of SHORTCUTS.filter(s=>s.available)) {
+ for (const action of SHORTCUTS.filter(s=>s.available&&!s.requiresPhysicalPress)) {
   const result=await service.command({op:'codexAction',action:action.id,...(action.id==='dictation'?{phase:'down'}:{})});
   assert.equal(result.ok,true,action.id);
   const sent=(await service.operations()).filter(o=>o.op==='shortcut').at(-1);

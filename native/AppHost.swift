@@ -2,6 +2,7 @@ import AppKit
 import WebKit
 import Carbon
 import Darwin
+import CryptoKit
 import ApplicationServices
 import IOKit.hidsystem
 #if canImport(Sparkle)
@@ -9,6 +10,246 @@ import Sparkle
 #endif
 
 let functionKeyCodes: [UInt32:String] = [122:"F1",120:"F2",99:"F3",118:"F4",96:"F5",97:"F6",98:"F7",100:"F8",101:"F9",109:"F10",103:"F11",111:"F12"]
+
+enum NativeKeyOrigin {
+    static func isHardware(_ event: CGEvent?) -> Bool {
+        guard let event=event else{return false}
+        return event.getIntegerValueField(.eventSourceUnixProcessID) == 0
+    }
+}
+
+// Authenticity belongs to the native event path, not the web API token. The
+// secret stays in memory and the worker environment; never expose it in state.
+struct NativeKeySigner {
+    private let key: SymmetricKey
+    private(set) var sequence = 0
+    init(secret: Data? = nil) {
+        if let secret {
+            precondition(secret.count == 32)
+            key = SymmetricKey(data: secret)
+        } else { key = SymmetricKey(size: .bits256) }
+    }
+    var environmentSecret: String { key.withUnsafeBytes { Data($0).base64EncodedString() } }
+    // Domain separation keeps the helper from signing native key events.
+    var physicalHoldSecret: String {
+        Data(HMAC<SHA256>.authenticationCode(for:Data("nuphylab-native-hold-key-v1".utf8),using:key)).base64EncodedString()
+    }
+    var mappingCommitSecret:String {
+        Data(HMAC<SHA256>.authenticationCode(for:Data("nuphylab-mapping-commit-key-v1".utf8),using:key)).base64EncodedString()
+    }
+    private static func validASCII(_ value: String, limit: Int) -> Bool {
+        !value.isEmpty && value.utf8.count <= limit && value.utf8.allSatisfy {
+            (48...57).contains($0) || (65...90).contains($0) || (97...122).contains($0) || [45,46,58,95].contains($0)
+        }
+    }
+    static func bindingEpoch(_ value: Any?) -> Int? {
+        guard let number=value as? NSNumber,CFGetTypeID(number) != CFBooleanGetTypeID(),
+              number.doubleValue.isFinite,number.doubleValue >= 0,number.doubleValue <= 9_007_199_254_740_991,
+              number.doubleValue.rounded(.towardZero) == number.doubleValue else{return nil}
+        return number.intValue
+    }
+    mutating func sign(_ packet: [String:Any], trusted: Bool = false) -> [String:Any]? {
+        guard trusted,packet["op"] as? String == "codexKey",
+              let code=packet["code"] as? String,Self.validASCII(code,limit:80),
+              let phase=packet["phase"] as? String,["down","up"].contains(phase),
+              let gestureID=packet["gestureId"] as? String,Self.validASCII(gestureID,limit:160),
+              let source=packet["eventSource"] as? String,["eventTap","carbon","local"].contains(source),
+              let epoch=Self.bindingEpoch(packet["nativeKeyBindingEpoch"]),
+              sequence < 9_007_199_254_740_991 else{return nil}
+        let next=sequence+1
+        let canonical: [Any] = ["nuphylab-native-key-v2",next,code,phase,gestureID,source,epoch]
+        guard let bytes=try? JSONSerialization.data(withJSONObject:canonical) else{return nil}
+        let signature=HMAC<SHA256>.authenticationCode(for:bytes,using:key).map{String(format:"%02x",$0)}.joined()
+        var signed=packet
+        signed["nativeKeySequence"]=next;signed["nativeKeySignature"]=signature;signed["nativeKeyBindingEpoch"]=epoch
+        sequence=next
+        return signed
+    }
+    mutating func signRotary(action:String,epoch:Int,sessionID:String,trusted:Bool=false)->[String:Any]? {
+        guard trusted,["left","right","pressDown","pressUp"].contains(action),epoch>0,
+              epoch<=9_007_199_254_740_991,let uuid=UUID(uuidString:sessionID),
+              uuid.uuidString.lowercased()==sessionID,sequence<9_007_199_254_740_991 else{return nil}
+        let next=sequence+1,atMs=Int(Date().timeIntervalSince1970*1000)
+        let canonical:[Any]=["nuphylab-native-rotary-v1",next,action,epoch,sessionID,atMs]
+        guard let bytes=try? JSONSerialization.data(withJSONObject:canonical) else{return nil}
+        let signature=HMAC<SHA256>.authenticationCode(for:bytes,using:key).map{String(format:"%02x",$0)}.joined()
+        sequence=next
+        return ["op":"codexRotary","action":action,"epoch":epoch,"sessionId":sessionID,"atMs":atMs,
+                "nativeRotarySequence":next,"nativeRotarySignature":signature]
+    }
+}
+
+// BEGIN NATIVE HOLD STATE
+// Ephemeral proof of the native key's present state. This store never opens
+// an application, observes HID, reads a target, or restores a previous session.
+final class NativePhysicalHoldStore {
+    typealias BeforeWrite = (Data, URL) throws -> Void
+    private struct Identity: Equatable {
+        let device: dev_t
+        let inode: ino_t
+        init(_ value: stat) {device=value.st_dev;inode=value.st_ino}
+    }
+    private struct Record {
+        let gestureID: String
+        let keyCode: Int
+        let bindingEpoch: Int
+        let held: Bool
+        let recordedAtMs: Int
+    }
+    static let maximumSafeInteger = 9_007_199_254_740_991
+    private static let modifierKeyCodes = Set(54...63)
+    let directoryURL: URL
+    let fileURL: URL
+    private let key: SymmetricKey
+    private let directoryIdentity: Identity
+    private let beforeWrite: BeforeWrite?
+    private let lock = NSLock()
+    private var directoryFD: Int32
+    private var currentIdentity: Identity?
+    private var lastRecord: Record?
+    private var closed = false
+
+    init?(secret: Data, baseDirectory: URL = FileManager.default.temporaryDirectory,
+          beforeWrite: BeforeWrite? = nil) {
+        guard secret.count == 32,baseDirectory.isFileURL else {return nil}
+        let base=baseDirectory.standardizedFileURL.resolvingSymlinksInPath()
+        var template=Array(base.appendingPathComponent("nuphylab-native-hold-XXXXXX").path.utf8CString)
+        guard let path=template.withUnsafeMutableBufferPointer({ buffer -> String? in
+            guard let pointer=buffer.baseAddress,let result=mkdtemp(pointer) else {return nil}
+            return String(cString:result)
+        }) else {return nil}
+        let directory=URL(fileURLWithPath:path,isDirectory:true)
+        let fd=Darwin.open(path,O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW)
+        var metadata=stat()
+        guard fd >= 0,fstat(fd,&metadata) == 0,
+              (metadata.st_mode & S_IFMT) == S_IFDIR,metadata.st_uid == geteuid(),
+              (metadata.st_mode & 0o777) == 0o700 else {
+            if fd >= 0 {Darwin.close(fd)}
+            _ = Darwin.rmdir(path)
+            return nil
+        }
+        directoryURL=directory;fileURL=directory.appendingPathComponent("current.json")
+        key=SymmetricKey(data:secret);directoryFD=fd;directoryIdentity=Identity(metadata)
+        self.beforeWrite=beforeWrite
+    }
+    deinit {close()}
+
+    @discardableResult
+    func write(gestureID: String, keyCode: Int, bindingEpoch: Int, held: Bool, nowMs: Int) -> Bool {
+        lock.lock();defer {lock.unlock()}
+        guard !closed,Self.validID(gestureID),keyCode >= 0,keyCode <= 127,
+              !Self.modifierKeyCodes.contains(keyCode),Self.safe(bindingEpoch),Self.safe(nowMs) else {return false}
+        return persist(Record(gestureID:gestureID,keyCode:keyCode,bindingEpoch:bindingEpoch,held:held,recordedAtMs:nowMs))
+    }
+    @discardableResult
+    func invalidate(nowMs: Int) -> Bool {
+        lock.lock();defer {lock.unlock()}
+        guard !closed else {return true}
+        guard Self.safe(nowMs),let record=lastRecord else {return removeCurrent()}
+        return persist(Record(gestureID:record.gestureID,keyCode:record.keyCode,
+            bindingEpoch:record.bindingEpoch,held:false,recordedAtMs:nowMs))
+    }
+    func close() {
+        lock.lock();defer {lock.unlock()}
+        guard !closed else {return}
+        _ = removeCurrent()
+        // Do not recursively remove a directory or follow a replacement path.
+        // Unexpected entries remain untouched; rmdir succeeds only when empty.
+        if directoryIsCurrent(requirePrivatePermissions:false) {_ = Darwin.rmdir(directoryURL.path)}
+        closed=true
+        if directoryFD >= 0 {Darwin.close(directoryFD);directoryFD = -1}
+    }
+    private static func safe(_ value: Int) -> Bool {value >= 0 && value <= maximumSafeInteger}
+    private static func validID(_ value: String) -> Bool {
+        !value.isEmpty && value.utf8.count <= 160 && value.utf8.allSatisfy {
+            (48...57).contains($0) || (65...90).contains($0) || (97...122).contains($0) || [45,46,58,95].contains($0)
+        }
+    }
+    private func directoryIsCurrent(requirePrivatePermissions: Bool = true) -> Bool {
+        guard directoryFD >= 0 else {return false}
+        var pathMetadata=stat(),fdMetadata=stat()
+        return lstat(directoryURL.path,&pathMetadata) == 0 && fstat(directoryFD,&fdMetadata) == 0 &&
+            Identity(pathMetadata) == directoryIdentity && Identity(fdMetadata) == directoryIdentity &&
+            (pathMetadata.st_mode & S_IFMT) == S_IFDIR && pathMetadata.st_uid == geteuid() &&
+            (!requirePrivatePermissions || (pathMetadata.st_mode & 0o777) == 0o700)
+    }
+    private func currentMayBeReplaced() -> Bool {
+        var value=stat()
+        if fstatat(directoryFD,"current.json",&value,AT_SYMLINK_NOFOLLOW) != 0 {return errno == ENOENT}
+        return (value.st_mode & S_IFMT) == S_IFREG && value.st_uid == geteuid() &&
+            (value.st_mode & 0o777) == 0o600 &&
+            currentIdentity == Identity(value)
+    }
+    @discardableResult
+    private func removeCurrent() -> Bool {
+        lastRecord=nil
+        guard directoryFD >= 0 else {currentIdentity=nil;return false}
+        var value=stat()
+        if fstatat(directoryFD,"current.json",&value,AT_SYMLINK_NOFOLLOW) != 0 {
+            let absent=errno == ENOENT
+            if absent {currentIdentity=nil}
+            return absent
+        }
+        guard (value.st_mode & S_IFMT) == S_IFREG,value.st_uid == geteuid(),
+              currentIdentity == Identity(value) else {return false}
+        guard unlinkat(directoryFD,"current.json",0) == 0 else {return false}
+        currentIdentity=nil;return true
+    }
+    private func persist(_ record: Record) -> Bool {
+        var temporaryName: String?
+        var temporaryIdentity: Identity?
+        var temporaryFD: Int32 = -1
+        defer {
+            if temporaryFD >= 0 {Darwin.close(temporaryFD)}
+            if let name=temporaryName,let identity=temporaryIdentity {
+                var value=stat()
+                if fstatat(directoryFD,name,&value,AT_SYMLINK_NOFOLLOW) == 0,
+                   Identity(value) == identity {_ = unlinkat(directoryFD,name,0)}
+            }
+        }
+        do {
+            guard directoryIsCurrent(),currentMayBeReplaced() else {throw CocoaError(.fileWriteUnknown)}
+            let canonical: [Any] = ["nuphylab-native-hold-v1",record.gestureID,record.keyCode,
+                record.bindingEpoch,record.held,record.recordedAtMs]
+            let canonicalBytes=try JSONSerialization.data(withJSONObject:canonical)
+            let signature=HMAC<SHA256>.authenticationCode(for:canonicalBytes,using:key).map{String(format:"%02x",$0)}.joined()
+            let payload: [String:Any] = ["gestureId":record.gestureID,"sourceKeyCode":record.keyCode,
+                "bindingEpoch":record.bindingEpoch,"held":record.held,"recordedAtMs":record.recordedAtMs,"signature":signature]
+            let bytes=try JSONSerialization.data(withJSONObject:payload,options:.sortedKeys)
+            try beforeWrite?(bytes,fileURL)
+            guard directoryIsCurrent(),currentMayBeReplaced() else {throw CocoaError(.fileWriteUnknown)}
+            let name=".write-\(UUID().uuidString).tmp"
+            temporaryFD=openat(directoryFD,name,O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0o600)
+            guard temporaryFD >= 0 else {throw CocoaError(.fileWriteUnknown)}
+            var value=stat()
+            guard fstat(temporaryFD,&value) == 0 else {throw CocoaError(.fileWriteUnknown)}
+            temporaryName=name;temporaryIdentity=Identity(value)
+            guard (value.st_mode & S_IFMT) == S_IFREG,value.st_uid == geteuid(),
+                  (value.st_mode & 0o777) == 0o600 else {throw CocoaError(.fileWriteUnknown)}
+            try bytes.withUnsafeBytes { raw in
+                guard let pointer=raw.baseAddress else {throw CocoaError(.fileWriteUnknown)}
+                var offset=0
+                while offset < raw.count {
+                    let count=Darwin.write(temporaryFD,pointer.advanced(by:offset),raw.count-offset)
+                    if count < 0 && errno == EINTR {continue}
+                    guard count > 0 else {throw CocoaError(.fileWriteUnknown)}
+                    offset+=count
+                }
+            }
+            guard Darwin.close(temporaryFD) == 0 else {temporaryFD = -1;throw CocoaError(.fileWriteUnknown)}
+            temporaryFD = -1
+            guard directoryIsCurrent(),currentMayBeReplaced(),
+                  renameat(directoryFD,name,directoryFD,"current.json") == 0 else {throw CocoaError(.fileWriteUnknown)}
+            temporaryName=nil;currentIdentity=Identity(value);lastRecord=record
+            return true
+        } catch {
+            // A failed release must never leave a readable held=true record.
+            _ = removeCurrent()
+            return false
+        }
+    }
+}
+// END NATIVE HOLD STATE
 
 struct WorkerRestartPolicy {
     private var failures = [TimeInterval]()
@@ -240,6 +481,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     var hotkeyPollTimer: Timer?
     var hotkeyStateTask: URLSessionDataTask?
     var hotkeyPollGeneration = 0
+    private var keySessionSuspended=false
+    private var nativeKeySigner = NativeKeySigner()
+    private var trustedNativeKeyGestures = Set<String>()
+    private var gestureBindingEpochs = [String:Int]()
+    private var keyBindingEpoch:Int?
+    private var dictationKeyCodes = Set<UInt32>()
+    var physicalCommandCodes:Set<String> = ["F7","F8","F9","F11","F12"]
+    var capturePermissionSignature:String?
+    var permissionRecovery=PermissionCaptureRecovery()
+    var permissionRelaunchPending=false
+    var permissionHelperReady=false
+    private var permissionProbeProcess:Process?
+    private var permissionProbeResult:[String:Any]?
+    private var permissionProbeAt:TimeInterval = -.infinity
+    private var nextPermissionProbe:TimeInterval = 0
+    private var lastPermissionProbeSignature:String?
+    private var nativePhysicalHold:NativePhysicalHoldStore?
+    private var physicalHoldGesture:NativeKeyGesture?
+    private var physicalHoldEpoch:Int?
+    private var physicalHoldHeartbeat:Timer?
     var keyConfiguration: [(code:String,keyCode:UInt32)] = []
     var configuredKeysEnabled = false
     var capturingKey = false
@@ -408,6 +669,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     }
     func startWorker(){
         guard let resources=Bundle.main.resourceURL else{return}
+        closePhysicalHoldStore()
+        nativeKeySigner=NativeKeySigner();trustedNativeKeyGestures.removeAll();gestureBindingEpochs.removeAll();keyBindingEpoch=nil
+        if let secret=Data(base64Encoded:nativeKeySigner.physicalHoldSecret){nativePhysicalHold=NativePhysicalHoldStore(secret:secret)}
         let child=Process();child.executableURL=resources.appendingPathComponent("runtime/node");child.arguments=[resources.appendingPathComponent("server/main.mjs").path];child.currentDirectoryURL=resources
         var env=ProcessInfo.processInfo.environment;env["AIR_STUDIO_HID"]=resources.appendingPathComponent("bin/HIDBridge").path;env["AIR_STUDIO_UI"]=resources.appendingPathComponent("ui/dist").path;env["AIR_STUDIO_DATA"]=dataDirectory.path;env.removeValue(forKey:"AIR_STUDIO_PORT")
         // Reuse the web origin so an app update preserves the existing unsaved canvas.
@@ -415,6 +679,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
            let runtime=(try? JSONSerialization.jsonObject(with:data)) as? [String:Any],
            let previous=runtime["port"] as? Int, previous>0 && previous<=65535 { env["AIR_STUDIO_PREFERRED_PORT"]=String(previous) }
         env["AIR_STUDIO_PARENT_PID"]=String(getpid())
+        env["AIR_STUDIO_NATIVE_KEY_SECRET"]=nativeKeySigner.environmentSecret
+        env.removeValue(forKey:"AIR_STUDIO_NATIVE_HOLD_SECRET");env.removeValue(forKey:"AIR_STUDIO_NATIVE_HOLD_PATH")
+        if let hold=nativePhysicalHold {
+            env["AIR_STUDIO_NATIVE_HOLD_SECRET"]=nativeKeySigner.physicalHoldSecret
+            env["AIR_STUDIO_NATIVE_HOLD_PATH"]=hold.fileURL.path
+        }
         child.environment=env
         let output=Pipe();child.standardOutput=output
         let errors=Pipe();child.standardError=errors
@@ -472,10 +742,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         }
     }
     func workerDidExit(status:Int32,signaled:Bool){
+        let permissionRecoveryFailed=permissionRelaunchPending && (status != 0 || signaled)
         stopHotkeyMonitoring()
         worker=nil
         baseURL=nil;apiToken=""
-        if !terminating, let delay=workerRestartPolicy.nextDelay(now:ProcessInfo.processInfo.systemUptime) {
+        if permissionRelaunchPending {
+            permissionRelaunchPending=false
+            if status==0 && !signaled {
+                do {try PermissionAppRelaunch.launch();NSApp.reply(toApplicationShouldTerminate:true);return}
+                catch {appendWorkerLog(Data("Permission relaunch could not start.\n".utf8))}
+            }
+            // A recovery may not bypass failed keyboard restoration. Keep the
+            // host open; the ordinary failure alert below retains diagnostics.
+            terminating=false;NSApp.reply(toApplicationShouldTerminate:false);setExitPresentation(false)
+            if status==0 && !signaled {startWorker();return}
+            permissionRecovery.attempted=true
+        }
+        if !terminating,!permissionRecoveryFailed, let delay=workerRestartPolicy.nextDelay(now:ProcessInfo.processInfo.systemUptime) {
             audioCapture.stop();pendingAudio=nil
             appendWorkerLog(Data("Restarting local service after unexpected exit in \(delay)s.\n".utf8))
             DispatchQueue.main.asyncAfter(deadline:.now()+delay){[weak self] in
@@ -562,8 +845,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             }
         }.resume()
     }
-    @objc func willSleep(){ audioCapture.stop();pendingAudio=nil }
-    @objc func didWake(){ if !terminating && !preparingUpdate {post(["op":"resumeConnection"])} }
+    @objc func willSleep(){ keySessionSuspended=true;setHotkeysEnabled(false);audioCapture.stop();pendingAudio=nil }
+    @objc func didWake(){ keySessionSuspended=false;if !terminating && !preparingUpdate {post(["op":"resumeConnection"]);refreshHotkeys()} }
     func post(_ data:[String:Any]){guard let base=baseURL else{return};var request=URLRequest(url:base.appendingPathComponent("api/command"));request.httpMethod="POST";request.setValue(apiToken,forHTTPHeaderField:"X-Air-Token");request.setValue("application/json",forHTTPHeaderField:"Content-Type");request.httpBody=try? JSONSerialization.data(withJSONObject:data);URLSession.shared.dataTask(with:request).resume()}
     func activateSlot(_ index:Int,phase:String="down",gesture:NativeKeyGesture?=nil,
                       source:NativeKeyEventSource?=nil,eventTime:Double?=nil){
@@ -572,20 +855,70 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             ["op":"codexKey","code":keyConfiguration[index].code,"phase":phase])
     }
     func dispatchBoundKey(_ index:Int,down:Bool,repeated:Bool,source:NativeKeyEventSource,
-                          eventTime:Double?,timestampNS:UInt64?=nil,owner:NativeKeyEventSource?=nil){
+                          eventTime:Double?,timestampNS:UInt64?=nil,owner:NativeKeyEventSource?=nil,
+                          hardwareVerified:Bool=false){
         guard hotkeysEnabled,!terminating,keyConfiguration.indices.contains(index) else{return}
         let binding=keyConfiguration[index],id=UInt32(index+1)
         if down {
             if let gesture=keyGestureGate.press(keyCode:binding.keyCode,code:binding.code,source:source,
                 eventTime:eventTime,timestampNS:timestampNS,repeated:repeated,owner:owner) {
+                // Trust can be established only by the fresh raw down, never
+                // by a duplicate, a Carbon notification or an API field.
+                if let epoch=keyBindingEpoch {
+                    gestureBindingEpochs[gesture.id]=epoch
+                    if hardwareVerified && source != .carbon {trustedNativeKeyGestures.insert(gesture.id)}
+                    if hardwareVerified && source != .carbon && dictationKeyCodes.contains(binding.keyCode) {
+                        beginPhysicalHold(gesture,epoch:epoch)
+                    }
+                }
                 heldHotkeys.insert(id);activateSlot(index,gesture:gesture,source:source,eventTime:eventTime)
             }
         } else if let gesture=keyGestureGate.release(keyCode:binding.keyCode,eventTime:eventTime,timestampNS:timestampNS) {
+            if physicalHoldGesture?.id == gesture.id {cancelPhysicalHold()}
             heldHotkeys.remove(id);activateSlot(index,phase:"up",gesture:gesture,source:source,eventTime:eventTime)
         }
     }
+    private func physicalHoldNowMs()->Int {Int(ProcessInfo.processInfo.systemUptime*1000)}
+    private func beginPhysicalHold(_ gesture:NativeKeyGesture,epoch:Int) {
+        cancelPhysicalHold()
+        physicalHoldGesture=gesture;physicalHoldEpoch=epoch
+        guard refreshPhysicalHold() else{return}
+        let timer=Timer(timeInterval:0.5,repeats:true){[weak self] _ in _ = self?.refreshPhysicalHold()}
+        physicalHoldHeartbeat=timer;RunLoop.main.add(timer,forMode:.common)
+    }
+    @discardableResult private func refreshPhysicalHold()->Bool {
+        if physicalHoldGesture != nil && !functionKeyTapIsActive() {
+            // Do not renew a gesture whose global release can no longer be
+            // observed, even if the disabled-tap notification is still queued.
+            interruptFunctionKeyTap();return false
+        }
+        guard let gesture=physicalHoldGesture,let epoch=physicalHoldEpoch,
+              !terminating,keyBindingEpoch==epoch,
+              gesture.owner == .eventTap,
+              trustedNativeKeyGestures.contains(gesture.id),
+              keyGestureGate.heldGesture(keyCode:gesture.keyCode)?.id==gesture.id,
+              nativePhysicalHold?.write(gestureID:gesture.id,keyCode:Int(gesture.keyCode),bindingEpoch:epoch,held:true,nowMs:physicalHoldNowMs())==true else {
+            cancelPhysicalHold();return false
+        }
+        return true
+    }
+    private func cancelPhysicalHold() {
+        physicalHoldHeartbeat?.invalidate();physicalHoldHeartbeat=nil
+        physicalHoldGesture=nil;physicalHoldEpoch=nil
+        _ = nativePhysicalHold?.invalidate(nowMs:physicalHoldNowMs())
+    }
+    private func closePhysicalHoldStore() {
+        cancelPhysicalHold();nativePhysicalHold?.close();nativePhysicalHold=nil
+    }
     func enqueueKey(_ data:[String:Any]) {
-        keyEventQueue.append(data);sendNextKey()
+        var packet=data
+        packet.removeValue(forKey:"nativeKeySequence");packet.removeValue(forKey:"nativeKeySignature");packet.removeValue(forKey:"nativeKeyBindingEpoch")
+        if let gestureID=packet["gestureId"] as? String {
+            if let epoch=gestureBindingEpochs[gestureID]{packet["nativeKeyBindingEpoch"]=epoch}
+            if let signed=nativeKeySigner.sign(packet,trusted:trustedNativeKeyGestures.contains(gestureID)){packet=signed}
+            if packet["phase"] as? String == "up"{trustedNativeKeyGestures.remove(gestureID);gestureBindingEpochs.removeValue(forKey:gestureID)}
+        }
+        keyEventQueue.append(packet);sendNextKey()
     }
     func sendNextKey() {
         guard !keyEventSending,!keyEventQueue.isEmpty,let base=baseURL else{return}
@@ -666,17 +999,72 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         // Query current TCC authorization. CoreGraphics preflight can retain a
         // denied result from before the first grant for this process lifetime.
         // IOHIDCheckAccess is a public, read-only API; unknown stays denied.
-        ["inputMonitoring":IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted,
-         "accessibility":AXIsProcessTrusted(),
-         "canPostEvents":IOHIDCheckAccess(kIOHIDRequestTypePostEvent) == kIOHIDAccessTypeGranted,"promptsRequested":false]
+        PermissionProbe.snapshot()
+    }
+    func refreshPermissionProbe(now:TimeInterval,needed:Bool) {
+        guard needed,permissionProbeProcess==nil,now>=nextPermissionProbe,
+              !permissionRecovery.attempted,!terminating,
+              let executable=Bundle.main.executableURL else{return}
+        nextPermissionProbe=now+2
+        let process=Process(),output=Pipe()
+        process.executableURL=executable;process.arguments=[PermissionProbe.argument]
+        process.standardInput=FileHandle.nullDevice;process.standardOutput=output;process.standardError=FileHandle.nullDevice
+        permissionProbeProcess=process
+        process.terminationHandler={ [weak self] child in
+            let data=output.fileHandleForReading.readDataToEndOfFile()
+            let result=child.terminationReason == .exit && child.terminationStatus==0 ? PermissionProbe.decode(data):nil
+            DispatchQueue.main.async {
+                guard let self=self,self.permissionProbeProcess === child else{return}
+                self.permissionProbeProcess=nil
+                self.permissionProbeResult=result;self.permissionProbeAt=ProcessInfo.processInfo.systemUptime
+                let signature=result.map{value in PermissionProbe.keys.map{value[$0] as? Bool==true ? "1":"0"}.joined()} ?? "unavailable"
+                if signature != self.lastPermissionProbeSignature {
+                    self.lastPermissionProbeSignature=signature
+                    self.appendWorkerLog(Data("Fresh permission probe (input/access/post): \(signature)\n".utf8))
+                }
+                self.reportNativePermissions(force:true)
+            }
+        }
+        do {try process.run()} catch {permissionProbeProcess=nil;permissionProbeResult=nil}
+        DispatchQueue.main.asyncAfter(deadline:.now()+2) { [weak self,weak process] in
+            guard let process=process,self?.permissionProbeProcess === process,process.isRunning else{return}
+            process.terminate()
+        }
     }
     func reportNativePermissions(force:Bool=false) {
         guard baseURL != nil,!terminating else{return}
         let permissions=nativePermissionSnapshot()
+        refreshCapturePermissions(permissions)
+        let now=ProcessInfo.processInfo.systemUptime,localGranted=PermissionProbe.allGranted(permissions)
+        let stale = !localGranted || !permissionHelperReady
+        refreshPermissionProbe(now:now,needed:stale)
+        let fresh=now-permissionProbeAt<4 ? permissionProbeResult:nil
+        let granted=fresh.map{PermissionProbe.allGranted($0)} ?? localGranted
+        permissionRecovery.observe(granted:granted,
+            captureReady:localGranted && permissionHelperReady && (!hotkeysEnabled || functionKeyTapIsActive()),now:now,
+            freshGrantNeedsRelaunch:fresh != nil && granted && stale)
+        let canRecover = !capturingKey && keyGestureGate.activeCount==0 && !driverOpenInFlight && !preparingUpdate && !permissionRelaunchPending
+            && !CommandLine.arguments.contains(PermissionAppRelaunch.argument)
+        if permissionRecovery.shouldRecover(now:now,idle:canRecover) {
+            permissionRelaunchPending=true
+            appendWorkerLog(Data("Applying newly granted permissions by a single clean app relaunch.\n".utf8))
+            NSApp.terminate(nil);return
+        }
         let signature=["inputMonitoring","accessibility","canPostEvents"].map{permissions[$0] as? Bool == true ? "1":"0"}.joined()
         guard force || signature != lastPermissionReportSignature || Date().timeIntervalSince(lastPermissionReport)>5 else{return}
         lastPermissionReportSignature=signature;lastPermissionReport=Date()
         post(["op":"nativePermissions","permissions":permissions])
+    }
+    // TCC can change while this process and its old event tap remain alive.
+    // Invalidate that tap on an authorization edge, release owned holds, then
+    // recreate it immediately. A repeated status poll must not cancel a hold.
+    func refreshCapturePermissions(_ permissions:[String:Any]) {
+        let signature=["inputMonitoring","accessibility","canPostEvents"].map{permissions[$0] as? Bool == true ? "1":"0"}.joined()
+        guard signature != capturePermissionSignature else{return}
+        capturePermissionSignature=signature
+        cancelPhysicalHold();interruptFunctionKeyTap();stopReservedKeyCapture()
+        nextCaptureRetry = .distantPast
+        if hotkeysEnabled {refreshReservedKeyCapture(force:true)}
     }
     func requestNativePermission(_ permission:String)->[String:Any]? {
         let pane:String
@@ -908,11 +1296,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         if let revision=value?["setupRevision"] as? Int,revision != setupRevision {
             setupRevision=revision;setHotkeysEnabled(false)
         }
+        let nextEpoch=NativeKeySigner.bindingEpoch(value?["bindingEpoch"])
+        if keyBindingEpoch != nextEpoch {setHotkeysEnabled(false);keyBindingEpoch=nextEpoch}
+        let dictationCodes=Set(value?["dictationCodes"] as? [String] ?? [])
+        physicalCommandCodes=Set(value?["physicalCodes"] as? [String] ?? ["F7","F8","F9","F11","F12"])
         let raw=value?["bindings"] as? [[String:Any]] ?? []
         let next=raw.compactMap { item -> (code:String,keyCode:UInt32)? in
             guard let code=item["code"] as? String,let n=item["keyCode"] as? Int,n>=0,n<=127 else{return nil}
             return (code,UInt32(n))
         }
+        dictationKeyCodes=Set(next.filter{dictationCodes.contains($0.code)}.map{$0.keyCode})
         let valid=next.count==12 && Set(next.map{$0.code}).count==12 && Set(next.map{$0.keyCode}).count==12
         configuredKeysEnabled=valid && value?["enabled"] as? Bool==true
         if keyConfiguration.map({$0.code}) != next.map({$0.code}) || keyConfiguration.map({$0.keyCode}) != next.map({$0.keyCode}) {
@@ -921,7 +1314,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         refreshHotkeys()
     }
     func refreshHotkeys(){
-        setHotkeysEnabled(configuredKeysEnabled && !capturingKey && !(editingField && NSApp.isActive) && !terminating && hotkeyPollTimer != nil)
+        setHotkeysEnabled(configuredKeysEnabled && !keySessionSuspended && !capturingKey && !(editingField && NSApp.isActive) && !terminating && hotkeyPollTimer != nil)
         if hotkeysEnabled { refreshReservedKeyCapture() }
         if capturingKey && NSApp.isActive && !terminating { _ = startReservedKeyCapture() }
         else if !hotkeysEnabled { stopReservedKeyCapture() }
@@ -966,6 +1359,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             DispatchQueue.main.async {
                 guard let self=self,self.hotkeyPollGeneration==generation else{return}
                 self.hotkeyStateTask=nil
+                let native=state?["native"] as? [String:Any]
+                let helper=native?["helper"] as? [String:Any] ?? native
+                self.permissionHelperReady=["inputMonitoring","accessibility","canPostEvents"].allSatisfy{helper?[$0] as? Bool==true}
                 if let value=settings?["language"] as? String, ["en","zh-CN"].contains(value), self.english != (value == "en") {
                     self.english = value == "en"; self.buildMenus()
                     #if canImport(Sparkle)
@@ -979,6 +1375,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         hotkeyStateTask?.resume()
     }
     func setHotkeysEnabled(_ enabled:Bool){
+        if !enabled {cancelPhysicalHold()}
         if enabled {
             guard !hotkeysEnabled else{return}
             hotkeysEnabled=true;installHotkeys()
@@ -1020,7 +1417,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         nextCaptureRetry=now.addingTimeInterval(2)
         let captured=startReservedKeyCapture()
         registeredCodes=keyConfiguration.map{$0.code}.filter{carbonRegisteredCodes.contains($0) || (captured && functions.contains($0))}
-        failedCodes=keyConfiguration.map{$0.code}.filter{!registeredCodes.contains($0) || (!captured && $0=="F11")}
+        failedCodes=keyConfiguration.map{$0.code}.filter{!registeredCodes.contains($0) || (!captured && physicalCommandCodes.contains($0))}
         // A key needing the event tap is not ready merely because Carbon
         // accepted a registration that macOS can intercept first.
         registeredCodes.removeAll{failedCodes.contains($0)}
@@ -1052,7 +1449,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         reservedKeyTap=tap;reservedKeySource=source
         CFRunLoopAddSource(CFRunLoopGetMain(),source,.commonModes);CGEvent.tapEnable(tap:tap,enable:true)
         _ = reconcileFunctionKeyTap()
-        return true
+        return CGEvent.tapIsEnabled(tap:tap)
     }
     func handleReservedKey(_ type:CGEventType,_ event:CGEvent)->Bool {
         guard [CGEventType.keyDown,.keyUp].contains(type) else{return false}
@@ -1060,7 +1457,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         let consumed=handleFunctionKey(keyCode,down:type == .keyDown,
             repeated:event.getIntegerValueField(.keyboardEventAutorepeat) != 0,
             modified:!event.flags.intersection([.maskCommand,.maskControl,.maskAlternate,.maskShift]).isEmpty,
-            source:.eventTap,eventTime:Double(event.timestamp)/1_000_000_000,timestampNS:event.timestamp)
+            source:.eventTap,eventTime:Double(event.timestamp)/1_000_000_000,timestampNS:event.timestamp,hardwareVerified:NativeKeyOrigin.isHardware(event))
         observeFunctionKey(source:.eventTap,keyCode:keyCode,phase:type == .keyDown ? "down":"up",
             uptimeSeconds:Double(event.timestamp)/1_000_000_000,timestampNS:event.timestamp,flags:event.flags,
             repeated:event.getIntegerValueField(.keyboardEventAutorepeat) != 0,consumed:consumed)
@@ -1079,12 +1476,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         }
         if self.handleFunctionKey(UInt32(event.keyCode),down:event.type == .keyDown,repeated:event.isARepeat,
             modified:!event.modifierFlags.intersection([.command,.control,.option,.shift]).isEmpty,
-            source:.local,eventTime:eventTime,timestampNS:rawTimestamp) {consumed=true;return nil}
+            source:.local,eventTime:eventTime,timestampNS:rawTimestamp,hardwareVerified:NativeKeyOrigin.isHardware(event.cgEvent)) {consumed=true;return nil}
         guard self.hotkeysEnabled,
               event.modifierFlags.intersection([.command,.control,.option,.shift]).isEmpty,
               let index=self.keyConfiguration.firstIndex(where:{$0.keyCode==UInt32(event.keyCode)}) else{return event}
         self.dispatchBoundKey(index,down:event.type == .keyDown,repeated:event.isARepeat,
-            source:.local,eventTime:eventTime,timestampNS:rawTimestamp)
+            source:.local,eventTime:eventTime,timestampNS:rawTimestamp,hardwareVerified:NativeKeyOrigin.isHardware(event.cgEvent))
         consumed=true
         return nil
     }
@@ -1122,14 +1519,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         }
         lastTapCaptureState=false
     }
-    func routeFunctionKey(_ index:Int,down:Bool,repeated:Bool,source:NativeKeyEventSource,eventTime:Double?,timestampNS:UInt64?=nil,tapActive:Bool){
+    func routeFunctionKey(_ index:Int,down:Bool,repeated:Bool,source:NativeKeyEventSource,eventTime:Double?,timestampNS:UInt64?=nil,tapActive:Bool,hardwareVerified:Bool=false){
         let binding=keyConfiguration[index]
         let owner=NativeFunctionKeyOwnership.owner(tapActive:tapActive,carbonRegistered:carbonRegisteredCodes.contains(binding.code))
         let heldOwner=keyGestureGate.heldGesture(keyCode:binding.keyCode)?.owner
         let permitted=NativeFunctionKeyOwnership.accepts(source,owner:owner) ||
             (!down && heldOwner.map{NativeFunctionKeyOwnership.accepts(source,owner:$0)} == true)
         guard permitted else{return}
-        dispatchBoundKey(index,down:down,repeated:repeated,source:source,eventTime:eventTime,timestampNS:timestampNS,owner:owner)
+        dispatchBoundKey(index,down:down,repeated:repeated,source:source,eventTime:eventTime,timestampNS:timestampNS,owner:owner,hardwareVerified:hardwareVerified)
     }
     func functionKeyCaptureDiagnostics()->[String:Any] {
         let active=functionKeyTapIsActive()
@@ -1143,7 +1540,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             "observationLimitReached":functionKeyObservations.rows.count == NativeFunctionKeyObservations.limit]
     }
     func handleFunctionKey(_ keyCode:UInt32,down:Bool,repeated:Bool,modified:Bool,
-                           source:NativeKeyEventSource = .local,eventTime:Double?=nil,timestampNS:UInt64?=nil)->Bool {
+                           source:NativeKeyEventSource = .local,eventTime:Double?=nil,timestampNS:UInt64?=nil,hardwareVerified:Bool=false)->Bool {
         guard !terminating,let code=functionKeyCodes[keyCode] else{return false}
         if capturingKey && NSApp.isActive {
             if !down,capturedFunctionKeys.remove(code) != nil {sendCapturedFunctionKey(code,phase:"up");return true}
@@ -1156,11 +1553,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         let tapActive=reconcileFunctionKeyTap(observedTapEvent:source == .eventTap)
         if !down {
             let wasHeld=heldHotkeys.contains(id)
-            routeFunctionKey(index,down:false,repeated:repeated,source:source,eventTime:eventTime,timestampNS:timestampNS,tapActive:tapActive)
+            routeFunctionKey(index,down:false,repeated:repeated,source:source,eventTime:eventTime,timestampNS:timestampNS,tapActive:tapActive,hardwareVerified:hardwareVerified)
             return !modified || wasHeld
         }
         guard !modified else{return false}
-        routeFunctionKey(index,down:true,repeated:repeated,source:source,eventTime:eventTime,timestampNS:timestampNS,tapActive:tapActive)
+        routeFunctionKey(index,down:true,repeated:repeated,source:source,eventTime:eventTime,timestampNS:timestampNS,tapActive:tapActive,hardwareVerified:hardwareVerified)
         return true
     }
     func sendCapturedFunctionKey(_ code:String,phase:String) {
@@ -1184,6 +1581,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         let signalResult=workerPID>0 ? Darwin.kill(workerPID,SIGTERM) : -1
         let signalError=workerPID>0 ? errno : EINVAL
         if signalResult != 0 && signalError != ESRCH {
+            permissionRelaunchPending=false
             terminating=false
             setExitPresentation(false)
             appendWorkerLog(Data("Worker shutdown signal failed: pid=\(workerPID), errno=\(signalError)\n".utf8))

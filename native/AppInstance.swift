@@ -1,5 +1,31 @@
 import Foundation
 import Darwin
+import ApplicationServices
+import IOKit.hid
+
+// Run the same signed host as a short-lived, read-only permission probe. A new
+// process observes a grant even when the long-lived host/helper cache a denial.
+// This entry point creates no NSApplication, event tap, worker or HID manager.
+enum PermissionProbe {
+    static let argument="--nuphylab-permission-probe"
+    static let keys=["inputMonitoring","accessibility","canPostEvents"]
+    static func snapshot()->[String:Any] {
+        ["inputMonitoring":IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted,
+         "accessibility":AXIsProcessTrusted(),
+         "canPostEvents":IOHIDCheckAccess(kIOHIDRequestTypePostEvent) == kIOHIDAccessTypeGranted,"promptsRequested":false]
+    }
+    static func allGranted(_ value:[String:Any])->Bool {keys.allSatisfy{value[$0] as? Bool==true}}
+    static func decode(_ data:Data)->[String:Any]? {
+        guard data.count<=1024,let value=(try? JSONSerialization.jsonObject(with:data)) as? [String:Any],
+              keys.allSatisfy({key in guard let number=value[key] as? NSNumber else{return false};return CFGetTypeID(number)==CFBooleanGetTypeID()}) else{return nil}
+        return Dictionary(uniqueKeysWithValues:keys.map{($0,value[$0]!)})
+    }
+    static func runIfRequested() {
+        guard CommandLine.arguments.count==2,CommandLine.arguments[1]==argument else{return}
+        guard let data=try? JSONSerialization.data(withJSONObject:snapshot()) else{exit(1)}
+        FileHandle.standardOutput.write(data);exit(0)
+    }
+}
 
 struct AppInstanceOwner: Codable {
     let pid: Int32
@@ -71,5 +97,43 @@ struct AppUpdateHandoff: Codable {
     func write(to file: URL) throws {
         try JSONEncoder().encode(self).write(to: file, options: .atomic)
         try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file.path)
+    }
+}
+
+// A single recovery after a live TCC grant. Some macOS releases keep an old
+// process's event authorization cached even after a fresh tap is attempted.
+struct PermissionCaptureRecovery {
+    var previousGranted:Bool?
+    var grantAt:TimeInterval?
+    var attempted=false
+    mutating func observe(granted:Bool,captureReady:Bool,now:TimeInterval,freshGrantNeedsRelaunch:Bool=false) {
+        if !granted {grantAt=nil}
+        else if previousGranted==false || (freshGrantNeedsRelaunch && grantAt==nil) {grantAt=now}
+        previousGranted=granted
+        if captureReady {grantAt=nil}
+    }
+    mutating func shouldRecover(now:TimeInterval,idle:Bool)->Bool {
+        guard !attempted,idle,let grantAt=grantAt,now>=grantAt+3 else{return false}
+        attempted=true;return true
+    }
+}
+
+enum PermissionAppRelaunch {
+    static let argument="--nuphylab-permission-relaunch"
+    static var file:URL {FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Air Studio/permission-relaunch.json")}
+    static func validatedHandoff()->AppUpdateHandoff? {
+        guard let index=CommandLine.arguments.firstIndex(of:argument),CommandLine.arguments.count==index+2,
+              let version=Bundle.main.object(forInfoDictionaryKey:"CFBundleVersion") as? String,
+              let record=AppUpdateHandoff.read(from:file),record.sourcePID>0,
+              record.isCurrent(token:CommandLine.arguments[index+1],version:version,now:Date().timeIntervalSince1970) else{return nil}
+        return record
+    }
+    static func launch() throws {
+        guard let version=Bundle.main.object(forInfoDictionaryKey:"CFBundleVersion") as? String else{throw POSIXError(.EINVAL)}
+        let record=AppUpdateHandoff(token:UUID().uuidString,sourcePID:getpid(),targetVersion:version,createdAt:Date().timeIntervalSince1970,acknowledgedPID:nil)
+        try record.write(to:file)
+        let process=Process();process.executableURL=URL(fileURLWithPath:"/usr/bin/open")
+        process.arguments=["-n",Bundle.main.bundleURL.path,"--args",argument,record.token]
+        try process.run()
     }
 }

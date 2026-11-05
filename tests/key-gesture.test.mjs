@@ -68,14 +68,14 @@ test('F2 late duplicate keeps its first captured target after a replacement fram
 test('stale structured or legacy release cannot release the next held command gesture',async t=>{
  const service=await fakeService(t,{tasks,codexKeybindings:[{command:'globalDictationHold',key:'Ctrl+Shift+D'}]});
  await service.command({op:'settings',settings:{codexEnabled:true}});
- await service.command(gesture('F9','fixture:dictation:1'));await service.command(gesture('F9','fixture:dictation:1','up'));
- await service.command(gesture('F9','fixture:dictation:2'));
- assert.equal((await service.command(gesture('F9','fixture:dictation:1','up'))).result.reason,'stale-release');
+ await service.nativeKey(gesture('F9','fixture:dictation:1'));await service.nativeKey(gesture('F9','fixture:dictation:1','up'));
+ await service.nativeKey(gesture('F9','fixture:dictation:2'));
+ assert.equal((await service.nativeKey(gesture('F9','fixture:dictation:1','up'))).result.reason,'stale-release');
  assert.equal((await service.command({op:'codexKey',code:'F9',phase:'up'})).result.reason,'stale-release');
  assert.equal((await service.state()).codex.keys.held.source,'F9');
- await service.command(gesture('F9','fixture:dictation:2','up'));
+ await service.nativeKey(gesture('F9','fixture:dictation:2','up'));
  assert.equal((await service.state()).codex.keys.held,null);
- assert.deepEqual((await shortcuts(service)).map(x=>x.phase),['down','up','down','up']);
+ assert.deepEqual((await service.operations()).filter(x=>x.op==='codexControl'&&x.action==='dictation').map(x=>x.phase),['down','up','down','up']);
 });
 
 test('gesture metadata rejects invalid input and trace contains only bounded F-key metadata',async t=>{

@@ -58,6 +58,7 @@ lines.on('line',line=>{
   ...(config.quietIdentity?{identified:true,transport:'USB',vendorId:0x19f5,productId:0x1028,modelId:'air75-v3',keyLedCount:84,protocolReady:true,readOnly:false}:{}),
   capabilities:{perKey:true,...(config.quietIdentity?{readProbeVerified:true}:{}),...(config.connectionWake!==undefined?{connectionWake:config.connectionWake}:{})},error:null});
  switch(message.op){
+  case 'codexControl':process.stdout.write(JSON.stringify({id:message.id,ok:false,error:{code:'CONTROL_NOT_FOUND',message:'unavailable',controlDiagnostic:config.controlDiagnostic}})+'\\n');break;
   case 'connect':if(++connectAttempts<=(config.missingConnectAttempts??0)){process.stdout.write(JSON.stringify({id:message.id,ok:false,error:{code:'DEVICE_NOT_FOUND',message:'Waiting for keyboard.'}})+'\\n');break;}connected=true;answer(message,state());break;
   case 'status':answer(message,state());break;
   case 'arm':if(pending&&!armed){process.stdout.write(JSON.stringify({id:message.id,ok:false,error:{code:'RECOVERY_REQUIRED',message:'A previous lighting backup exists.'}})+'\\n');break;}armed=true;pending=true;answer(message,state());break;
@@ -107,6 +108,17 @@ test("reconnect restores an existing backup before allowing another arm", async 
     "arm",
   ]);
   await hardware.close();
+});
+
+test('native control diagnostics survive JSONL errors without carrying target content',async t=>{
+  const {hardware}=await fakeHardware(t,{controlDiagnostic:{visitedNodes:1,webAreasSeen:0,enableStatus:'requested',
+    title:'private chat',url:'app://-/private',focusRole:'private text',elapsedMs:200,scanLimited:false}});
+  await hardware.connect();
+  await assert.rejects(hardware.request('codexControl',{action:'toggleFastMode'}),error=>{
+    assert.equal(error.code,'CONTROL_NOT_FOUND');
+    assert.deepEqual(error.controlDiagnostic,{enableStatus:'requested',visitedNodes:1,webAreasSeen:0,elapsedMs:200,scanLimited:false});
+    return true;
+  });
 });
 
 test('verified quiet wake continues the durable original without showing a restore first',async t=>{

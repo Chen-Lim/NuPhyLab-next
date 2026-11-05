@@ -1,0 +1,13 @@
+{
+  "version": "1.2.37",
+  "zh-CN": [
+    "基于已发布的 1.2.15 调整 AI 命令键，保留 Air75 V3 连接动画。",
+    "默认 F7 普通／极速模式、F8 批准、F9 拒绝、F10 新聊天、F11 听写、F12 发送。",
+    "Codex 专用命令自动准备并保留用户原有快捷键；批准、拒绝和发送仅由实体命令键触发。"
+  ],
+  "en": [
+    "Update AI command keys on the released 1.2.15 foundation while preserving the Air75 V3 connection animation.",
+    "Default F7 Standard/Fast, F8 approve, F9 decline, F10 new chat, F11 dictation and F12 send.",
+    "Prepare dedicated Codex commands while preserving existing shortcuts; approval, decline and send require a physical key press."
+  ]
+}

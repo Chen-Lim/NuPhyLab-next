@@ -15,7 +15,7 @@ test('host SIGKILL leaves the real service restoring its fake keyboard and exiti
 import {fakeService} from ${JSON.stringify(helperURL)};
 process.env.AIR_STUDIO_PARENT_PID=String(process.pid);
 const s=await fakeService({after(){}},{permissions:{inputMonitoring:true,accessibility:true,canPostEvents:true},tasks:[{id:'fixture',status:'running'}],codexKeybindings:[{command:'globalDictationHold',key:'Ctrl+Shift+D'},{command:'globalDictationSingleTap',key:null}]});
-for(const body of [{op:'settings',settings:{codexAmbient:false,codexSelectedPulse:false,lightDurationMs:0,lightIdleMs:0}},{op:'agentMode',source:'codex',enabled:true},{op:'preview',colors:Array(84).fill('#ff0000')},{op:'codexKey',code:'F9',phase:'down'}]){const r=await s.command(body);if(!r.ok)throw Error(JSON.stringify(r));}
+for(const body of [{op:'settings',settings:{codexAmbient:false,codexSelectedPulse:false,lightDurationMs:0,lightIdleMs:0}},{op:'agentMode',source:'codex',enabled:true},{op:'preview',colors:Array(84).fill('#ff0000')},{op:'codexKey',code:'F9',phase:'down'}]){const r=await (body.op==='codexKey'?s.nativeKey(body):s.command(body));if(!r.ok)throw Error(JSON.stringify(r));}
 process.stdout.write(JSON.stringify({pid:s.child.pid,dataDir:s.dataDir})+'\\n');
 setInterval(()=>{},1000);
 `);
@@ -33,7 +33,7 @@ setInterval(()=>{},1000);
   });
   servicePid=result.pid;dataDir=result.dataDir;
   const ops=async()=>((await readFile(path.join(path.dirname(dataDir),'operations.jsonl'),'utf8')).trim().split('\n').filter(Boolean).map(JSON.parse));
-  const before=await ops();assert.ok(before.some(r=>r.op==='paint'));assert.ok(before.some(r=>r.op==='shortcut'&&r.phase==='down'));
+  const before=await ops();assert.ok(before.some(r=>r.op==='paint'));assert.ok(before.some(r=>r.op==='codexControl'&&r.action==='dictation'&&r.phase==='down'));
   const exit=once(host,'exit');host.kill('SIGKILL');await exit;
   let all=[];
   for(let i=0;i<120;i++){all=await ops();if(all.some(r=>r.op==='quit'))break;await wait(25);}
@@ -42,7 +42,7 @@ setInterval(()=>{},1000);
   assert.ok(names.includes('restore'),'original lighting is restored');
   assert.ok(names.includes('quit'),'the helper is asked to exit');
   assert.ok(names.indexOf('restore')<names.indexOf('quit'),'restoration precedes closing the HID process');
-  assert.ok(cleanup.some(r=>r.op==='shortcut'&&r.phase==='up'),'held shortcut released after host crash');
+  assert.ok(cleanup.some(r=>r.op==='codexControl'&&r.action==='dictation'&&r.phase==='up'),'held shortcut released after host crash');
   for(let i=0;i<80;i++){try{process.kill(servicePid,0);}catch{servicePid=null;break;}await wait(25);}
   assert.equal(servicePid,null,'no orphan worker remains');
 });

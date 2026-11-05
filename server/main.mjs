@@ -1,3 +1,6 @@
+import {CodexAccessibilityBridge} from './codex-accessibility-bridge.mjs';
+import {createNativeKeyVerifier} from './native-key-auth.mjs';
+import {takeNativeHoldEnvironment} from './native-hold-env.mjs';
 import http from "node:http";
 import {AudioSession} from "./audio.mjs";
 import {startFrameLoop} from "./frame-loop.mjs";
@@ -42,6 +45,9 @@ const dataDir =
 const port = Number(process.env.AIR_STUDIO_PORT || process.env.AIR_STUDIO_PREFERRED_PORT || 0),
   token = process.env.AIR_STUDIO_TOKEN ?? randomBytes(32).toString("hex");
 const store = await new Store(dataDir).load();
+const verifiedNativeGesture=Symbol('verifiedNativeGesture');
+const verifyNativeKey=createNativeKeyVerifier();
+const nativeHoldEnvironment=takeNativeHoldEnvironment();
 // Written by scripts/package.mjs. Absent when running from source.
 const build = await readFile(path.join(root, "signing.json"), "utf8")
   .then(text => { const value = JSON.parse(text); return { version: String(value.version ?? ""), platform: process.platform, arch: process.arch, adhoc: value.adhoc === true, identity: String(value.identity ?? ""), packagedAt: String(value.packagedAt ?? "") }; })
@@ -49,6 +55,7 @@ const build = await readFile(path.join(root, "signing.json"), "utf8")
 const hardware = new Hardware(
   process.env.AIR_STUDIO_HID ?? path.join(root, "bin/HIDBridge"),
   path.join(dataDir, "original-lighting.json"),
+  {nativeHoldEnvironment},
 );
 hardware.setOutputColorProfile(store.data.settings.outputColorProfile);
 const codex = new CodexAdapter();
@@ -66,17 +73,34 @@ hardware.on('disconnect', () => {
 });
 const bluetoothInput = new BluetoothInput(hardware);
 const codexPresses=new PhysicalPressGate();
+const codexCommandBridge=new CodexAccessibilityBridge({
+  prepare:()=>hardware.request('codexPrepare'),
+  enabled:()=>!stopping&&store.data.settings.agentSource!=='claude'&&store.data.settings.claudeEnabled!==true
+});
+async function resolveAvailableCodexShortcut(action) {
+  if(['toggleFastMode','dictation','approve','decline','sendPrompt'].includes(action.id)) {
+    let opener;
+    if(action.id==='toggleFastMode')try {
+      const shortcut=await resolveCodexShortcut(describeAction('modelPicker'),{blockedCodes:codexBindings(store.data.settings).map(key=>key.code),avoidCollisions:true});
+      const flags=[...(shortcut.modifiers??[])].sort().join(',');
+      if(shortcut.code==='KeyM'&&flags==='control,shift'||/^F(1[3-9]|20)$/.test(shortcut.code)&&shortcut.modifiers?.some(flag=>flag!=='fn'))
+        opener={keyCode:shortcut.keyCode,modifiers:shortcut.modifiers};
+    }catch{}
+    return {delivery:'accessibility',action:action.id,...(opener?{opener}:{})};
+  }
+  return resolveCodexShortcut(action,{blockedCodes:codexBindings(store.data.settings).map(key=>key.code)});
+}
 const codexGestures=new CodexKeyGestures({
-  send:request=>hardware.request('shortcut',request).catch(error=>{
-    if(error.code==='ACCESSIBILITY_REQUIRED') throw new Error('发送系统快捷键需要辅助功能权限，请在系统设置中为 NuPhyLab 开启。');
+  send:request=>hardware.request(request.delivery==='accessibility'?'codexControl':'shortcut',request).catch(error=>{
+    if(error.code==='ACCESSIBILITY_REQUIRED')throw Object.assign(new Error('发送系统快捷键需要辅助功能权限，请在系统设置中为 NuPhyLab 开启。'),{code:error.code});
     throw error;
   }),
-  resolve:action=>resolveCodexShortcut(action,{blockedCodes:codexBindings(store.data.settings).map(key=>key.code)})
+  resolve:resolveAvailableCodexShortcut
 });
-// Read user-editable shortcuts only. Keep the button/physical key instructions
-// in sync when Codex switches between hold-to-talk and tap-to-toggle.
 void codexGestures.inspectDictation(describeAction('dictation'));
-setInterval(()=>void codexGestures.inspectDictation(describeAction('dictation')),2000).unref();
+setInterval(()=>{void codexGestures.inspectDictation(describeAction('dictation'));void codexCommandBridge.inspect();},2000).unref();
+setImmediate(()=>void codexCommandBridge.inspect());
+
 const codexLights = new CodexLights();
 const claude = new ClaudeCodeAdapter({ dataDir });
 const claudeLights = new ClaudeLights();
@@ -280,7 +304,7 @@ function codexKeysState() {
     && (!store.data.settings.codexKeyAdaptation || (hardware.state.connected && !explicitDisconnect) || bluetoothOnly())};
   const signature=JSON.stringify(config);
   if(signature!==codexKeySignature){codexKeySignature=signature;codexKeyRevision++;}
-  return {...config,revision:codexKeyRevision,setupRevision:codexSetupRevision,
+  return {...config,bindingEpoch:keyBindingEpoch,physicalCodes:agentSource()==='codex'?codexBindings(store.data.settings).filter((_,index)=>index>=6&&describeAction(store.data.settings.codexCommandIds[index-6])?.requiresPhysicalPress).map(key=>key.code):[],dictationCodes:codexBindings(store.data.settings).filter((_,index)=>index>=6&&store.data.settings.codexCommandIds[index-6]==='dictation').map(key=>key.code),commandBridge:codexCommandBridge.snapshot(),revision:codexKeyRevision,setupRevision:codexSetupRevision,
     host:codexKeyHost && Date.now()-codexKeyHost.updatedAt<15000 ? codexKeyHost : null, lastEvent:codexKeyEvent,
     held:codexGestures.held,dictation:codexGestures.dictation,gestureTrace:[...keyGestureTrace],taskOpenTrace:[...taskOpenTrace]};
 }
@@ -1089,6 +1113,7 @@ async function command(req) {
       applicationUpdating = true;
       explicitDisconnect = true;
       try {
+        await codexCommandBridge.close();
         audio.stop();
         await codexGestures.release();codexPresses.reset();
         await disableTrigger();
@@ -1099,9 +1124,10 @@ async function command(req) {
         await hardware.close();
         invalidateLightingCache();
         return {ready:true};
-      } catch(error) {applicationUpdating=false;throw error;}
+      } catch(error) {applicationUpdating=false;codexCommandBridge.resume();throw error;}
     }
     case "resumeConnection":
+      codexCommandBridge.resume();
       if(!explicitDisconnect && !driverHandoff) {
         connectionRecovery.reset();
         await reconcileHardwareError();
@@ -1153,6 +1179,7 @@ async function command(req) {
         }
       }
       const helperChanged=permissionKeys.some(key=>previousHelper?.[key]!==hardware.state.permissions?.[key]);
+      if(changed || helperChanged) void codexCommandBridge.inspect();
       if((changed || helperChanged) && (agentEnabled() || keyCapture.active)) await syncKeyAdaptation(true);
       if(refreshError) throw refreshError;
       return {received:true};
@@ -1310,6 +1337,7 @@ async function command(req) {
       const old = store.data.settings;
       if(audio.session && req.settings.audio && (req.settings.audio.source !== undefined && req.settings.audio.source!==old.audio.source || req.settings.audio.deviceId !== undefined && req.settings.audio.deviceId!==old.audio.deviceId)) await stop();
       const settings = await store.settings(req.settings);
+      void codexCommandBridge.inspect();
       if(keyBindingFingerprint(old)!==keyBindingFingerprint(settings))keyBindingEpoch++;
       hardware.setOutputColorProfile(settings.outputColorProfile);
       if (JSON.stringify(old.outputColorProfile) !== JSON.stringify(settings.outputColorProfile))
@@ -1364,6 +1392,7 @@ async function command(req) {
       else if (hardware.state.armed && playback.mode === "game")
         await output(game.render());
       await syncKeyAdaptation();
+      void codexCommandBridge.inspect();
       return settings;
     }
     case "triggerArm": {
@@ -1560,14 +1589,15 @@ async function command(req) {
         if(index<0)throw new Error('这个按键尚未绑定');
         const context=Object.freeze({code:req.code,gestureId:gesture?.id??null,eventSource:gesture?.source??'legacy',
           ...(gesture?.time!==undefined?{eventTime:gesture.time}:{}),source:captured?.source??agentSource(),
-          index,epoch:captured?.epoch??keyBindingEpoch});
+          index,epoch:captured?.epoch??keyBindingEpoch,trustedNative:req[verifiedNativeGesture]===true,nativeEpoch:req.nativeKeyBindingEpoch});
         const result=await command({op:agentSource()==='claude'?'claudeSlot':'codexSlot',index,phase:req.phase,source:req.code,
           [capturedKeyContext]:captured,[taskOpenContext]:context});
         codexKeyEvent={id:++codexKeyEventId,code:req.code,ok:true,threadId:result?.threadId??null};
         traceKeyGesture(req,'completed',{targetId:result?.threadId??null});
         return result;
       } catch(error) {
-        codexKeyEvent={id:++codexKeyEventId,code:req.code,ok:false,error:error.message};
+        codexKeyEvent={id:++codexKeyEventId,code:req.code,ok:false,error:error.message,errorCode:error.code,
+          ...(error.controlDiagnostic?{controlDiagnostic:error.controlDiagnostic}:{})};
         traceKeyGesture(req,'failed',{targetId:req[capturedKeyContext]?.id??null});
         throw error;
       }
@@ -1583,7 +1613,7 @@ async function command(req) {
           : '暂无可用任务，请先在 Codex 中打开一个聊天，再刷新状态。');
         return command({op:"codexAction",action:"task",threadId,[taskOpenContext]:req[taskOpenContext]});
       }
-      return command({op:"codexAction",action:captured?captured.actionId:store.data.settings.codexCommandIds[req.index-6],phase:req.phase,source:req.source});
+      return command({op:"codexAction",action:captured?captured.actionId:store.data.settings.codexCommandIds[req.index-6],phase:req.phase,source:req.source,[taskOpenContext]:req[taskOpenContext]});
     }
     case "readColors":
       return hardware.request("readColors");
@@ -1619,8 +1649,13 @@ async function command(req) {
         req.action === "task" ? "openTask" : req.action,
         { threadId: req.threadId },
       );
-      if (!action.available)
+      if (!action.available&&!action.requiresDedicatedShortcut)
         throw new Error(action.reason ?? "这个快捷操作暂不可用");
+      if(action.requiresPhysicalPress) {
+        const press=req[taskOpenContext];
+        if(req.phase!=='down'||!press?.gestureId||press.trustedNative!==true||press.nativeEpoch!==keyBindingEpoch||press.source!=='codex')
+          throw new Error('此操作仅由实体命令键触发；请在 Codex 中确认当前请求或输入。');
+      }
       if (action.type === "deepLink") {
         await codexGestures.release();
         const threadId = decodeURIComponent(new URL(action.url).pathname.slice(1));
@@ -1637,11 +1672,14 @@ async function command(req) {
         wakeCodexInteraction();
         return {...result,threadId};
       }
-      if (action.requiresVerifiedApprovalContext)
+      if (action.requiresVerifiedApprovalContext&&!action.requiresDedicatedShortcut)
         throw new Error(
           "请在 Codex 的当前审批卡中批准或拒绝；此处无法确认审批上下文",
         );
-      const result = await codexGestures.execute(action,{phase:req.phase,source:req.source});
+      const press=req[taskOpenContext];
+      const binding=action.id==='dictation'&&press?.trustedNative===true?codexBindings(store.data.settings).find(key=>key.code===press.code):null;
+      const physicalHold=binding?{gestureId:press.gestureId,sourceKeyCode:binding.keyCode,bindingEpoch:press.nativeEpoch}:undefined;
+      const result = await codexGestures.execute(action,{phase:req.phase,source:req.source,physicalHold});
       wakeCodexInteraction();
       return result;
     }
@@ -1840,6 +1878,7 @@ const server = http.createServer(async (req, res) => {
         } catch {
           throw new Error("数据不是有效的 JSON");
         }
+        if(value?.op==='codexKey'&&verifyNativeKey(value))value[verifiedNativeGesture]=true;
         const captured = captureTaskRequest(value);
         const result = await serialized(() => command(captured));
         return json(res, 200, { ok: true, result });
@@ -1918,6 +1957,7 @@ server.once("listening", async () => {
 server.listen(port, "127.0.0.1");
 hardware.on("diagnostic", detail => process.stderr.write(`[HIDBridge] ${detail}`));
 async function shutdown() {
+  const commandBridgeClosed=codexCommandBridge.close();
   if (stopping) return;
   stopping = true;
   cancelConnectionWake('shutdown');
@@ -1930,6 +1970,7 @@ async function shutdown() {
   try {
     while (busy) await new Promise((r) => setTimeout(r, 20));
     await commandTail;
+    await commandBridgeClosed;
     // A failure in one cleanup step must not skip keyboard restoration or
     // leave another child process running after the application has exited.
     for (const [stage, cleanup] of [

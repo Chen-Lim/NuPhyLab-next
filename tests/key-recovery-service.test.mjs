@@ -64,7 +64,7 @@ const modeRecoveryFixture=()=>{
 test('active Codex or Claude mode refuses an old recovery token before releasing held input or sending HID confirmation',async t=>{
  for(const source of ['codex','claude']){
   const service=await fakeService(t,modeRecoveryFixture());
-  const ok=async body=>{const r=await service.command(body);assert.equal(r.ok,true,JSON.stringify(r));return r.result;};
+  const ok=async body=>{const r=await (body.op==='codexKey'&&body.code==='F9'?service.nativeKey(body):service.command(body));assert.equal(r.ok,true,JSON.stringify(r));return r.result;};
   const old=await ok({op:'previewFunctionKeyRecovery'});
   await ok({op:'agentMode',source,enabled:true});
   if(source==='codex')await ok({op:'codexKey',code:'F9',phase:'down'});
@@ -84,7 +84,7 @@ test('active Codex or Claude mode refuses an old recovery token before releasing
 
 test('a confirmation received behind a queued mode On is checked at execution, before any recovery write',async t=>{
  const service=await fakeService(t,{...modeRecoveryFixture(),paintDelayMs:180});
- const ok=async body=>{const r=await service.command(body);assert.equal(r.ok,true,JSON.stringify(r));return r.result;};
+ const ok=async body=>{const r=await (body.op==='codexKey'&&body.code==='F9'?service.nativeKey(body):service.command(body));assert.equal(r.ok,true,JSON.stringify(r));return r.result;};
  const old=await ok({op:'previewFunctionKeyRecovery'}),start=(await service.operations()).length;
  const painting=service.command({op:'preview',colors:Array(84).fill('#123456')});
  await until(service.operations,ops=>ops.slice(start).some(op=>op.op==='paint'),'Delayed ordinary paint did not start');

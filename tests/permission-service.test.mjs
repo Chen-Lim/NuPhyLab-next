@@ -167,7 +167,7 @@ test("native authorization changes refresh the helper immediately without changi
   }
   let operations = (await service.operations()).slice(start);
   assert.equal(operations.filter(({ op }) => op === "permissions").length, 1, "unchanged granted host reports do not repeatedly query the helper");
-  assert(operations.every(({ op }) => ["permissions", "status", "bluetoothDevices", "systemIdle"].includes(op)), JSON.stringify(operations));
+  assert(operations.every(({ op }) => ["permissions", "status", "bluetoothDevices", "systemIdle", "codexPrepare"].includes(op)), JSON.stringify(operations));
 
   const revoked = { ...granted, accessibility: false, canPostEvents: false };
   await service.configure({ permissions: revoked });
@@ -197,7 +197,7 @@ test("a delayed helper grant is picked up from unchanged native reports without 
   "helper grant did not become visible from the host reports", 4000);
   const operations = (await service.operations()).slice(start);
   assert.equal(operations.filter(({ op }) => op === "permissions").length, 1, "waiting host reports coalesce into one throttled read-only helper check");
-  assert(operations.every(({ op }) => ["permissions", "status", "bluetoothDevices"].includes(op)), JSON.stringify(operations));
+  assert(operations.every(({ op }) => ["permissions", "status", "bluetoothDevices", "codexPrepare"].includes(op)), JSON.stringify(operations));
   assert.deepEqual(lightingSnapshot(await service.state()), before);
 });
 

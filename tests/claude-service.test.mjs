@@ -103,7 +103,7 @@ test('single-session whole-keyboard mode follows one session only',async t=>{
 test('switching the source hands the keys over without leaving Codex holding one',async t=>{
  const service=await claudeService(t,{tasks:[{id:'codex-task',title:'Codex',status:'running'}]});
  await service.command({op:'settings',settings:{codexEnabled:true}});
- assert.equal((await service.command({op:'codexKey',code:'F9',phase:'down'})).ok,true);
+ assert.equal((await service.nativeKey({op:'codexKey',code:'F9',phase:'down'})).ok,true);
  assert.equal((await service.state()).codex.keys.held.source,'F9');
  await service.command({op:'settings',settings:{agentSource:'claude',claudeEnabled:true}});
  const state=await service.state();

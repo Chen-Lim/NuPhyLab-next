@@ -21,11 +21,11 @@ import type {AppState,Command,Task} from './types';
 const object=(value:unknown):Record<string,unknown>=>value&&typeof value==='object'?value as Record<string,unknown>:{};
 const taskId=(task:Task)=>String(task.id??task.threadId??'');
 const statusClass=(status:string)=>['running','working','thinking','in_progress'].includes(status)?'running':['needsInput','awaitingApproval','approval','waiting'].includes(status)?'waiting':['completed','awaitingInput','complete'].includes(status)?'complete':['error','failed'].includes(status)?'error':'idle';
-const defaultCommandIds=['modelPicker','newTask','dictation','voice','toggleTerminal','settings'];
+const defaultCommandIds=['toggleFastMode','approve','decline','newTask','dictation','sendPrompt'];
 type CommandDraft={ids:string[];keys:string[];baseIds:string[];baseKeys:string[];edits:{index:number;code:string}[]};
 const CODE_LABEL=(code:string)=>CODEX_KEYS.find(key=>key.code===code)?.label??code;
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
-const commandShortLabels:Record<string,string>={modelPicker:'模型',newTask:'新任务',dictation:'听写',voice:'语音',toggleTerminal:'终端',settings:'设置'};
+const commandShortLabels:Record<string,string>={toggleFastMode:'普通 / 极速',approve:'批准',decline:'拒绝',sendPrompt:'发送',modelPicker:'模型',newTask:'新聊天',dictation:'听写',voice:'语音',toggleTerminal:'终端',settings:'设置'};
 function initialTab(focus?:boolean):AgentTab {
   if(focus)return 'lights';
   const value=sessionStorage.getItem('nuphylab-agent-tab');
@@ -119,7 +119,7 @@ export function AgentDashboard({source,state,command,focusColors,readState=readA
     if(item.id==='revealProject'&&!currentTask?.cwd)return '此会话还没有有效项目路径。';
     return ({openSession:'桌面会话可定位，终端会话可使用恢复命令。',nextAttention:'选择需要关注的本机会话。',nextTask:'选择下一个本机会话。',prevTask:'选择上一个本机会话。',focusApp:'需要这台 Mac 已安装 Claude 桌面应用。',revealProject:'打开当前会话的项目文件夹。',copyResume:'复制当前会话的恢复命令。',toggleLightMode:'切换本套 AI 的状态灯显示模式。',wakeLights:'唤醒本套 AI 状态灯；灯光输出需 USB 连接。',refresh:'刷新本机会话状态，不要求 Claude 桌面应用。',none:'不执行任何操作。'} as Record<string,string>)[item.id]??'可用性依赖当前会话与应用状态。';
   };
-  const operationDisabled=(item:{id:string;available?:boolean})=>operationUnavailable(item)||(!releasingDictation(item.id)&&!claude&&!canSend)||Boolean(operationBusy);
+  const operationDisabled=(item:{id:string;available?:boolean;requiresPhysicalPress?:boolean})=>!claude&&item.requiresPhysicalPress===true||operationUnavailable(item)||(!releasingDictation(item.id)&&!claude&&!canSend)||Boolean(operationBusy);
   const saveEditor=async()=>{
     if(!commandDraft||editorLock.current||savedPending)return;
     editorLock.current=true;setEditorBusy(true);setEditorError('');
@@ -182,6 +182,7 @@ export function AgentDashboard({source,state,command,focusColors,readState=readA
           <span role="cell" className={`agent-task-status ${task?statusClass(String(task.status)):'idle'}`} title={selected?t('控制中'):undefined}><i/>{t(statusLabel(task))}</span><div role="cell"><Button kind="ghost" aria-label={t(`更改任务键 ${index+1}`)} onClick={()=>setRecording({group:'task',index,keys:bindings.map(item=>item.code)})}>{t('更改按键')}</Button></div>
         </div>;})}</div>
       <div className="agent-command-heading"><h2>{t('命令键')}</h2><Button kind="ghost" disabled={!state} onClick={openEditor}>{t('编辑命令键')}</Button></div>
+      {!claude&&enabled&&Boolean(object(keys.commandBridge).message)&&<p className="agent-feedback-v6" role="status">{t(String(object(keys.commandBridge).message))}</p>}
       <div className="agent-command-strip">{Array.from({length:6},(_,index)=>{const id=commandIds[index]??'none',item=commands.find(item=>item.id===id);return <button key={index} disabled={!item||operationDisabled(item)} title={releasingDictation(id)?t('结束听写'):item&&operationUnavailable(item)?t(operationReason(item)):!claude&&!canSend?t('需要辅助功能权限'):id==='dictation'?t(dictation.mode==='toggle'?'听写时按一次开始，再按一次结束。':'听写时按住对应按键，松开结束。'):t(item?.label??'未绑定')} onClick={()=>execute(id)}><kbd>{t(bindings[index+6].label)}</kbd><span>{t(releasingDictation(id)?'结束听写':(!claude&&commandShortLabels[id])||item?.label||'未绑定')}</span></button>;})}</div>
       {dictationError&&!keys.held&&commandIds.includes('dictation')&&<p className="agent-warning" role="status">{t('听写')}: {t(dictationError)}</p>}
       {ordinaryKeys.length>0&&<p className="agent-note">{t('这些绑定是普通按键，开启本模式时会被全局接管，期间无法用它们正常输入：')}{ordinaryKeys.map(key=>t(key.label)).join('、')}</p>}
@@ -223,7 +224,7 @@ export function AgentDashboard({source,state,command,focusColors,readState=readA
       {feedback&&<p className="agent-inline-error" role="alert">{t(feedback)}</p>}
       <div className="agent-directory-list">{matchingCommands.map(item=><div className="agent-directory-row" key={item.id}><div><strong>{t(releasingDictation(item.id)?'结束听写':item.label)}</strong><p>{t(operationReason(item))}</p></div><Button kind="ghost" disabled={operationDisabled(item)} busy={operationBusy===item.id} onClick={()=>execute(item.id)}>{t(operationUnavailable(item)?'不可用':'执行')}</Button></div>)}</div>
       {!matchingCommands.length&&<div className="agent-directory-empty"><p>{t('没有匹配的操作。')}</p><Button kind="ghost" onClick={()=>setSearch('')}>{t('清除搜索')}</Button></div>}
-      <details className="agent-details-v6"><summary>{t('支持范围与限制')}</summary><p>{t(String(integration?.reason??currentSource.reason??'任务状态自动更新；未确认的状态会单独标明。'))}</p>{claude?<><p>{t('Claude 停止本轮响应只表示这一轮结束，不代表整个项目完成；单次工具失败也不会把会话标成失败。')}</p><p>{t('NuPhy Lab 不会代替你批准或拒绝权限请求，也不会向会话发送输入。账户剩余额度没有可供第三方应用读取的官方接口，因此显示为暂不支持。')}</p></>:<><p>{t('“控制中”表示在 NuPhy Lab 选择的任务；直接在 Codex 切换页面时，当前无法同步真实焦点。状态依据本机任务事件和进程记录，尚不包含云端任务及部分桌面审批、语音状态。')}</p><p>{t('Fast、批准／拒绝、直接分叉、按住说话、发送输入、旋钮／摇杆导航和技能直达仍需要 Codex 的界面接口，当前未接入。快捷操作使用已确认的默认键位，Codex 内自定义键位可能影响执行。')}</p></>}<p>{t(claude?'命令键只在 NuPhy Lab 内部切换会话、跳转或刷新状态，不会向 Claude Code 发送按键或输入。':'听写方式跟随 Codex 的快捷键设置；长按模式最长 2 分钟。语音对话需要当前页面支持，终端需要本地项目。')}</p><p>{t('快捷控制暂停时，等待录键、按键触发或游戏结束后恢复。绑定位置与 RGB 索引分别处理。')}</p><div className="agent-support-notice-v6" role="note"><Info size={14} strokeWidth={1.5} aria-hidden="true"/><p>{t('能力、状态和额度未知时明确显示原因；不估算、不把过期数据当成最新结果。')}</p></div></details>
+      <details className="agent-details-v6"><summary>{t('支持范围与限制')}</summary><p>{t(String(integration?.reason??currentSource.reason??'任务状态自动更新；未确认的状态会单独标明。'))}</p>{claude?<><p>{t('Claude 停止本轮响应只表示这一轮结束，不代表整个项目完成；单次工具失败也不会把会话标成失败。')}</p><p>{t('NuPhy Lab 不会代替你批准或拒绝权限请求，也不会向会话发送输入。账户剩余额度没有可供第三方应用读取的官方接口，因此显示为暂不支持。')}</p></>:<><p>{t('“控制中”表示在 NuPhy Lab 选择的任务；直接在 Codex 切换页面时，当前无法同步真实焦点。状态依据本机任务事件和进程记录，尚不包含云端任务及部分桌面审批、语音状态。')}</p><p>{t('快速模式、批准、拒绝、听写和发送通过当前 Codex 界面操作，无需配置专用快捷键。批准只允许一次；没有对应请求时不会执行。')}</p></>}<p>{t(claude?'命令键只在 NuPhy Lab 内部切换会话、跳转或刷新状态，不会向 Claude Code 发送按键或输入。':'听写按住开始、松开结束，最长 2 分钟。发送需当前聊天输入框获得焦点。语音对话需要当前页面支持，终端需要本地项目。')}</p><p>{t('快捷控制暂停时，等待录键、按键触发或游戏结束后恢复。绑定位置与 RGB 索引分别处理。')}</p><div className="agent-support-notice-v6" role="note"><Info size={14} strokeWidth={1.5} aria-hidden="true"/><p>{t('能力、状态和额度未知时明确显示原因；不估算、不把过期数据当成最新结果。')}</p></div></details>
       </div>
     </Modal>}
   </div>;

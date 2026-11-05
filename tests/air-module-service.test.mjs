@@ -16,7 +16,7 @@ const mutations=new Set(['arm','paint','side','restore','restoreKeys','restoreFu
 const writes=operations=>operations.filter(operation=>mutations.has(operation.op));
 const withoutModule=settings=>Object.fromEntries(Object.entries(settings).filter(([key])=>key!=='airTopRightModule'));
 const colors=Array(84).fill('#d07d74');
-const ok=async(service,body)=>{const result=await service.command(body);assert.equal(result.ok,true,JSON.stringify(result));return result.result;};
+const ok=async(service,body)=>{const result=await (body.op==='codexKey'&&body.code==='F9'?service.nativeKey(body):service.command(body));assert.equal(result.ok,true,JSON.stringify(result));return result.result;};
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function calibratedService(t,extra={}) {
   const service=await fakeService(t,{modelId:'kick75',firmwareVersion:'4.0.18.6',

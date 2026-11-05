@@ -11,7 +11,7 @@ import os from 'node:os';
 test('actual native task diagnostic helper opens once and preserves rejected/unknown handler paths',{skip:process.platform!=='darwin'},async t=>{
   const dir=await mkdtemp(path.join(os.tmpdir(),'nuphy-task-open-fixture-'));t.after(()=>rm(dir,{recursive:true,force:true}));
   const source=await readFile(new URL('../native/HIDBridge.swift',import.meta.url),'utf8');
-  const start=source.indexOf('struct TaskOpenHandlerSnapshot {'),end=source.indexOf('\nfinal class KeyHooks {',start);
+  const start=source.indexOf('struct TaskOpenHandlerSnapshot {'),end=source.indexOf('// BEGIN CODEX CONTROLS',start);
   assert.ok(start>=0&&end>start,'production native diagnostic helper missing');
   const fixture=String.raw`
 let url=URL(string:"codex://threads/fixture-b")!

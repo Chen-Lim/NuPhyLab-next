@@ -1,0 +1,15 @@
+{
+  "version": "1.2.38",
+  "zh-CN": [
+    "提前准备 Codex 辅助功能控件，减少第一次按命令键时的初始化等待。",
+    "批准、拒绝和发送改用当前界面的对应按钮，无需为这些功能修改快捷键或重新打开 Codex。",
+    "授权变化后自动重建按键监听；系统权限仍未生效时，在安全恢复键盘后自动重开 NuPhy Lab 一次。",
+    "保留 F1–F12 默认分配和 Air75 V3 连接动画。此包用于首次安装体验测试。"
+  ],
+  "en": [
+    "Prepare Codex accessibility controls ahead of the first command-key press to reduce initialization delays.",
+    "Approve, decline and send now use the corresponding visible controls without editing keybindings or restarting Codex.",
+    "Recreate key capture after permission changes. If macOS retains stale permission state, safely restore the keyboard and relaunch NuPhy Lab once.",
+    "Preserve the F1–F12 defaults and Air75 V3 connection animation. This build is for first-install testing."
+  ]
+}

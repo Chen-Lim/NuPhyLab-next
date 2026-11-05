@@ -6,6 +6,9 @@ import {layout} from './layout.mjs';
 export const CODEX_KEYS = keys;
 export const DEFAULT_TASK_KEYS = Object.freeze(Array.from({length:6},(_,i)=>`F${i+1}`));
 export const DEFAULT_COMMAND_KEYS = Object.freeze(Array.from({length:6},(_,i)=>`F${i+7}`));
+export const DEFAULT_COMMAND_IDS = Object.freeze(['toggleFastMode','approve','decline','newTask','dictation','sendPrompt']);
+export const PREVIOUS_RECOMMENDED_COMMAND_IDS = Object.freeze(['toggleFastMode','approve','decline','newWindow','dictation','sendPrompt']);
+export const LEGACY_COMMAND_IDS = Object.freeze(['modelPicker','newTask','dictation','voice','toggleTerminal','settings']);
 export function codexBindings(settings={}) {
   return [...(settings.codexTaskKeys ?? DEFAULT_TASK_KEYS), ...(settings.codexCommandKeys ?? DEFAULT_COMMAND_KEYS)]
     .map((code,index)=>({index, ...CODEX_KEYS.find(key=>key.code===code), ledIndex:layout.find(key=>key.code===code)?.index ?? null}));
