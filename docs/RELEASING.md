@@ -1,5 +1,7 @@
 # NuPhy Lab 发布流程
 
+[English](RELEASING.en.md) · [文档目录](README.md)
+
 GitHub 仓库：`bohu8264/NuPhyLab-next`。旧 `bohu8264/NuPhyLab` 不参与新版发布。
 
 1. 同时增加 `package.json` 的版本号，并新增 `updates/release-notes/<版本>.json`：`version` 必须完全一致，`zh-CN` 与 `en` 数组填写这一版真实完成的更新说明，不用通用文案或占位内容。运行 `npm run build` 和 `npm test`。
@@ -15,6 +17,8 @@ GitHub 仓库：`bohu8264/NuPhyLab-next`。旧 `bohu8264/NuPhyLab` 不参与新�
 <https://github.com/bohu8264/NuPhyLab-next/releases/latest/download/NuPhyLab-macOS-AppleSilicon.dmg>
 
 GitHub 根据 Latest 正式版解析此链接。发布预览版时不得将其设置为 Latest；发布新版正式版前先确认草稿含有固定命名资产，避免切换后出现 404。
+
+面向用户的入口保持一致：中英双语首页、中文指南、英文指南和市场分享页都使用上述固定下载地址及 `releases/latest`。每次正式发布同步中英文发行说明与文档目录，不把旧版说明作为当前版本介绍。GitHub 页面说明可单独维护；应用内置说明和签名更新源仍遵循上面的冻结与重新签名要求。
 
 应用每小时在后台检查新版本；断网不影响键盘使用。用户可从应用菜单或设备页主动检查。更新内容和安装包都经过 Ed25519 验证，安装包同时需要通过 Developer ID 验证。安装前暂停灯效并确认键盘已安全释放；恢复记录不会混入发行包。
 
