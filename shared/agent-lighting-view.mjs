@@ -1,8 +1,9 @@
+import {blank} from './layout.mjs';
 import {CodexLights,resolveWholeTask} from './codex-lighting.mjs';
 import {ClaudeLights,resolveClaudeWholeTask} from './claude-lighting.mjs';
 
 const object = value => value && typeof value === 'object' ? value : {};
-const emptyColors = () => Array(84).fill('#000000');
+const emptyColors = () => blank();
 
 // Presentation facts are separate from whether task lights currently own USB.
 // In particular, a different AI source or scene must not be labelled as this AI.

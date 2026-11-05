@@ -1,3 +1,4 @@
+import {getKeyboardProfile,getCanvasCount} from '../shared/keyboard-models.mjs';
 import {CodexAccessibilityBridge} from './codex-accessibility-bridge.mjs';
 import {createNativeKeyVerifier} from './native-key-auth.mjs';
 import {takeNativeHoldEnvironment} from './native-hold-env.mjs';
@@ -367,7 +368,7 @@ function state() {
       sideColor: lastQuotaColor,
       storagePath: dataDir,
       storageWarning: store.warning,
-      unmappedIndices: getLayoutModel() === "kick75" ? [] : [83],
+      unmappedIndices: getKeyboardProfile(getLayoutModel()).unmappedIndices,
       autoConnecting: !hardware.state.connected && store.data.settings.autoConnect && !explicitDisconnect,
       connection: connectionRecovery.snapshot(hardware.state, store.data.settings.autoConnect && !explicitDisconnect),
       connectionPaused: explicitDisconnect,
@@ -1058,7 +1059,7 @@ async function command(req) {
       });
       await hardware.status();
       const frame = await hardware.request("readColors");
-      colors = [...frame.colors.slice(0, hardware.state.keyLedCount), ...Array(84 - hardware.state.keyLedCount).fill("#000000")];
+      colors = [...frame.colors.slice(0, hardware.state.keyLedCount), ...Array(Math.max(0,getCanvasCount(getLayoutModel()) - hardware.state.keyLedCount)).fill("#000000")];
       playback = {...playback,mode:"native",playing:false,lastError:null};
       return result;
     }
@@ -1312,6 +1313,7 @@ async function command(req) {
       await output(renderAnimation(baseColors, animation, 0));
       return playback;
     case "saveScene":
+      if(req.scene?.modelId !== undefined && req.scene.modelId !== getLayoutModel()) throw new Error("作品型号与当前键盘不一致，请先切换到对应键盘。");
       return { savedScene: await store.saveScene({ ...req.scene, modelId: getLayoutModel() }) };
     case "deleteScene":
       await store.deleteScene(req.id);

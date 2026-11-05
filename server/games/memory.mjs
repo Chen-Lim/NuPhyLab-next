@@ -1,4 +1,5 @@
-import { blank, layout, LED_COUNT } from "../../shared/layout.mjs";
+import {canvasCountForLayout} from '../../shared/keyboard-models.mjs';
+import { blank, layout } from "../../shared/layout.mjs";
 
 const PAD_CODES = [
   "KeyA", "KeyS", "KeyD", "KeyF", "KeyJ", "KeyK", "KeyL", "Semicolon",
@@ -13,6 +14,7 @@ const GOAL_ROUNDS = 20;
 export class MemoryGame {
   constructor(random = Math.random, keys = layout) {
     this.random = random;
+    this.canvasCount = canvasCountForLayout(keys.filter(key=>key.controllable!==false));
     this.pads = PAD_CODES.map((code) => {
       const key = keys.find(
         (candidate) => candidate.code === code && candidate.controllable !== false,
@@ -21,7 +23,7 @@ export class MemoryGame {
         !key ||
         !Number.isInteger(key.index) ||
         key.index < 0 ||
-        key.index >= LED_COUNT - 1
+        key.controllable === false
       )
         throw new TypeError(`Memory requires a controllable ${code} key`);
       return { code, index: key.index };
@@ -155,7 +157,7 @@ export class MemoryGame {
   }
 
   render() {
-    const colors = blank();
+    const colors = Array(this.canvasCount).fill("#000000");
     const padAt = this.pads.findIndex((pad) => pad.index === this.cueIndex);
     if (padAt >= 0)
       colors[this.cueIndex] =

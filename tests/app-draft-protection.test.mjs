@@ -47,7 +47,7 @@ for(const phase of['save','stop'])for(const change of['disconnect','model'])test
   return{ok:true};
  }});await request(f,'open');if(phase==='save')guardPrimary(f).props.onClick();else f.button('放弃修改并打开').props.onClick();await f.flush();const original=copy(f.draft());
  if(change==='disconnect'){f.state.device.connected=false;f.api.serviceError='fixture service unavailable';}
- else{f.storage.set('nuphylab-draft-kick75-v1',JSON.stringify(scene('Kick retained draft',{colors:Array(84).fill('#abcdef')})));f.api.layout=f.layout.slice(0,80);}
+ else{f.storage.set('nuphylab-draft-kick75-v1',JSON.stringify(scene('Kick retained draft',{colors:Array(84).fill('#abcdef')})));f.api.layout=f.layout.slice(0,80);f.state.device.modelId='kick75';}
  f.render();await f.flush();assert.equal(f.modal(),undefined);const afterChange=copy(f.draft());wait.resolve({ok:true});await f.flush();assert.notEqual(f.draft().name,'Target artwork');assert.equal(f.draft().name,change==='model'?'Kick retained draft':original.name);assert.deepEqual(copy(f.draft()).colors,afterChange.colors);if(phase==='save')assert.equal(f.commands.some(c=>c.op==='stop'),false,'stale save cannot dispatch ordinary-load stop');
  if(change==='disconnect'){f.state.device.connected=true;f.api.serviceError='';f.render();await f.flush();}
  await f.click('灯光创作');await f.edit({name:'New context unsaved edit'});await request(f,'open');await f.click('放弃修改并打开');assert.equal(f.modal(),undefined);assert.equal(f.draft().name,'Target artwork','new context action succeeds after old lock finally releases');assert.equal(f.commands.filter(c=>c.op==='stop').length,phase==='stop'?2:1);f.unmount();

@@ -1,3 +1,4 @@
+import {keyboardGeometry} from './keyboard-geometry';
 import {useEffect,useState,type CSSProperties} from 'react';
 import {Moon,ArrowUp} from 'lucide-react';
 import {resolveAgentLightingView,renderAgentLightingPreview} from '../../shared/agent-lighting-view.mjs';
@@ -5,7 +6,7 @@ import {codexBindings} from '../../shared/codex-keys.mjs';
 import {claudeBindings} from '../../shared/claude-keys.mjs';
 import {lightingUnavailableMessage} from '../../shared/device-status.mjs';
 import {Keyboard} from './Keyboard';
-import {airLayout,kickLayout} from '../../shared/layout.mjs';
+import {getLayoutModel,getLayoutForModel} from '../../shared/layout.mjs';
 import {useStartupCopy} from './StartupGuide';
 import {CodexStatusColors} from './CodexStatusColors';
 import {ClaudeStatusColors} from './ClaudeStatusColors';
@@ -23,8 +24,8 @@ export function AgentLighting({source,state,command,focusColors,serviceUnknown=f
   const connectionWakeActive=!serviceUnknown&&state?.connectionWake?.active===true;
   const ownsOutput=ownsAgentOutput&&!connectionWakeActive,showing=showingAgentOutput||connectionWakeActive;
   const claude=source==='claude',name=claude?'Claude Code':'Codex';
-  const keyLayout=state?.layout??(state?.device.modelId==='kick75'?kickLayout:airLayout);
-  const workspace=useWorkspaceLayout({aspectRatio:keyLayout.length===80?1009/440:959/384});
+  const keyLayout=state?.layout??getLayoutForModel(getLayoutModel());
+  const workspace=useWorkspaceLayout({aspectRatio:keyboardGeometry[getLayoutModel()].width/keyboardGeometry[getLayoutModel()].height});
   const bindings=claude?claudeBindings(settings):codexBindings(settings);
   const unavailable=!view.capable;
   const bluetooth=Boolean(state?.bluetooth?.connected&&!state.device.connected);
@@ -63,7 +64,7 @@ export function AgentLighting({source,state,command,focusColors,serviceUnknown=f
     <div ref={workspace.gridRef} className="agent-light-grid"><div className="agent-light-canvas">
       <div ref={workspace.stageRef} className="agent-workspace-core" tabIndex={-1}>
       <p className={`agent-live-status ${showing?'connected':''}`}><i/>{status}</p>
-      <div ref={workspace.keyboardRef} className="agent-workspace-keyboard">{state&&<Keyboard layout={keyLayout} colors={preview}/>}</div>
+      <div ref={workspace.keyboardRef} className="agent-workspace-keyboard keyboard-viewport">{state&&<Keyboard modelId={getLayoutModel()} layout={keyLayout} colors={preview} sideColor={state.device.connected && typeof state.device.sideColor === 'string' ? state.device.sideColor : undefined}/>}</div>
       </div><div ref={workspace.auxiliaryRef} className="agent-workspace-aux">
       <div className="agent-brightness v7-agent-brightness"><label htmlFor={`${source}-brightness`}>{t('状态灯亮度')}</label><input id={`${source}-brightness`} aria-label={`${name} ${t('状态灯亮度')}`} aria-describedby={`${source}-brightness-help`} type="range" min="0" max="100" style={{'--range-progress':`${Number(settings[`${source}Brightness`]??100)}%`} as CSSProperties} value={Number(settings[`${source}Brightness`]??100)} disabled={!state||unavailable||serviceUnknown} onChange={e=>set({[`${source}Brightness`]:Number(e.target.value)})}/><output>{Number(settings[`${source}Brightness`]??100)}%</output>
         <Button kind="ghost" icon={<Moon size={16}/>} onClick={()=>window.dispatchEvent(new CustomEvent('nuphylab:navigate',{detail:'lighting'}))}>{t('普通作品休眠设置')}</Button><p id={`${source}-brightness-help`} className="v7-agent-brightness-help">{t('状态灯亮度还会叠加全局逐键输出亮度。')}</p><p className="v7-agent-brightness-help">{t('页面预览不受全局亮度影响。')}</p><p className="v7-agent-brightness-help">{t('对话状态灯持续显示，关闭模式后停止。')}</p></div>

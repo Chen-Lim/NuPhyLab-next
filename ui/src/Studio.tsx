@@ -1,3 +1,5 @@
+import {keyboardGeometry} from './keyboard-geometry';
+import {getLayoutModel} from '../../shared/layout.mjs';
 import { rangeStyle } from "./rangeStyle";
 import {lightingUnavailableMessage} from '../../shared/device-status.mjs';
 import type {ConnectionDisplay} from '../../shared/connection-display.mjs';
@@ -116,7 +118,7 @@ export function Studio({
   onPlayRequestFinished,
   notify,
 }: Props) {
-  const workspace=useWorkspaceLayout({aspectRatio:layout.length===80?1009/440:959/384,enabled:tab!=='game'});
+  const workspace=useWorkspaceLayout({aspectRatio:keyboardGeometry[getLayoutModel()].width/keyboardGeometry[getLayoutModel()].height,enabled:tab!=='game'});
   const perKeySupported = state?.device.capabilities?.perKey !== false;
   const isCross=tab==='trigger'&&draft.trigger?.effect==='cross';
   const triggerArmed=Boolean(state?.trigger?.armed&&state.playback.mode==='trigger');
@@ -548,8 +550,8 @@ export function Studio({
           </> : tab === "animation" ? <><Button icon={<Eye size={16} />} onClick={() => setPagePreview(value => !value)}>{tr(pagePreview ? "停止预览" : "预览动画")}</Button><span className="v5-helper">{tr("仅在页面播放")}</span>{draft.animation.effect !== "frames" && <Button kind="ghost" icon={<Paintbrush size={16} />} onClick={() => {setPagePreview(false);setEditingPattern(true);}}>{tr("编辑图案")}</Button>}</> : tab === "trigger"&&!isCross ? <Button icon={<Paintbrush size={16} />} onClick={() => setEditingPattern(true)}>{tr("编辑图案")}</Button> : null}
           {!isCross&&<Button kind="ghost" icon={<Trash2 size={16}/>} disabled={!clearSource.some(value => !/^#0{6}$/i.test(value))} onClick={clearCanvas}>{tr(frameEditor || tab === "animation" && draft.animation.effect === "frames" ? "清空当前帧" : "清空画板")}</Button>}
         </div>
-        <div ref={workspace.keyboardRef} className="v5-keyboard" tabIndex={tab === "trigger" && !editingPattern && !isCross ? -1 : undefined} onPointerDown={tab === "trigger" && !editingPattern && !isCross ? event => { event.preventDefault(); event.currentTarget.focus({ preventScroll: true }); } : undefined}>
-          {layout.length ? <Keyboard layout={layout} colors={currentColors} lightPreview={tab === "animation" && draft.animation.effect !== "static"} lightPreviewPeak={previewPeak} selected={paintTools ? selected : []} onKey={paintTools ? touchKey : undefined} onStrokeStart={paintTools ? startStroke : undefined} sideColor={state?.device.connected && typeof state.device.sideColor === "string" ? state.device.sideColor : undefined} /> : <div className="layout-loading">{tr("正在读取键盘布局…")}</div>}
+        <div ref={workspace.keyboardRef} className="v5-keyboard keyboard-viewport" tabIndex={tab === "trigger" && !editingPattern && !isCross ? -1 : undefined} onPointerDown={tab === "trigger" && !editingPattern && !isCross ? event => { event.preventDefault(); event.currentTarget.focus({ preventScroll: true }); } : undefined}>
+          {layout.length ? <Keyboard modelId={getLayoutModel()} layout={layout} colors={currentColors} lightPreview={tab === "animation" && draft.animation.effect !== "static"} lightPreviewPeak={previewPeak} selected={paintTools ? selected : []} onKey={paintTools ? touchKey : undefined} onStrokeStart={paintTools ? startStroke : undefined} sideColor={state?.device.connected && typeof state.device.sideColor === "string" ? state.device.sideColor : undefined} /> : <div className="layout-loading">{tr("正在读取键盘布局…")}</div>}
         </div>
         </div>
         <div ref={workspace.auxiliaryRef} className="v5-workspace-aux">
@@ -557,7 +559,7 @@ export function Studio({
           : tab === "trigger" ? <div className="v5-canvas-note">{tr(isCross?'按任意键，从对应位置向横纵扩散。':`平时熄灭；按下 ${(draft.trigger?.code || "Space").replace(/^(Key|Digit)/, "")} 时显示此图案。`)}</div>
           : tab === "animation" ? <>
             <div className="v5-animation-kind"><h3>{tr(draft.animation.effect === "frames" ? "逐帧动画" : "效果动画")}</h3><button onClick={() => { setPagePreview(false); setAnimation({ effect: draft.animation.effect === "frames" ? "move" : "frames" }); }}>{tr(draft.animation.effect === "frames" ? "切换到效果动画" : "切换到逐帧动画")}</button></div>
-            {draft.animation.effect === "frames" && <div className="v5-frame-strip">{frames.map((frame, index) => <button key={index} className={`v5-frame-chip ${frameIndex === index ? "active" : ""}`} aria-label={tr(`选择第 ${index + 1} 帧`)} onClick={() => { setFrameIndex(index); setPagePreview(false); }}><Keyboard layout={layout} colors={draft.animation.colorOverride !== undefined ? applyArtworkAppearance(frame.colors, draft.animation) : frame.colors} mini /><span><b>{index + 1}</b><span>{frame.duration} ms</span></span></button>)}<button className="v5-add-frame" disabled={frames.length >= 120} onClick={() => { setAnimation({ frames: [...frames, { colors: selectedFrame?.colors.slice() || draft.colors.slice(), duration: 300 }] }); setFrameIndex(frames.length); }}><Plus size={16} />{tr("新建帧")}</button></div>}
+            {draft.animation.effect === "frames" && <div className="v5-frame-strip">{frames.map((frame, index) => <button key={index} className={`v5-frame-chip ${frameIndex === index ? "active" : ""}`} aria-label={tr(`选择第 ${index + 1} 帧`)} onClick={() => { setFrameIndex(index); setPagePreview(false); }}><Keyboard modelId={getLayoutModel()} layout={layout} colors={draft.animation.colorOverride !== undefined ? applyArtworkAppearance(frame.colors, draft.animation) : frame.colors} mini /><span><b>{index + 1}</b><span>{frame.duration} ms</span></span></button>)}<button className="v5-add-frame" disabled={frames.length >= 120} onClick={() => { setAnimation({ frames: [...frames, { colors: selectedFrame?.colors.slice() || draft.colors.slice(), duration: 300 }] }); setFrameIndex(frames.length); }}><Plus size={16} />{tr("新建帧")}</button></div>}
           </> : <div className="v5-canvas-controls v7-output-controls"><span>{tr("逐键输出亮度")}</span><input aria-label={tr("逐键输出亮度")} aria-describedby="studio-output-brightness-help" type="range" min="0" max="100" value={brightness} style={rangeStyle(brightness)} onChange={event => setBrightness(Number(event.target.value))} onPointerUp={() => run(command({ op: "settings", settings: { brightness } }))} onKeyUp={() => run(command({ op: "settings", settings: { brightness } }))} /><span>{brightness}%</span><button className="text-button" onClick={() => run(command({ op: "restore" }))} disabled={!state?.device.connected}><RotateCcw size={16} />{tr("恢复原灯效")}</button><div id="studio-output-brightness-help" className="v7-output-help"><p>{tr('影响所有逐键输出；不改 HEX，不随作品保存。')}</p><p>{tr('AI 状态灯还会叠加此全局亮度。')}</p></div></div>}
         </div>
       </section>

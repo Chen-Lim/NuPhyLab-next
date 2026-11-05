@@ -1,3 +1,4 @@
+import {getKeyboardProfile,isKeyboardModel} from '../shared/keyboard-models.mjs';
 // Read the actual base layer before translating media functions. The mappings
 // are scoped macOS service properties. Factory F4 additionally uses a narrow,
 // journaled onboard lease because its generated Command+Space has no unique usage.
@@ -13,11 +14,13 @@ const sources = new Map([
   [168,consumer(0xe2)], [170,consumer(0xea)], [169,consumer(0xe9)],
 ]);
 export function planKeyAdaptation(keymap, bindings) {
-  const kick = keymap?.protocol === 'kick75-s4-keymap';
-  const matrixCount = kick ? 90 : 96, keymapCount = matrixCount + 2;
-  const verified = keymap?.geometryVerified === true && keymap?.readOnly === true &&
-    (kick ? keymap.modelId === 'kick75' && keymap.matrixKeyCount === 90 && keymap.keymapKeyCount === 92
-      : keymap.protocol === 'air75-s4-keymap' && (keymap.modelId === undefined || keymap.modelId === 'air75-v3'));
+  const modelId=keymap?.modelId ?? 'air75-v3';
+  const profile=isKeyboardModel(modelId)?getKeyboardProfile(modelId):null;
+  const matrixCount = profile ? profile.rows*profile.columns : 0;
+  const keymapCount = matrixCount+(profile?.extraKeys ?? 0);
+  const protocol=modelId==='air75-v3'?'air75-s4-keymap':modelId+'-s4-keymap';
+  const verified = profile?.functionRow === true && keymap?.geometryVerified === true && keymap?.readOnly === true && keymap.protocol === protocol &&
+    (modelId==='air75-v3' || keymap.matrixKeyCount===matrixCount && keymap.keymapKeyCount===keymapCount);
   // Preserve the original AIR helper contract without allowing its version
   // string to override an explicit conflicting model or protocol.
   const legacyAir = keymap?.protocol === undefined && keymap?.firmwareVersion === '1.0.16.6' &&
@@ -41,6 +44,10 @@ export function planKeyAdaptation(keymap, bindings) {
     if(position<0 || factory.lastIndexOf(target)!==position || position>=matrixCount)
       throw new Error('无法确认功能键的位置，未修改系统映射。');
     const source=keymap.active[position];
+    const sharedSource=keymap.active.filter(value=>value===source).length>1;
+    // NODE gestures share media usages with F keys. Only a verified onboard
+    // function-row lease may separate them; never redirect the touch strip.
+    if(sharedSource && !['air75-v3','kick75'].includes(modelId)) {unsupported.push(code);shared.push(code);continue;}
     if(source===target){ready.push(code);continue;}
     // The keyboard's extended F13–F24 layer can be active over USB as well
     // as Bluetooth. Resolve it by physical matrix position, not by key name.
@@ -49,7 +56,7 @@ export function planKeyAdaptation(keymap, bindings) {
     if(!usage || mappings.some(row=>row.HIDKeyboardModifierMappingSrc===usage)) {unsupported.push(code);continue;}
     mappings.push({HIDKeyboardModifierMappingSrc:usage,HIDKeyboardModifierMappingDst:keyboard(target)});
     ready.push(code);
-    if(keymap.active.filter(value=>value===source).length>1) shared.push(code);
+    if(sharedSource) shared.push(code);
   }
   return {mappings,ready,unsupported,shared,locationId:keymap.locationId,mode:keymap.mode,
     signature:JSON.stringify([keymap.protocol ?? 'legacy-air75',keymap.mode,keymap.locationId,keymap.active,bindings])};
@@ -82,7 +89,7 @@ export function planKeycapFunctions(keymap) {
 export class KeyAdaptation {
   constructor(hardware,{now=Date.now}={}) {
     this.hardware=hardware;this.now=now;this.nextCheck=0;this.signature=null;
-    this.child=null;this.owned=false;this.boardOwned=false;this.recovered=false;
+    this.child=null;this.owned=false;this.boardOwned=false;this.boardKeys=[];this.recovered=false;
     this.value={status:'off',ready:[],unsupported:[],shared:[],error:null};
   }
   snapshot(){return {...this.value};}
@@ -133,12 +140,13 @@ export class KeyAdaptation {
       }
       // Validate the complete model/geometry before a narrow firmware lease;
       // a malformed map must never trigger prepareFunctionKey as a probe.
-      if (!wireless) planKeyAdaptation(map,bindings);
+      const beforeLease=wireless ? null : planKeyAdaptation(map,bindings);
       const f4=map?.defaults?.[1]?.indexOf(61);
       const leaseSupported=map?.functionKeyLeaseSupported === true ||
         (map?.functionKeyLeaseSupported === undefined && map?.protocol !== 'kick75-s4-keymap');
-      const leaseNeeded=!wireless&&!keycaps&&leaseSupported&&bindings.includes('F4')&&map?.mode===0&&f4>=0&&
-        (map.active?.[f4]===32263 || map.functionKeyLease===true);
+      const sharedLease=!['air75-v3','kick75'].includes(map?.modelId??'air75-v3') && (beforeLease?.shared.length>0 || map?.functionKeyLease===true&&bindings.some(code=>/^F([1-9]|1[0-2])$/.test(code)));
+      const leaseNeeded=!wireless&&!keycaps&&leaseSupported&&map?.mode===0 &&
+        (sharedLease || bindings.includes('F4')&&f4>=0&&(map.active?.[f4]===32263 || map.functionKeyLease===true));
       if(!leaseNeeded && this.boardOwned) {
         await this.hardware.request('restoreFunctionKey');this.boardOwned=false;
         if(!wireless)map=await this.hardware.request('readKeymap');
@@ -149,9 +157,10 @@ export class KeyAdaptation {
         }
         // Keep recovery armed before issuing a mutation whose reply may be lost.
         this.boardOwned=true;
-        const result=await this.hardware.request('prepareFunctionKey');
+        const result=await this.hardware.request('prepareFunctionKey',{keys:bindings.filter(code=>/^F([1-9]|1[0-2])$/.test(code))});
         if(result.verified!==true)throw new Error('F4 配置未通过回读检查，原键位备份已保留。');
         this.boardOwned=result.leased===true;
+        this.boardKeys=this.boardOwned?(Array.isArray(result.keys)?result.keys:['F4']):[];
         map=await this.hardware.request('readKeymap');
       }
       const plan=wireless ? (keycaps ? {mappings:extendedKeycapMappings(),ready:[],unsupported:[],shared:[],profile:'keycaps',keycapsMapped:true,signature:JSON.stringify(['keycaps-bluetooth',bluetoothIdentity])} : planBluetoothKeys(bindings,bluetoothIdentity))
@@ -181,7 +190,7 @@ export class KeyAdaptation {
       }
       this.value={status:keycaps?'keycaps':plan.unsupported.length?'partial':'ready',ready:plan.ready,
         unsupported:plan.unsupported,shared:plan.shared,error:null,mode:plan.mode,
-        mapped:plan.mappings.length+(this.boardOwned?1:0),boardAdapted:this.boardOwned?['F4']:[],keycapsMapped:plan.keycapsMapped===true,transport:wireless?'bluetooth':'usb',checkedAt:this.now()};
+        mapped:plan.mappings.length+(this.boardOwned?this.boardKeys.length:0),boardAdapted:this.boardOwned?this.boardKeys:[],keycapsMapped:plan.keycapsMapped===true,transport:wireless?'bluetooth':'usb',checkedAt:this.now()};
     } catch(error) {
       let message=error.message;
       try {await this.release();} catch(restoreError) {message+=' '+restoreError.message;}

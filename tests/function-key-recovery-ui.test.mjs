@@ -36,7 +36,7 @@ test('human confirmation consumes the token once and only a fully verified resto
   const old=f.button('恢复原功能');old.props.onClick();old.props.onClick();f.instance.render();await f.flush();
   assert.deepEqual(f.commands,[{op:'previewFunctionKeyRecovery'},{op:'confirmFunctionKeyRecovery',token:'private-preview-token',confirmSameKeyboard:true}]);
   f.instance.tree.props.onClose();assert.deepEqual(f.closed,[],'the write in flight cannot be dismissed');
-  wait.resolve({restored:true,verified:true});await f.flush();assert.match(f.words(),/F4 已恢复为原来的功能/);assert.ok(f.button('完成'));f.click('完成');assert.equal(f.closed.length,1);f.instance.unmount();
+  wait.resolve({restored:true,verified:true});await f.flush();assert.match(f.words(),/临时功能键已恢复/);assert.ok(f.button('完成'));f.click('完成');assert.equal(f.closed.length,1);f.instance.unmount();
 });
 
 for(const bad of[{restored:true},{verified:true},{restored:false,verified:true},null])test(`incomplete restore receipt ${JSON.stringify(bad)} requires a fresh preview and a new human confirmation`,async()=>{
@@ -82,15 +82,36 @@ test('errors remain local and sanitized, retry does not carry the previous human
   let attempts=0;const f=await fixture({language:'en',handler:()=>{if(++attempts===1)throw Error('private-preview-token private-serial');return preview();}});await f.flush();assert.match(f.words(),/The check did not finish/);assert.equal(f.words().includes('private-'),false);f.click('Check again');await f.flush();assert.equal(f.checkbox().props.checked,false);assert.match(f.words(),/same keyboard/);f.click('Cancel');assert.equal(f.closed.length,1);f.instance.unmount();
 });
 
-test('Device exposes the dialog for legacy pending F4 without blocking ordinary RGB or automatically confirming it',async()=>{
+async function deviceFixture(current=state()){
   const names=['Button','Keyboard','FunctionKeyRecoveryDialog'],nodes=Object.fromEntries(names.map(name=>[name,stub(name)])),commands=[];
   const ui=createVMEnvironment({'lucide-react':Object.fromEntries(['ArrowLeft','Bluetooth','Cable','ChevronRight','CircleAlert','RotateCcw','Unplug'].map(name=>[name,stub(name)])),
     './primitives':{Button:nodes.Button,run:promise=>promise.catch(()=>{})},'./Keyboard':{Keyboard:nodes.Keyboard},'./FunctionKeyRecoveryDialog':{FunctionKeyRecoveryDialog:nodes.FunctionKeyRecoveryDialog},
     './StartupGuide':{firmwarePrompt:()=>null,showFirmwareGuide(){},useStartupCopy:()=>zh=>zh},'./KeyRecoveryPanel':{friendlyConnectionError:value=>value,keyRecoveryProblem:()=>null},'./codexKeys':{nativeCodexKeys:async()=>{}},'./connection-copy-v7':{connectionCopy:value=>value},'./i18n':{t:value=>value}});
-  const Device=(await ui.load(new URL('../ui/src/Device.tsx',import.meta.url))).exports.Device,current=state(),props={state:current,command:async body=>commands.push(body),serviceError:''},instance=ui.mount(Device,props);
+  const Device=(await ui.load(new URL('../ui/src/Device.tsx',import.meta.url))).exports.Device,props={state:current,command:async body=>commands.push(body),serviceError:''},instance=ui.mount(Device,props);
+  return{nodes,commands,current,props,instance};
+}
+
+test('Device exposes the dialog for legacy pending F4 without blocking ordinary RGB or automatically confirming it',async()=>{
+  const {nodes,commands,current,instance}=await deviceFixture();
   const find=predicate=>walkAll(instance.tree,predicate)[0],entry=find(n=>n.type===nodes.Button&&textOf(n)==='检查并恢复按键'),lighting=find(n=>n.type===nodes.Button&&textOf(n)==='恢复键盘原灯效');
   assert.ok(entry);assert.equal(entry.props.disabled,false);assert.equal(lighting.props.disabled,false);const focus={id:'fixture-trigger'};entry.props.onClick({currentTarget:focus});instance.render();
   const dialog=find(n=>n.type===nodes.FunctionKeyRecoveryDialog);assert.ok(dialog);assert.equal(dialog.props.returnFocus,focus);assert.equal(dialog.props.state,current);assert.deepEqual(commands,[]);
   current.device.keyRecovery.pending=false;instance.render();assert.ok(find(n=>n.type===nodes.FunctionKeyRecoveryDialog),'success can remain visible after pending clears');
   current.settings.codexEnabled=true;instance.render();assert.equal(find(n=>n.type===nodes.FunctionKeyRecoveryDialog),undefined);instance.unmount();
+});
+
+test('Device does not label a healthy owned AI lease as a recovery problem, but retains recovery for lost ownership, failures and legacy records',async()=>{
+  const current=state();current.settings.codexEnabled=true;
+  current.device.modelId='node75-lp';current.device.functionKeyRecoveryPending=true;
+  const active={status:'active',pending:true,blocking:false,ownsCurrentHandle:true,error:null,errorCode:null,unownedHistory:false};
+  current.device.keyRecovery={...active};
+  const {nodes,commands,instance}=await deviceFixture(current);
+  const hasEntry=()=>walkAll(instance.tree,n=>n.type===nodes.Button&&textOf(n)==='检查并恢复按键').length>0;
+  assert.equal(hasEntry(),false);assert.equal(textOf(instance.tree).includes('部分按键的原功能尚未确认'),false);
+  for(const change of[{ownsCurrentHandle:false},{status:'confirmationRequired'},{blocking:true},{error:'restore failed'},{errorCode:'KEY_LEASE_TIMEOUT'},{unownedHistory:true}]){
+    current.device.keyRecovery={...active,...change};instance.render();assert.equal(hasEntry(),true,JSON.stringify(change));
+  }
+  delete current.device.keyRecovery;instance.render();assert.equal(hasEntry(),true,'legacy pending flag keeps the recovery entry');
+  current.device.functionKeyRecoveryPending=false;instance.render();assert.equal(hasEntry(),false);
+  assert.deepEqual(commands,[],'rendering recovery state never writes to the keyboard');instance.unmount();
 });

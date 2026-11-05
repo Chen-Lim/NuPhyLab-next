@@ -1,3 +1,4 @@
+import {KEYBOARD_MODELS,isKeyboardModel} from '../../shared/keyboard-models.mjs';
 import {useEffect,useRef,useState} from 'react';
 import {Button,Modal,run} from './primitives';
 import {useLanguage} from './i18n';
@@ -13,15 +14,15 @@ const object=(value:unknown):Record<string,unknown>=>value&&typeof value==='obje
 const firmware=(value:unknown)=>typeof value==='string'&&/^\d{1,4}(?:\.\d{1,5}){3}$/.test(value)?value:'';
 function identity(value:unknown):Identity {
   const raw=object(value),name=typeof raw.model==='string'?raw.model:'';
-  const modelId=/^air75 v3(?: ansi)?$/i.test(name)?'air75-v3':/^kick75(?: ansi)?$/i.test(name)?'kick75':'';
-  return {modelId,model:modelId==='kick75'?'Kick75':modelId==='air75-v3'?'Air75 V3':'',firmware:firmware(raw.firmware)};
+  const modelId=Object.entries(KEYBOARD_MODELS).find(([,profile])=>profile.name.toLowerCase()===name.replace(/ ANSI$/i,'').toLowerCase())?.[0]??'';
+  return {modelId,model:isKeyboardModel(modelId)?KEYBOARD_MODELS[modelId].name:'',firmware:firmware(raw.firmware)};
 }
 function context(state:AppState|null,serviceError='') {
   const device=state?.device,model=device?.modelId??'',session=device?.connectionSessionId??'';
   const version=firmware(device?.firmwareVersion??device?.firmware);
   const modeOff=state?.settings.codexEnabled===false&&state?.settings.claudeEnabled===false;
   const connected=device?.connected===true&&device.transport==='USB'&&device.readOnly!==true;
-  const ready=!serviceError&&connected&&modeOff&&Boolean(session)&&['air75-v3','kick75'].includes(model);
+  const ready=!serviceError&&connected&&modeOff&&Boolean(session)&&isKeyboardModel(model)&&KEYBOARD_MODELS[model].functionRow;
   return {key:JSON.stringify([model,session,version,connected,modeOff,Boolean(serviceError)]),ready,modeOff,model,version};
 }
 
@@ -87,9 +88,9 @@ export function FunctionKeyRecoveryDialog({state,command,onClose,serviceError=''
   return <Modal title={copy('检查并恢复按键','Check and restore keys')} width={460} busy={busy==='restoring'} initialFocus="title" returnFocus={returnFocus} onClose={close} className="function-key-recovery-dialog" footer={success
     ?<Button kind="primary" onClick={close}>{copy('完成','Done')}</Button>
     :<><Button kind="ghost" data-modal-cancel disabled={busy==='restoring'} onClick={close}>{copy('取消','Cancel')}</Button><Button kind="primary" busy={busy==='restoring'} disabled={!canRestore} onClick={()=>run(restore())}>{copy('恢复原功能','Restore original function')}</Button></>}>
-    {success?<p className="function-key-recovery-success" role="status">{copy('F4 已恢复为原来的功能。','F4 has been restored to its original function.')}</p>:<>
-      <p>{preview?.alreadyRestored?copy('F4 当前已是原来的功能。确认同一把键盘后，可完成检查。','F4 already has its original function. Confirm this is the same keyboard to finish the check.'):copy('之前的 F4 临时设置尚未确认恢复。请先检查键盘，再恢复原来的功能。','The previous temporary F4 setting has not been confirmed as restored. Check the keyboard before restoring its original function.')}</p>
-      <p className="muted">{copy('恢复范围：仅恢复 F4 原功能。','Scope: restore only the original F4 function.')}</p>
+    {success?<p className="function-key-recovery-success" role="status">{copy('临时功能键已恢复。','Temporary function keys have been restored.')}</p>:<>
+      <p>{preview?.alreadyRestored?copy('功能键当前已是原来的功能。确认同一把键盘后，可完成检查。','The function keys already have their original functions. Confirm this is the same keyboard to finish the check.'):copy('之前的功能键临时设置尚未确认恢复。请先检查键盘，再恢复原来的功能。','The previous temporary function-key settings has not been confirmed as restored. Check the keyboard before restoring its original function.')}</p>
+      <p className="muted">{copy('恢复范围：本软件临时适配的功能键。','Scope: function keys temporarily adapted by NuPhy Lab.')}</p>
       {busy==='checking'&&<p role="status">{copy('正在检查键盘…','Checking the keyboard…')}</p>}
       {preview&&<dl className="function-key-recovery-identities">{[[copy('之前使用的键盘','Previous keyboard'),preview.original],[copy('当前连接的键盘','Connected keyboard'),preview.current]].map(([label,value])=><div key={String(label)}><dt>{String(label)}</dt><dd>{model(value as Identity)}<span>{copy('固件','Firmware')} {version(value as Identity)}</span></dd></div>)}</dl>}
       {preview?.ready&&scope.current.ready&&!problem&&<label className="checkbox-field function-key-recovery-confirm"><input type="checkbox" checked={confirmed} disabled={Boolean(busy)} onChange={event=>{if(!lock.current&&authorization.current?.scope===scope.current)setConfirmed(event.target.checked);}}/><span>{copy('我确认这是之前使用的同一把键盘','I confirm this is the same keyboard I used before')}</span></label>}

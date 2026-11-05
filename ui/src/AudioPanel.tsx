@@ -1,3 +1,5 @@
+import {keyboardGeometry} from './keyboard-geometry';
+import {blank,getLayoutModel} from '../../shared/layout.mjs';
 import { rangeStyle } from "./rangeStyle";
 import {lightingUnavailableMessage} from '../../shared/device-status.mjs';
 import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
@@ -22,7 +24,7 @@ export type AudioState={active:boolean;available:boolean;systemSupported:boolean
 const defaults:AudioConfig={source:'system',deviceId:'',effect:'pulse',colorMode:'single',color:'#6f9e85',sensitivity:1.5,noiseFloor:-55};
 const errorText:Record<string,string>={microphonePermission:'请允许 NuPhy Lab 使用麦克风，然后重新开始。',inputUnavailable:'麦克风不可用，请检查连接或选择其他设备。',systemCapture:'系统声音暂不可用，请检查录音权限后重试。',systemPermission:'请允许 NuPhy Lab 录制系统声音，然后重新开始。',systemFormat:'当前输出设备的音频格式暂不支持，请切换输出设备。',systemUnsupported:'系统声音需要 macOS 14.2 或更新版本，请改用麦克风',keyboardDisconnected:'键盘已断开，声音采集已停止。',lightingFailed:'灯效输出已停止，请检查键盘连接后重试。',captureStopped:'声音采集已中断，请重新开始。'};
 export function AudioPanel({state,layout,command}:{state:AppState|null;layout:Key[];command:Command}){
-  const workspace=useWorkspaceLayout({aspectRatio:layout.length===80?1009/440:959/384});
+  const workspace=useWorkspaceLayout({aspectRatio:keyboardGeometry[getLayoutModel()].width/keyboardGeometry[getLayoutModel()].height});
   const saved=state?.settings.audio as AudioConfig|undefined;
   const audio=state?.audio as AudioState|undefined;
   const [busy,setBusy]=useState(false);
@@ -61,7 +63,7 @@ export function AudioPanel({state,layout,command}:{state:AppState|null;layout:Ke
       <div ref={workspace.stageRef} className="audio-workspace-core" tabIndex={-1}>
       <div className="audio-v5-status" role="status"><i className={capturing?'active':''}/>{t(statusText)}{audio?.status==='paused'&&<Button kind="ghost" busy={busy} onClick={()=>{if(actionPending.current)return;actionPending.current=true;setBusy(true);run(command({op:'lightWake'},{silent:true}).catch(error=>setActionError(error instanceof Error?error.message:'操作未完成，请重试。')).finally(()=>{actionPending.current=false;setBusy(false);}));}}>{t('唤醒灯光')}</Button>}</div>
       {unavailable&&<p className="audio-v5-unavailable">{t(unavailable)}</p>}
-      <div ref={workspace.keyboardRef} className="audio-workspace-keyboard"><Keyboard layout={layout} colors={capturing?state?.colors??[]:Array(84).fill('#000000')} sideColor="#000000"/></div>
+      <div ref={workspace.keyboardRef} className="audio-workspace-keyboard keyboard-viewport"><Keyboard modelId={getLayoutModel()} layout={layout} colors={capturing?state?.colors??[]:blank()} sideColor="#000000"/></div>
       </div>
       <div ref={workspace.auxiliaryRef} className="audio-workspace-aux"><div className="audio-v5-footer"><div className="audio-v5-meter" role="meter" aria-label={t('声音电平')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(level*100)}><span><AudioLines size={16}/>{t('声音电平')}</span><div>{Array.from({length:32},(_,i)=><i key={i} className={i<Math.round(level*32)?'lit':''}/>)}</div></div>
         <div id="audio-output-brightness-group" tabIndex={-1} className="audio-v5-brightness v7-output-controls"><span>{t('逐键输出亮度')}</span><input aria-label={t('逐键输出亮度')} aria-describedby="audio-output-brightness-help" type="range" min="0" max="100" value={brightness} style={rangeStyle(brightness)} onChange={e=>changeBrightness(Number(e.target.value))} onPointerUp={()=>run(flushBrightness())} onKeyUp={()=>run(flushBrightness())} onBlur={()=>run(flushBrightness())}/><output>{brightness}%</output><button onClick={()=>navigate('permissions')}><ShieldCheck size={16}/>{t('声音与隐私')}</button><div id="audio-output-brightness-help" className="v7-output-help"><p>{t('影响所有逐键输出；不改 HEX，不随作品保存。')}</p><p>{t('AI 状态灯还会叠加此全局亮度。')}</p></div>{pending.brightnessError&&<div className="inline-v6-notice inline-v6-error audio-v6-settings-error" role="alert"><p>{connectionCopy({zh:'输出亮度的保存结果尚未确认，修改已保留。',en:'Saving output brightness is not confirmed. Your changes are kept.'})}</p><Button kind="ghost" busy={retrying} onClick={()=>run(retrySettings())}>{connectionCopy({zh:'重试保存',en:'Retry save'})}</Button></div>}</div>

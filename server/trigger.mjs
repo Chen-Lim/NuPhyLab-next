@@ -1,4 +1,5 @@
-import { blank, LED_COUNT, layout } from "../shared/layout.mjs";
+import {getKeyboardProfile} from '../shared/keyboard-models.mjs';
+import { blank, getLayoutModel, layout } from "../shared/layout.mjs";
 import {TypingCross} from '../shared/typing-cross.mjs';
 import { DEFAULT_TRIGGER, validateTrigger } from "../shared/trigger.mjs";
 import { validateColors } from "./storage.mjs";
@@ -19,7 +20,7 @@ export class TriggerEffect {
     const nextColors = validateColors(colors);
     const nextConfig = validateTrigger(config);
     // The final HID slot has no measured key location; never illuminate it.
-    nextColors[LED_COUNT - 1] = "#000000";
+    for (const index of getKeyboardProfile(getLayoutModel()).unmappedIndices) nextColors[index] = "#000000";
     this.colors = nextColors;
     this.config = nextConfig;
     this.armed = true;

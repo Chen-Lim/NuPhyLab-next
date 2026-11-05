@@ -1,3 +1,4 @@
+import type {KeyboardModel} from './layout.mjs';
 export type ConnectionDisplayCopy = Readonly<{zh:string;en:string}>;
 export type ConnectionStateId = 'serviceUnknown'|'loading'|'attention'|'reconnecting'|'paused'|'usbReady'|'bluetoothOnly'|'disconnected';
 export type ConnectionReasonId = 'multipleUsb'|'appUpdateRequired'|'keyRecoveryBlocked'|'lightingRecoveryBlocked'|'readOnly'|'genericConnection';
@@ -38,7 +39,7 @@ export type ConnectionDisplay = Readonly<{
   deviceTitle:ConnectionDisplayCopy;deviceBody:ConnectionDisplayCopy|null;
   primaryAction:ConnectionActionId|null;devicePrimaryAction:ConnectionActionId|null;devicePrimaryCopy:ConnectionDisplayCopy|null;
   identity:Readonly<{modelName:string|null;transport:'usb'|'bluetooth'|null}>;
-  canvasModelId:'air75-v3'|'kick75'|null;canvasIdentity:ConnectionDisplayCopy|null;
+  canvasModelId:KeyboardModel|null;canvasIdentity:ConnectionDisplayCopy|null;
   capability:Readonly<{kind:'perKey'|'stockOnly'|'readOnly'|'unknown'|'unavailable';label:ConnectionDisplayCopy|null;tone:ConnectionTone}>;
   offlineCapabilities:ConnectionDisplayCopy;reason:ConnectionDisplayReason|null;restoreEvidenceAccepted:boolean;
 }>;

@@ -2,7 +2,7 @@
 
 [中文 / English 首页](README.md) · [English guide](README.en.md)
 
-NuPhy Lab 是适用于 macOS 的 **NuPhy AIR75 V3 / Kick75（ANSI）** 灯光创作软件。USB 插入后自动识别型号，作品按键盘分别保存。
+NuPhy Lab 是适用于 macOS 的 **NuPhy AIR65 / AIR75 / AIR100 V3、NODE75 / NODE100（LP / HP）及 Kick75（ANSI）** 灯光创作软件。USB 插入后自动识别型号，作品按键盘分别保存。
 
 提供绘图、动画、按键触发、游戏、声音律动、作品库，以及 Codex / Claude Code 任务快捷键和状态灯。
 
@@ -21,6 +21,8 @@ NuPhy Lab 是适用于 macOS 的 **NuPhy AIR75 V3 / Kick75（ANSI）** 灯光创
 首次使用按提示授予输入监控和辅助功能权限。软件可能自动关闭并重新打开一次，使新权限生效。声音权限在实际启用声音律动时请求。
 
 需要更新键盘固件时，请按 NuPhyIO 提示操作；升级完成后关闭官网页面，再回到 NuPhy Lab。
+
+兼容固件、型号和验证范围请见[键盘兼容性](docs/KEYBOARD_COMPATIBILITY.md)。AIR65 V3 没有实体 F 区，不提供 F1–F12 自动接管。
 
 ## AI 助手
 

@@ -1,9 +1,11 @@
-import {AIR_CONNECTION_WAKE_DURATION_MS, renderAirConnectionWake} from '../shared/air-connection-wake.mjs';
+import {getKeyboardProfile,isKeyboardModel} from '../shared/keyboard-models.mjs';
+import {AIR_CONNECTION_WAKE_DURATION_MS, renderConnectionWake} from '../shared/air-connection-wake.mjs';
 
 export function supportsAirConnectionWake(device) {
-  return device?.connected === true && device.identified === true &&
-    device.transport === 'USB' && device.vendorId === 0x19f5 && device.productId === 0x1028 &&
-    device.modelId === 'air75-v3' && device.ledCount === 104 && device.keyLedCount === 84 &&
+  const profile=isKeyboardModel(device?.modelId)?getKeyboardProfile(device.modelId):null;
+  return !!profile && device?.connected === true && device.identified === true &&
+    device.transport === 'USB' && device.vendorId === 0x19f5 && profile.productIds.includes(device.productId) &&
+    device.ledCount === profile.keyCount+profile.sideCount && device.keyLedCount === profile.keyCount &&
     device.protocolReady === true && device.readOnly === false &&
     typeof device.connectionSessionId === 'string' && device.connectionSessionId.length > 0 &&
     device.capabilities?.perKey === true && device.capabilities.readProbeVerified === true &&
@@ -31,14 +33,14 @@ export class AirConnectionWake {
     // Recovery, a cancelled animation or a rejected write must not replay it.
     this.available = false;
     if (!supportsAirConnectionWake(device)) return null;
-    const ticket = {sessionId:device.connectionSessionId, epoch, started:null, context};
+    const ticket = {modelId:device.modelId,sessionId:device.connectionSessionId, epoch, started:null, context};
     this.current = ticket;
-    this.last = {status:'starting', reason:null, elapsedMs:0, sessionId:ticket.sessionId};
+    this.last = {modelId:device.modelId,status:'starting', reason:null, elapsedMs:0, sessionId:ticket.sessionId};
     return ticket;
   }
   matches(ticket, device, epoch) {
     return this.current === ticket && supportsAirConnectionWake(device) &&
-      ticket.sessionId === device.connectionSessionId && ticket.epoch === epoch;
+      ticket.modelId === device.modelId && ticket.sessionId === device.connectionSessionId && ticket.epoch === epoch;
   }
   start(ticket, device, epoch) {
     if (!this.matches(ticket, device, epoch) || device.armed !== true) {
@@ -60,12 +62,12 @@ export class AirConnectionWake {
       this.cancel('sessionChanged');
       return null;
     }
-    return renderAirConnectionWake(ticket.started === null ? 0 : this.elapsed());
+    return renderConnectionWake(ticket.modelId,ticket.started === null ? 0 : this.elapsed());
   }
   handoff() {
     const ticket = this.current;
     if (!ticket) return null;
-    this.last = {status:'finishing', reason:null, elapsedMs:AIR_CONNECTION_WAKE_DURATION_MS, sessionId:ticket.sessionId};
+    this.last = {modelId:ticket.modelId,status:'finishing', reason:null, elapsedMs:AIR_CONNECTION_WAKE_DURATION_MS, sessionId:ticket.sessionId};
     this.current = null;
     return ticket.context;
   }
@@ -84,6 +86,6 @@ export class AirConnectionWake {
   }
   snapshot() {
     return {...this.last, active:this.active, elapsedMs:this.active ? this.elapsed() : this.last.elapsedMs,
-      durationMs:AIR_CONNECTION_WAKE_DURATION_MS, modelId:'air75-v3', brightness:100};
+      durationMs:AIR_CONNECTION_WAKE_DURATION_MS, modelId:this.last.modelId ?? 'air75-v3', brightness:100};
   }
 }

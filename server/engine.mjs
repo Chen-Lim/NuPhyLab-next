@@ -1,4 +1,5 @@
-import { layout, blank, LED_COUNT } from "../shared/layout.mjs";
+import {canvasCountForLayout} from '../shared/keyboard-models.mjs';
+import { layout, blank } from "../shared/layout.mjs";
 export {
   scaleColor,
   renderAnimation,
@@ -15,12 +16,13 @@ export function overlayCodex(colors, slots) {
 // row are crossed by a horizontal move; only the outer row edges are walls.
 export function buildGameBoard(keys = layout) {
   const byIndex = new Map();
+  const canvasCount = canvasCountForLayout(keys.filter(key=>key.controllable!==false));
   for (const key of keys) {
     if (key.controllable === false) continue;
     if (
       !Number.isInteger(key.index) ||
       key.index < 0 ||
-      key.index >= LED_COUNT ||
+      key.index >= canvasCount ||
       !Number.isFinite(key.x) ||
       !Number.isFinite(key.y) ||
       !Number.isFinite(key.w) ||
@@ -82,6 +84,7 @@ export const gameRows = buildGameBoard().rows;
 export class SnakeGame {
   constructor(random = Math.random, keys = layout) {
     this.random = random;
+    this.canvasCount = canvasCountForLayout(keys.filter(key=>key.controllable!==false));
     this.board = buildGameBoard(keys);
     this.status = "idle";
     this.score = 0;
@@ -149,7 +152,7 @@ export class SnakeGame {
     } else this.body.pop();
   }
   render() {
-    const colors = blank();
+    const colors = Array(this.canvasCount).fill("#000000");
     this.body.forEach((index, i) => {
       if (!this.board.byIndex.has(index)) return;
       colors[index] =

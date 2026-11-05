@@ -2,9 +2,9 @@
 
 [简体中文指南](README.zh-CN.md) · [English guide](README.en.md)
 
-为 **NuPhy AIR75 V3 和 Kick75（ANSI）** 提供灯光创作、键盘游戏、声音律动，以及 Codex / Claude Code 任务快捷键和状态灯。
+为 **NuPhy AIR65 / AIR75 / AIR100 V3、NODE75 / NODE100（LP / HP）和 Kick75（ANSI）** 提供灯光创作、键盘游戏、声音律动，以及 Codex / Claude Code 任务快捷键和状态灯。
 
-A macOS lighting studio for **NuPhy AIR75 V3 and Kick75 (ANSI)**, with keyboard games, audio-reactive lighting, and Codex / Claude Code task shortcuts and status lights.
+A macOS lighting studio for **NuPhy AIR65 / AIR75 / AIR100 V3, NODE75 / NODE100 (LP / HP), and Kick75 (ANSI)**, with keyboard games, audio-reactive lighting, and Codex / Claude Code task shortcuts and status lights.
 
 ## 下载 / Download
 
@@ -37,6 +37,8 @@ The installer is signed with NuPhy's Developer ID and notarized by Apple.
 灯效需要 USB 连接；AIR75 V3 另支持蓝牙快捷控制。需要更新键盘固件时，请按软件指引前往 NuPhyIO。
 
 Lighting requires USB. AIR75 V3 also supports Bluetooth shortcut control. Follow the app's NuPhyIO guidance if a firmware update is needed.
+
+各型号固件与兼容范围 / Model-specific firmware and compatibility: [键盘兼容性 / Keyboard compatibility](docs/KEYBOARD_COMPATIBILITY.md)。AIR65 V3 无实体 F 区，不提供 F1–F12 自动接管。/ AIR65 V3 has no physical function row and does not offer automatic F1–F12 takeover.
 
 ## Codex 默认命令键 / Default Codex command keys
 

@@ -2,6 +2,8 @@
 import { createPresets, heartColors } from "./presets.mjs";
 import raw from "./air75-v3-ansi.json" with { type: "json" };
 import kickRaw from "./kick75-ansi.json" with { type: "json" };
+import additional from './additional-keyboards.json' with {type:'json'};
+import {getKeyboardProfile,isKeyboardModel} from './keyboard-models.mjs';
 export const LED_COUNT = 84;
 const names = {
   esc: "Escape",
@@ -102,15 +104,17 @@ export let layout = airLayout;
 export function getLayoutModel() { return layoutModel; }
 export function setLayoutModel(modelId) {
   const normalized = ["air75v3", "air75-v3-ansi"].includes(modelId) ? "air75-v3" : modelId;
-  if (!["air75-v3", "kick75"].includes(normalized))
+  if (!isKeyboardModel(normalized))
     throw new Error(`Unsupported keyboard model: ${modelId}`);
   layoutModel = normalized;
-  layout = normalized === "kick75" ? kickLayout : airLayout;
+  layout = getLayoutForModel(normalized);
   return layout;
 }
-// Scene files retain their historical 84-slot format across models. Hardware
-// adapters send only the active model's physical key slots to the keyboard.
-export const blank = () => Array(LED_COUNT).fill("#000000");
+export function getLayoutForModel(modelId='air75-v3') {
+  getKeyboardProfile(modelId);
+  return modelId === 'air75-v3' ? airLayout : modelId === 'kick75' ? kickLayout : additional[modelId].layout;
+}
+export const blank = (modelId=layoutModel) => Array(getKeyboardProfile(modelId).canvasCount).fill('#000000');
 export function hsv(h, s = 0.55, v = 0.85) {
   const f = (n) => {
     const k = (n + h * 6) % 6;

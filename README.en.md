@@ -2,7 +2,7 @@
 
 [中文 / English home](README.md) · [简体中文指南](README.zh-CN.md)
 
-NuPhy Lab is a macOS lighting studio for **NuPhy AIR75 V3 and Kick75 (ANSI)**. Connect a keyboard by USB to detect the model automatically. Artwork stays separate for each model.
+NuPhy Lab is a macOS lighting studio for **NuPhy AIR65 / AIR75 / AIR100 V3, NODE75 / NODE100 (LP / HP), and Kick75 (ANSI)**. Connect a keyboard by USB to detect the model automatically. Artwork stays separate for each model.
 
 It includes drawing, animation, key-triggered effects, games, audio-reactive lighting, a local artwork library, and Codex / Claude Code task shortcuts and status lights.
 
@@ -21,6 +21,8 @@ Requires **Apple Silicon and macOS 13.5 or later**. The DMG is signed with NuPhy
 Allow Input Monitoring and Accessibility when prompted. The app may automatically close and reopen once to apply newly granted permissions. Audio permissions are requested when using audio-reactive lighting.
 
 If the keyboard needs a firmware update, follow the NuPhyIO reminder, close the website after upgrading, then return to NuPhy Lab.
+
+See [keyboard compatibility](docs/KEYBOARD_COMPATIBILITY.md) for firmware requirements and validation coverage. AIR65 V3 has no physical function row and does not offer automatic F1–F12 takeover.
 
 ## AI Assistant
 

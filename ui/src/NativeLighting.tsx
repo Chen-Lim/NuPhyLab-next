@@ -1,3 +1,4 @@
+import {blank,getLayoutModel} from '../../shared/layout.mjs';
 import { rangeStyle } from "./rangeStyle";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Check, Paintbrush, Play, RotateCcw } from "lucide-react";
@@ -88,7 +89,7 @@ export function NativeLighting({ state, layout, command, onOffline, onDevice }:{
     <div className="lab-native-workrow"><div><h2>{copy("Kick75 内置灯效", "Kick75 built-in lighting")}</h2><p>{copy("旧固件兼容状态", "Legacy firmware compatibility")}</p></div><Button kind="primary" icon={applied ? <Check size={16}/> : <Play size={16}/>} busy={busy === "apply"} disabled={!!busy || !state.device.connected || state.device.capabilities?.stockEffects !== true} onClick={() => run(apply())}>{copy(applied ? "已应用到键盘" : "应用内置灯效", applied ? "Applied to keyboard" : "Apply built-in effect")}</Button></div>
     <div className="lab-native-grid"><div className="lab-native-canvas">
       <div className="lab-native-intro"><h3>{copy("当前固件支持键盘内置灯效", "Built-in lighting is available on this firmware")}</h3><p>{copy("升级固件后可使用逐键创作。", "Update firmware to enable per-key creation.")}</p></div>
-      <div className="lab-native-keyboard"><Keyboard layout={layout} colors={readback ? state.colors : Array(84).fill(previewColor)}/></div>
+      <div className="lab-native-keyboard"><Keyboard modelId={getLayoutModel()} layout={layout} colors={readback ? state.colors : blank().fill(previewColor)}/></div>
       <div className="lab-native-canvas-actions"><Button kind="ghost" icon={<RotateCcw size={16}/>} busy={busy === "restore"} disabled={!!busy || !state.device.connected} onClick={() => run(restore())}>{copy("恢复原灯效", "Restore lighting")}</Button><Button kind="ghost" icon={<Paintbrush size={16}/>} onClick={onOffline}>{copy("进入离线绘图", "Open offline drawing")}</Button></div>
       {error&&<div className="inline-v6-notice inline-v6-error" role="alert">{t(error)}</div>}
       <details className="lab-native-preview-note inline-v6-details"><summary>{copy("预览说明", "About this preview")}</summary><div className="inline-v6-detail-body"><p>{t(readback ? "上次回读颜色 · 动态效果以实体键盘为准，旋钮不作为按键灯。" : "颜色示意 · 动态效果以实体键盘为准，旋钮不作为按键灯。")}</p><p>{copy("应用前会备份当前灯效；点击恢复可还原。", "Current lighting is backed up before applying. Use Restore to return to it.")}</p></div></details>

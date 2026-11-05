@@ -1,22 +1,24 @@
+import {getCanvasCount,isKeyboardModel} from '../shared/keyboard-models.mjs';
 import { mkdir, readFile, writeFile, rename } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { LED_COUNT, defaultAnimation } from "../shared/layout.mjs";
+import { getLayoutModel, defaultAnimation } from "../shared/layout.mjs";
 import { GAME_TYPES, validateGameType } from "../shared/games.mjs";
 import { validateTrigger } from "../shared/trigger.mjs";
 import { validateStatusColors } from "../shared/codex-lighting.mjs";
 import { DEFAULT_LIGHT_TIME_MS, validLightTime } from "../shared/lighting-power.mjs";
 import { validateOutputColorProfile } from "../shared/output-color-profile.mjs";
-export function validateColors(colors) {
+export function validateColors(colors, modelId=getLayoutModel()) {
+  const count=getCanvasCount(modelId);
   if (
     !Array.isArray(colors) ||
-    colors.length !== LED_COUNT ||
+    colors.length !== count ||
     colors.some((c) => typeof c !== "string" || !/^#[0-9a-f]{6}$/i.test(c))
   )
-    throw new Error("颜色数据必须包含 84 个有效的 RGB 颜色");
+    throw new Error(`颜色数据必须包含 ${count} 个有效的 RGB 颜色`);
   return colors.map((c) => c.toLowerCase());
 }
-export function validateAnimation(a = {}, { legacy = false } = {}) {
+export function validateAnimation(a = {}, { legacy = false, modelId=getLayoutModel() } = {}) {
   if (!a || typeof a !== "object" || Array.isArray(a))
     throw new Error("动画格式无效");
   const out = { ...defaultAnimation };
@@ -68,7 +70,7 @@ export function validateAnimation(a = {}, { legacy = false } = {}) {
       )
         throw new Error("每帧时长应为 80–10000 毫秒");
       return {
-        colors: validateColors(f.colors),
+        colors: validateColors(f.colors,modelId),
         duration: Math.round(f.duration),
       };
     });
@@ -91,14 +93,14 @@ export function validateScene(scene, now = new Date().toISOString()) {
     (typeof scene.id !== "string" || !/^[a-zA-Z0-9_-]{1,80}$/.test(scene.id))
   )
     throw new Error("作品 ID 无效");
-  if (scene.modelId !== undefined && !["air75-v3", "kick75"].includes(scene.modelId))
+  if (scene.modelId !== undefined && !isKeyboardModel(scene.modelId))
     throw new Error("作品键盘型号无效");
   return {
     id: scene.id ?? randomUUID(),
     name: scene.name.trim(),
     ...(scene.modelId ? { modelId: scene.modelId } : {}),
-    colors: validateColors(scene.colors),
-    animation: validateAnimation(scene.animation, { legacy: true }),
+    colors: validateColors(scene.colors,scene.modelId ?? "air75-v3"),
+    animation: validateAnimation(scene.animation, { legacy: true,modelId:scene.modelId ?? "air75-v3" }),
     ...(scene.trigger !== undefined ? { trigger: validateTrigger(scene.trigger) } : {}),
     createdAt:
       typeof scene.createdAt === "string" &&

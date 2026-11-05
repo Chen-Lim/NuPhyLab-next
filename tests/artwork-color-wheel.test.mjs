@@ -1,3 +1,5 @@
+import * as modelLayouts from '../shared/layout.mjs';
+import keyboardGeometry from '../ui/src/keyboard-geometry.json' with {type:'json'};
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,readFile,rm} from 'node:fs/promises';
@@ -124,6 +126,8 @@ async function paletteFixture(initial){
   const react={useRef:()=>memory,useState:initial=>[typeof initial==='function'?initial():initial,()=>{}],useEffect:fn=>fn(),useId:()=> 'fixture-value'};
   const jsx=(type,props,key)=>({type,props:props??{},key});
   const require=name=>{
+    if(name==='../../shared/layout.mjs')return modelLayouts;
+    if(name==='./keyboard-geometry')return {keyboardGeometry};
     if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:Symbol.for('fixture.Fragment')};
     if(name.endsWith('.css'))return{};if(name==='lucide-react')return new Proxy({},{get:(_t,key)=>component(String(key))});
     if(name==='./i18n')return{t:v=>v};if(name==='./rangeStyle')return{rangeStyle:()=>({})};
@@ -184,6 +188,8 @@ async function studioFixture(mode){
   const props={mode,layout:airLayout,state,draft:{name:'Fixture',colors:raw(),animation:{...baseAnimation,effect:'pulse'}},
     setDraft:value=>{props.draft=value;dirty=true;},command:async body=>{commands.push(structuredClone(body));if(body.op==='play')state.playback={mode:'animation',playing:true};if(body.op==='preview'){state.playback={mode:'static',playing:false};state.colors=body.colors;}if(body.op==='pause')state.playback.playing=!state.playback.playing;return{};},notify(){},onSave(){},onBrowsePresets(){},onEditCodexColors(){}};
   const require=name=>{
+    if(name==='../../shared/layout.mjs')return modelLayouts;
+    if(name==='./keyboard-geometry')return {keyboardGeometry};
     if(name==='react')return react;if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:Symbol.for('fixture.Fragment')};if(name.endsWith('.css'))return{};
     if(name==='lucide-react')return new Proxy({},{get:(_t,key)=>component(String(key))});if(name==='./i18n')return{t:v=>v};
     if(name==='./rangeStyle')return{rangeStyle:()=>({})};if(name==='../../shared/render-animation.mjs')return appearance;if(name==='../../shared/trigger.mjs')return triggers;if(name==='../../shared/typing-cross.mjs')return typingCross;

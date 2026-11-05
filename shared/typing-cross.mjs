@@ -1,10 +1,11 @@
+import {canvasCountForLayout} from './keyboard-models.mjs';
 // Approved typing prototype, expressed in physical key-pitch coordinates.
 // A wave belongs to one press. Later presses never restart or erase its tail.
 export const TYPING_CROSS_DURATION_MS = 800;
 export const MAX_TYPING_CROSS_WAVES = 48;
 const clamp = value => Math.max(0, Math.min(1, value));
 const ease = value => { const x=clamp(value); return x*x*(3-2*x); };
-const blank = () => Array(84).fill('#000000');
+const blank = keys => Array(canvasCountForLayout(keys)).fill('#000000');
 const center = key => [key.x+key.w/2,key.y+(key.h??1)/2];
 function beam(age,distance) {
   const at=age-distance*29;
@@ -47,7 +48,7 @@ export class TypingCross {
     if(!Number.isFinite(speed)||speed<1||speed>10)throw new Error('触发速度应在 1–10 之间');
     const rate=speed/4;
     this.waves=this.waves.filter(wave=>(now-wave.at)*rate<TYPING_CROSS_DURATION_MS);
-    const out=blank(),rgb=[1,3,5].map(at=>parseInt(color.slice(at,at+2),16));
+    const out=blank(this.keys),rgb=[1,3,5].map(at=>parseInt(color.slice(at,at+2),16));
     for(const key of this.keys) {
       let unlit=1;
       for(const wave of this.waves)unlit*=1-powerFor(key,wave.key,(now-wave.at)*rate,this.pitch);

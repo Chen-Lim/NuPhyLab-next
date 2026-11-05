@@ -1,9 +1,10 @@
+import {canvasCountForLayout} from './keyboard-models.mjs';
 import heartKeys from "./heart-keys.json" with { type: "json" };
 import {typingCrossThumbnail} from './typing-cross.mjs';
 
 export const DEFAULT_COLOR = "#dc847b";
 const BLACK = "#000000";
-const blank = () => Array(84).fill(BLACK);
+const blank = keys => Array(canvasCountForLayout(keys)).fill(BLACK);
 const animation = (effect = "static", frames = [], speed = 4) => ({
   effect,
   direction: "right",
@@ -14,7 +15,7 @@ const animation = (effect = "static", frames = [], speed = 4) => ({
 const center = (key) => [key.x + key.w / 2, key.y + (key.h ?? 1) / 2];
 
 export function heartColors(keys, color = DEFAULT_COLOR) {
-  const colors = blank();
+  const colors = blank(keys);
   const hasRightMeta = keys.some((key) => key.code === "MetaRight");
   for (const key of keys)
     if (heartKeys.includes(key.code) || (!hasRightMeta && key.code === "AltRight"))
@@ -26,7 +27,7 @@ export function heartColors(keys, color = DEFAULT_COLOR) {
 // stretching its bottom pixel across the six-unit Space key. Snap each point
 // onto the actual row's key centers instead of treating this as a square grid.
 function stencil(keys, rows, color) {
-  const colors = blank();
+  const colors = blank(keys);
   const physicalRows = [...new Set(keys.map((key) => key.y))].sort((a, b) => a - b);
   rows.forEach((row, y) => {
     const candidates = keys.filter((key) => key.y === physicalRows[y] && key.w <= 1.5);
@@ -56,7 +57,7 @@ function tint(hex, amount) {
 
 function framesFor(keys, count, duration, render) {
   return Array.from({ length: count }, (_, frame) => {
-    const colors = blank();
+    const colors = blank(keys);
     for (const key of keys) colors[key.index] = render(key, frame / count);
     return { colors, duration };
   });

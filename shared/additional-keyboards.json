@@ -1,0 +1,5595 @@
+{
+  "node75-lp": {
+    "name": "NODE75 LP",
+    "vendorId": 6645,
+    "productIds": [
+      4144
+    ],
+    "keyCount": 84,
+    "sideCount": 5,
+    "canvasCount": 84,
+    "rows": 6,
+    "columns": 16,
+    "extraKeys": 5,
+    "qualifiedFirmware": "1.0.10.6",
+    "minimumVersion": "1.0.10.6",
+    "businessId": "1981637685720875010",
+    "globalPalette": true,
+    "functionRow": true,
+    "unmappedIndices": [],
+    "layout": [
+      {
+        "index": 0,
+        "code": "Escape",
+        "label": "Esc",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 1,
+        "code": "F1",
+        "label": "F1",
+        "x": 1.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 2,
+        "code": "F2",
+        "label": "F2",
+        "x": 2.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 3,
+        "code": "F3",
+        "label": "F3",
+        "x": 3.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 4,
+        "code": "F4",
+        "label": "F4",
+        "x": 4.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 5,
+        "code": "F5",
+        "label": "F5",
+        "x": 5.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 6,
+        "code": "F6",
+        "label": "F6",
+        "x": 6.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 7,
+        "code": "F7",
+        "label": "F7",
+        "x": 7.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 8,
+        "code": "F8",
+        "label": "F8",
+        "x": 8.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 9,
+        "code": "F9",
+        "label": "F9",
+        "x": 9.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 10,
+        "code": "F10",
+        "label": "F10",
+        "x": 10.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 11,
+        "code": "F11",
+        "label": "F11",
+        "x": 11.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 12,
+        "code": "F12",
+        "label": "F12",
+        "x": 12.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 13,
+        "code": "PrintScreen",
+        "label": "截图",
+        "x": 13.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 14,
+        "code": "Insert",
+        "label": "Ins",
+        "x": 14.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 15,
+        "code": "Delete",
+        "label": "Del",
+        "x": 15.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 16,
+        "code": "Backquote",
+        "label": "`",
+        "x": 0.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 17,
+        "code": "Digit1",
+        "label": "1",
+        "x": 1.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 18,
+        "code": "Digit2",
+        "label": "2",
+        "x": 2.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 19,
+        "code": "Digit3",
+        "label": "3",
+        "x": 3.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 20,
+        "code": "Digit4",
+        "label": "4",
+        "x": 4.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 21,
+        "code": "Digit5",
+        "label": "5",
+        "x": 5.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 22,
+        "code": "Digit6",
+        "label": "6",
+        "x": 6.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 23,
+        "code": "Digit7",
+        "label": "7",
+        "x": 7.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 24,
+        "code": "Digit8",
+        "label": "8",
+        "x": 8.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 25,
+        "code": "Digit9",
+        "label": "9",
+        "x": 9.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 26,
+        "code": "Digit0",
+        "label": "0",
+        "x": 10.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 27,
+        "code": "Minus",
+        "label": "−",
+        "x": 11.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 28,
+        "code": "Equal",
+        "label": "=",
+        "x": 12.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 29,
+        "code": "Backspace",
+        "label": "⌫",
+        "x": 13.0,
+        "y": 1.04,
+        "w": 2.0,
+        "h": 1
+      },
+      {
+        "index": 30,
+        "code": "Home",
+        "label": "Home",
+        "x": 15.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 31,
+        "code": "Tab",
+        "label": "Tab",
+        "x": 0.0,
+        "y": 2.08,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 32,
+        "code": "KeyQ",
+        "label": "Q",
+        "x": 1.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 33,
+        "code": "KeyW",
+        "label": "W",
+        "x": 2.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 34,
+        "code": "KeyE",
+        "label": "E",
+        "x": 3.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 35,
+        "code": "KeyR",
+        "label": "R",
+        "x": 4.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 36,
+        "code": "KeyT",
+        "label": "T",
+        "x": 5.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 37,
+        "code": "KeyY",
+        "label": "Y",
+        "x": 6.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 38,
+        "code": "KeyU",
+        "label": "U",
+        "x": 7.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 39,
+        "code": "KeyI",
+        "label": "I",
+        "x": 8.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 40,
+        "code": "KeyO",
+        "label": "O",
+        "x": 9.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 41,
+        "code": "KeyP",
+        "label": "P",
+        "x": 10.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 42,
+        "code": "BracketLeft",
+        "label": "[",
+        "x": 11.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 43,
+        "code": "BracketRight",
+        "label": "]",
+        "x": 12.5,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 44,
+        "code": "Backslash",
+        "label": "\\",
+        "x": 13.5,
+        "y": 2.08,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 45,
+        "code": "End",
+        "label": "End",
+        "x": 15.0,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 46,
+        "code": "CapsLock",
+        "label": "Caps",
+        "x": 0.0,
+        "y": 3.12,
+        "w": 1.8,
+        "h": 1
+      },
+      {
+        "index": 47,
+        "code": "KeyA",
+        "label": "A",
+        "x": 1.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 48,
+        "code": "KeyS",
+        "label": "S",
+        "x": 2.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 49,
+        "code": "KeyD",
+        "label": "D",
+        "x": 3.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 50,
+        "code": "KeyF",
+        "label": "F",
+        "x": 4.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 51,
+        "code": "KeyG",
+        "label": "G",
+        "x": 5.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 52,
+        "code": "KeyH",
+        "label": "H",
+        "x": 6.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 53,
+        "code": "KeyJ",
+        "label": "J",
+        "x": 7.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 54,
+        "code": "KeyK",
+        "label": "K",
+        "x": 8.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 55,
+        "code": "KeyL",
+        "label": "L",
+        "x": 9.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 56,
+        "code": "Semicolon",
+        "label": ";",
+        "x": 10.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 57,
+        "code": "Quote",
+        "label": "'",
+        "x": 11.8,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 58,
+        "code": "Enter",
+        "label": "Enter",
+        "x": 12.8,
+        "y": 3.12,
+        "w": 2.24,
+        "h": 1
+      },
+      {
+        "index": 59,
+        "code": "PageUp",
+        "label": "PgUp",
+        "x": 15.04,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 60,
+        "code": "ShiftLeft",
+        "label": "Shift",
+        "x": 0.0,
+        "y": 4.16,
+        "w": 2.3,
+        "h": 1
+      },
+      {
+        "index": 61,
+        "code": "KeyZ",
+        "label": "Z",
+        "x": 2.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 62,
+        "code": "KeyX",
+        "label": "X",
+        "x": 3.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 63,
+        "code": "KeyC",
+        "label": "C",
+        "x": 4.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 64,
+        "code": "KeyV",
+        "label": "V",
+        "x": 5.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 65,
+        "code": "KeyB",
+        "label": "B",
+        "x": 6.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 66,
+        "code": "KeyN",
+        "label": "N",
+        "x": 7.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 67,
+        "code": "KeyM",
+        "label": "M",
+        "x": 8.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 68,
+        "code": "Comma",
+        "label": ",",
+        "x": 9.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 69,
+        "code": "Period",
+        "label": ".",
+        "x": 10.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 70,
+        "code": "Slash",
+        "label": "/",
+        "x": 11.3,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 71,
+        "code": "ShiftRight",
+        "label": "Shift",
+        "x": 12.34,
+        "y": 4.16,
+        "w": 1.7,
+        "h": 1
+      },
+      {
+        "index": 72,
+        "code": "ArrowUp",
+        "label": "↑",
+        "x": 14.04,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 73,
+        "code": "PageDown",
+        "label": "PgDn",
+        "x": 15.04,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 74,
+        "code": "ControlLeft",
+        "label": "Ctrl",
+        "x": 0.0,
+        "y": 5.2,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 75,
+        "code": "MetaLeft",
+        "label": "⌘",
+        "x": 1.25,
+        "y": 5.2,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 76,
+        "code": "AltLeft",
+        "label": "Opt",
+        "x": 2.5,
+        "y": 5.2,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 77,
+        "code": "Space",
+        "label": "",
+        "x": 3.75,
+        "y": 5.2,
+        "w": 5.71,
+        "h": 1
+      },
+      {
+        "index": 78,
+        "code": "AltRight",
+        "label": "Opt",
+        "x": 9.46,
+        "y": 5.2,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 79,
+        "code": "Fn",
+        "label": "Fn",
+        "x": 10.7,
+        "y": 5.2,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 80,
+        "code": "ControlRight",
+        "label": "Ctrl",
+        "x": 11.95,
+        "y": 5.2,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 81,
+        "code": "ArrowLeft",
+        "label": "←",
+        "x": 13.2,
+        "y": 5.2,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 82,
+        "code": "ArrowDown",
+        "label": "↓",
+        "x": 14.2,
+        "y": 5.2,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 83,
+        "code": "ArrowRight",
+        "label": "→",
+        "x": 15.2,
+        "y": 5.2,
+        "w": 1,
+        "h": 1
+      }
+    ],
+    "rgbWriteIndices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      30,
+      29,
+      28,
+      27,
+      26,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      59,
+      58,
+      57,
+      56,
+      55,
+      54,
+      53,
+      52,
+      51,
+      50,
+      49,
+      48,
+      47,
+      46,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      83,
+      82,
+      81,
+      80,
+      79,
+      78,
+      77,
+      76,
+      75,
+      74
+    ]
+  },
+  "node75-hp": {
+    "name": "NODE75 HP",
+    "vendorId": 6645,
+    "productIds": [
+      4145
+    ],
+    "keyCount": 82,
+    "sideCount": 5,
+    "canvasCount": 84,
+    "rows": 6,
+    "columns": 16,
+    "extraKeys": 5,
+    "qualifiedFirmware": "1.0.10.6",
+    "minimumVersion": "1.0.10.6",
+    "businessId": "1981635915493900289",
+    "globalPalette": true,
+    "functionRow": true,
+    "unmappedIndices": [
+      82,
+      83
+    ],
+    "layout": [
+      {
+        "index": 0,
+        "code": "Escape",
+        "label": "Esc",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 1,
+        "code": "F1",
+        "label": "F1",
+        "x": 1.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 2,
+        "code": "F2",
+        "label": "F2",
+        "x": 2.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 3,
+        "code": "F3",
+        "label": "F3",
+        "x": 3.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 4,
+        "code": "F4",
+        "label": "F4",
+        "x": 4.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 5,
+        "code": "F5",
+        "label": "F5",
+        "x": 5.5,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 6,
+        "code": "F6",
+        "label": "F6",
+        "x": 6.5,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 7,
+        "code": "F7",
+        "label": "F7",
+        "x": 7.5,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 8,
+        "code": "F8",
+        "label": "F8",
+        "x": 8.5,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 9,
+        "code": "F9",
+        "label": "F9",
+        "x": 9.74,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 10,
+        "code": "F10",
+        "label": "F10",
+        "x": 10.74,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 11,
+        "code": "F11",
+        "label": "F11",
+        "x": 11.74,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 12,
+        "code": "F12",
+        "label": "F12",
+        "x": 12.74,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 13,
+        "code": "Insert",
+        "label": "Ins",
+        "x": 13.98,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 14,
+        "code": "Delete",
+        "label": "Del",
+        "x": 14.98,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 15,
+        "code": "Backquote",
+        "label": "`",
+        "x": 0.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 16,
+        "code": "Digit1",
+        "label": "1",
+        "x": 1.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 17,
+        "code": "Digit2",
+        "label": "2",
+        "x": 2.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 18,
+        "code": "Digit3",
+        "label": "3",
+        "x": 3.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 19,
+        "code": "Digit4",
+        "label": "4",
+        "x": 4.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 20,
+        "code": "Digit5",
+        "label": "5",
+        "x": 5.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 21,
+        "code": "Digit6",
+        "label": "6",
+        "x": 6.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 22,
+        "code": "Digit7",
+        "label": "7",
+        "x": 7.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 23,
+        "code": "Digit8",
+        "label": "8",
+        "x": 8.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 24,
+        "code": "Digit9",
+        "label": "9",
+        "x": 9.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 25,
+        "code": "Digit0",
+        "label": "0",
+        "x": 10.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 26,
+        "code": "Minus",
+        "label": "−",
+        "x": 11.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 27,
+        "code": "Equal",
+        "label": "=",
+        "x": 12.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 28,
+        "code": "Backspace",
+        "label": "⌫",
+        "x": 13.0,
+        "y": 1.28,
+        "w": 2.0,
+        "h": 1
+      },
+      {
+        "index": 29,
+        "code": "Home",
+        "label": "Home",
+        "x": 15.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 30,
+        "code": "Tab",
+        "label": "Tab",
+        "x": 0.0,
+        "y": 2.32,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 31,
+        "code": "KeyQ",
+        "label": "Q",
+        "x": 1.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 32,
+        "code": "KeyW",
+        "label": "W",
+        "x": 2.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 33,
+        "code": "KeyE",
+        "label": "E",
+        "x": 3.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 34,
+        "code": "KeyR",
+        "label": "R",
+        "x": 4.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 35,
+        "code": "KeyT",
+        "label": "T",
+        "x": 5.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 36,
+        "code": "KeyY",
+        "label": "Y",
+        "x": 6.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 37,
+        "code": "KeyU",
+        "label": "U",
+        "x": 7.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 38,
+        "code": "KeyI",
+        "label": "I",
+        "x": 8.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 39,
+        "code": "KeyO",
+        "label": "O",
+        "x": 9.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 40,
+        "code": "KeyP",
+        "label": "P",
+        "x": 10.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 41,
+        "code": "BracketLeft",
+        "label": "[",
+        "x": 11.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 42,
+        "code": "BracketRight",
+        "label": "]",
+        "x": 12.5,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 43,
+        "code": "Backslash",
+        "label": "\\",
+        "x": 13.5,
+        "y": 2.32,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 44,
+        "code": "End",
+        "label": "End",
+        "x": 15.0,
+        "y": 2.32,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 45,
+        "code": "CapsLock",
+        "label": "Caps",
+        "x": 0.0,
+        "y": 3.36,
+        "w": 1.8,
+        "h": 1
+      },
+      {
+        "index": 46,
+        "code": "KeyA",
+        "label": "A",
+        "x": 1.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 47,
+        "code": "KeyS",
+        "label": "S",
+        "x": 2.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 48,
+        "code": "KeyD",
+        "label": "D",
+        "x": 3.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 49,
+        "code": "KeyF",
+        "label": "F",
+        "x": 4.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 50,
+        "code": "KeyG",
+        "label": "G",
+        "x": 5.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 51,
+        "code": "KeyH",
+        "label": "H",
+        "x": 6.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 52,
+        "code": "KeyJ",
+        "label": "J",
+        "x": 7.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 53,
+        "code": "KeyK",
+        "label": "K",
+        "x": 8.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 54,
+        "code": "KeyL",
+        "label": "L",
+        "x": 9.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 55,
+        "code": "Semicolon",
+        "label": ";",
+        "x": 10.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 56,
+        "code": "Quote",
+        "label": "'",
+        "x": 11.8,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 57,
+        "code": "Enter",
+        "label": "Enter",
+        "x": 12.8,
+        "y": 3.36,
+        "w": 2.24,
+        "h": 1
+      },
+      {
+        "index": 58,
+        "code": "PageUp",
+        "label": "PgUp",
+        "x": 15.04,
+        "y": 3.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 59,
+        "code": "ShiftLeft",
+        "label": "Shift",
+        "x": 0.0,
+        "y": 4.4,
+        "w": 2.3,
+        "h": 1
+      },
+      {
+        "index": 60,
+        "code": "KeyZ",
+        "label": "Z",
+        "x": 2.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 61,
+        "code": "KeyX",
+        "label": "X",
+        "x": 3.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 62,
+        "code": "KeyC",
+        "label": "C",
+        "x": 4.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 63,
+        "code": "KeyV",
+        "label": "V",
+        "x": 5.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 64,
+        "code": "KeyB",
+        "label": "B",
+        "x": 6.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 65,
+        "code": "KeyN",
+        "label": "N",
+        "x": 7.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 66,
+        "code": "KeyM",
+        "label": "M",
+        "x": 8.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 67,
+        "code": "Comma",
+        "label": ",",
+        "x": 9.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 68,
+        "code": "Period",
+        "label": ".",
+        "x": 10.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 69,
+        "code": "Slash",
+        "label": "/",
+        "x": 11.3,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 70,
+        "code": "ShiftRight",
+        "label": "Shift",
+        "x": 12.3,
+        "y": 4.4,
+        "w": 1.74,
+        "h": 1
+      },
+      {
+        "index": 71,
+        "code": "ArrowUp",
+        "label": "↑",
+        "x": 14.04,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 72,
+        "code": "PageDown",
+        "label": "PgDn",
+        "x": 15.04,
+        "y": 4.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 73,
+        "code": "ControlLeft",
+        "label": "Ctrl",
+        "x": 0.0,
+        "y": 5.44,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 74,
+        "code": "MetaLeft",
+        "label": "⌘",
+        "x": 1.25,
+        "y": 5.44,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 75,
+        "code": "AltLeft",
+        "label": "Opt",
+        "x": 2.5,
+        "y": 5.44,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 76,
+        "code": "Space",
+        "label": "",
+        "x": 3.75,
+        "y": 5.44,
+        "w": 6.4,
+        "h": 1
+      },
+      {
+        "index": 77,
+        "code": "AltRight",
+        "label": "Opt",
+        "x": 10.15,
+        "y": 5.44,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 78,
+        "code": "Fn",
+        "label": "Fn",
+        "x": 11.4,
+        "y": 5.44,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 79,
+        "code": "ArrowLeft",
+        "label": "←",
+        "x": 13.22,
+        "y": 5.44,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 80,
+        "code": "ArrowDown",
+        "label": "↓",
+        "x": 14.22,
+        "y": 5.44,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 81,
+        "code": "ArrowRight",
+        "label": "→",
+        "x": 15.22,
+        "y": 5.44,
+        "w": 1,
+        "h": 1
+      }
+    ],
+    "rgbWriteIndices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      29,
+      28,
+      27,
+      26,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      18,
+      17,
+      16,
+      15,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      58,
+      57,
+      56,
+      55,
+      54,
+      53,
+      52,
+      51,
+      50,
+      49,
+      48,
+      47,
+      46,
+      45,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      81,
+      80,
+      79,
+      78,
+      77,
+      76,
+      75,
+      74,
+      73
+    ]
+  },
+  "air65-v3": {
+    "name": "Air65 V3",
+    "vendorId": 6645,
+    "productIds": [
+      4139
+    ],
+    "keyCount": 68,
+    "sideCount": 20,
+    "canvasCount": 84,
+    "rows": 5,
+    "columns": 15,
+    "extraKeys": 2,
+    "qualifiedFirmware": "1.0.5.6",
+    "minimumVersion": "1.0.5.6",
+    "businessId": "2030830151745871873",
+    "globalPalette": true,
+    "functionRow": false,
+    "unmappedIndices": [
+      14,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83
+    ],
+    "layout": [
+      {
+        "index": 0,
+        "code": "Escape",
+        "label": "Esc",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 1,
+        "code": "Digit1",
+        "label": "1",
+        "x": 1.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 2,
+        "code": "Digit2",
+        "label": "2",
+        "x": 2.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 3,
+        "code": "Digit3",
+        "label": "3",
+        "x": 3.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 4,
+        "code": "Digit4",
+        "label": "4",
+        "x": 4.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 5,
+        "code": "Digit5",
+        "label": "5",
+        "x": 5.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 6,
+        "code": "Digit6",
+        "label": "6",
+        "x": 6.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 7,
+        "code": "Digit7",
+        "label": "7",
+        "x": 7.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 8,
+        "code": "Digit8",
+        "label": "8",
+        "x": 8.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 9,
+        "code": "Digit9",
+        "label": "9",
+        "x": 9.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 10,
+        "code": "Digit0",
+        "label": "0",
+        "x": 10.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 11,
+        "code": "Minus",
+        "label": "−",
+        "x": 11.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 12,
+        "code": "Equal",
+        "label": "=",
+        "x": 12.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 13,
+        "code": "Backspace",
+        "label": "⌫",
+        "x": 13.0,
+        "y": 0.0,
+        "w": 2.0,
+        "h": 1
+      },
+      {
+        "index": 15,
+        "code": "Tab",
+        "label": "Tab",
+        "x": 0.0,
+        "y": 1.04,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 16,
+        "code": "KeyQ",
+        "label": "Q",
+        "x": 1.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 17,
+        "code": "KeyW",
+        "label": "W",
+        "x": 2.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 18,
+        "code": "KeyE",
+        "label": "E",
+        "x": 3.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 19,
+        "code": "KeyR",
+        "label": "R",
+        "x": 4.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 20,
+        "code": "KeyT",
+        "label": "T",
+        "x": 5.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 21,
+        "code": "KeyY",
+        "label": "Y",
+        "x": 6.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 22,
+        "code": "KeyU",
+        "label": "U",
+        "x": 7.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 23,
+        "code": "KeyI",
+        "label": "I",
+        "x": 8.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 24,
+        "code": "KeyO",
+        "label": "O",
+        "x": 9.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 25,
+        "code": "KeyP",
+        "label": "P",
+        "x": 10.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 26,
+        "code": "BracketLeft",
+        "label": "[",
+        "x": 11.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 27,
+        "code": "BracketRight",
+        "label": "]",
+        "x": 12.5,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 28,
+        "code": "Backslash",
+        "label": "\\",
+        "x": 13.5,
+        "y": 1.04,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 29,
+        "code": "PageDown",
+        "label": "PgDn",
+        "x": 15.0,
+        "y": 1.04,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 30,
+        "code": "CapsLock",
+        "label": "Caps",
+        "x": 0.0,
+        "y": 2.08,
+        "w": 1.8,
+        "h": 1
+      },
+      {
+        "index": 31,
+        "code": "KeyA",
+        "label": "A",
+        "x": 1.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 32,
+        "code": "KeyS",
+        "label": "S",
+        "x": 2.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 33,
+        "code": "KeyD",
+        "label": "D",
+        "x": 3.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 34,
+        "code": "KeyF",
+        "label": "F",
+        "x": 4.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 35,
+        "code": "KeyG",
+        "label": "G",
+        "x": 5.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 36,
+        "code": "KeyH",
+        "label": "H",
+        "x": 6.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 37,
+        "code": "KeyJ",
+        "label": "J",
+        "x": 7.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 38,
+        "code": "KeyK",
+        "label": "K",
+        "x": 8.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 39,
+        "code": "KeyL",
+        "label": "L",
+        "x": 9.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 40,
+        "code": "Semicolon",
+        "label": ";",
+        "x": 10.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 41,
+        "code": "Quote",
+        "label": "'",
+        "x": 11.8,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 42,
+        "code": "Enter",
+        "label": "Enter",
+        "x": 12.8,
+        "y": 2.08,
+        "w": 2.25,
+        "h": 1
+      },
+      {
+        "index": 43,
+        "code": "Home",
+        "label": "Home",
+        "x": 15.04,
+        "y": 2.08,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 44,
+        "code": "ShiftLeft",
+        "label": "Shift",
+        "x": 0.0,
+        "y": 3.12,
+        "w": 2.3,
+        "h": 1
+      },
+      {
+        "index": 45,
+        "code": "KeyZ",
+        "label": "Z",
+        "x": 2.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 46,
+        "code": "KeyX",
+        "label": "X",
+        "x": 3.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 47,
+        "code": "KeyC",
+        "label": "C",
+        "x": 4.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 48,
+        "code": "KeyV",
+        "label": "V",
+        "x": 5.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 49,
+        "code": "KeyB",
+        "label": "B",
+        "x": 6.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 50,
+        "code": "KeyN",
+        "label": "N",
+        "x": 7.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 51,
+        "code": "KeyM",
+        "label": "M",
+        "x": 8.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 52,
+        "code": "Comma",
+        "label": ",",
+        "x": 9.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 53,
+        "code": "Period",
+        "label": ".",
+        "x": 10.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 54,
+        "code": "Slash",
+        "label": "/",
+        "x": 11.3,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 55,
+        "code": "ShiftRight",
+        "label": "Shift",
+        "x": 12.3,
+        "y": 3.1,
+        "w": 1.75,
+        "h": 1
+      },
+      {
+        "index": 56,
+        "code": "ArrowUp",
+        "label": "↑",
+        "x": 14.05,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 57,
+        "code": "End",
+        "label": "End",
+        "x": 15.05,
+        "y": 3.12,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 58,
+        "code": "ControlLeft",
+        "label": "Ctrl",
+        "x": 0.0,
+        "y": 4.16,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 59,
+        "code": "MetaLeft",
+        "label": "⌘",
+        "x": 1.25,
+        "y": 4.16,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 60,
+        "code": "AltLeft",
+        "label": "Opt",
+        "x": 2.5,
+        "y": 4.16,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 61,
+        "code": "Space",
+        "label": "",
+        "x": 3.75,
+        "y": 4.16,
+        "w": 6.48,
+        "h": 1
+      },
+      {
+        "index": 62,
+        "code": "AltRight",
+        "label": "Opt",
+        "x": 10.24,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 63,
+        "code": "Fn",
+        "label": "Fn",
+        "x": 11.24,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 64,
+        "code": "ControlRight",
+        "label": "Ctrl",
+        "x": 12.24,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 65,
+        "code": "ArrowLeft",
+        "label": "←",
+        "x": 13.24,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 66,
+        "code": "ArrowDown",
+        "label": "↓",
+        "x": 14.24,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 67,
+        "code": "ArrowRight",
+        "label": "→",
+        "x": 15.22,
+        "y": 4.16,
+        "w": 1,
+        "h": 1
+      }
+    ],
+    "rgbWriteIndices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67
+    ]
+  },
+  "air100-v3": {
+    "name": "Air100 V3",
+    "vendorId": 6645,
+    "productIds": [
+      4141
+    ],
+    "keyCount": 99,
+    "sideCount": 20,
+    "canvasCount": 99,
+    "rows": 6,
+    "columns": 18,
+    "extraKeys": 2,
+    "qualifiedFirmware": "1.0.6.6",
+    "minimumVersion": "1.0.6.6",
+    "businessId": "1996757112579686401",
+    "globalPalette": true,
+    "functionRow": true,
+    "unmappedIndices": [
+      13
+    ],
+    "layout": [
+      {
+        "index": 0,
+        "code": "Escape",
+        "label": "Esc",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 1,
+        "code": "F1",
+        "label": "F1",
+        "x": 1.23,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 2,
+        "code": "F2",
+        "label": "F2",
+        "x": 2.22,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 3,
+        "code": "F3",
+        "label": "F3",
+        "x": 3.22,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 4,
+        "code": "F4",
+        "label": "F4",
+        "x": 4.22,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 5,
+        "code": "F5",
+        "label": "F5",
+        "x": 5.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 6,
+        "code": "F6",
+        "label": "F6",
+        "x": 6.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 7,
+        "code": "F7",
+        "label": "F7",
+        "x": 7.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 8,
+        "code": "F8",
+        "label": "F8",
+        "x": 8.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 9,
+        "code": "F9",
+        "label": "F9",
+        "x": 9.62,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 10,
+        "code": "F10",
+        "label": "F10",
+        "x": 10.62,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 11,
+        "code": "F11",
+        "label": "F11",
+        "x": 11.62,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 12,
+        "code": "F12",
+        "label": "F12",
+        "x": 12.62,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 14,
+        "code": "Home",
+        "label": "Home",
+        "x": 14.97,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 15,
+        "code": "End",
+        "label": "End",
+        "x": 15.97,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 16,
+        "code": "PageUp",
+        "label": "PgUp",
+        "x": 16.97,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 17,
+        "code": "PageDown",
+        "label": "PgDn",
+        "x": 17.97,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 18,
+        "code": "Backquote",
+        "label": "`",
+        "x": 0.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 19,
+        "code": "Digit1",
+        "label": "1",
+        "x": 1.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 20,
+        "code": "Digit2",
+        "label": "2",
+        "x": 2.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 21,
+        "code": "Digit3",
+        "label": "3",
+        "x": 3.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 22,
+        "code": "Digit4",
+        "label": "4",
+        "x": 4.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 23,
+        "code": "Digit5",
+        "label": "5",
+        "x": 5.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 24,
+        "code": "Digit6",
+        "label": "6",
+        "x": 6.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 25,
+        "code": "Digit7",
+        "label": "7",
+        "x": 7.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 26,
+        "code": "Digit8",
+        "label": "8",
+        "x": 8.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 27,
+        "code": "Digit9",
+        "label": "9",
+        "x": 9.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 28,
+        "code": "Digit0",
+        "label": "0",
+        "x": 10.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 29,
+        "code": "Minus",
+        "label": "−",
+        "x": 11.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 30,
+        "code": "Equal",
+        "label": "=",
+        "x": 12.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 31,
+        "code": "Backspace",
+        "label": "⌫",
+        "x": 13.0,
+        "y": 1.28,
+        "w": 1.84,
+        "h": 1
+      },
+      {
+        "index": 32,
+        "code": "NumLock",
+        "label": "Num",
+        "x": 15.05,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 33,
+        "code": "NumpadDivide",
+        "label": "/",
+        "x": 16.05,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 34,
+        "code": "NumpadMultiply",
+        "label": "×",
+        "x": 17.05,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 35,
+        "code": "NumpadSubtract",
+        "label": "−",
+        "x": 18.05,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 36,
+        "code": "Tab",
+        "label": "Tab",
+        "x": 0.0,
+        "y": 2.31,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 37,
+        "code": "KeyQ",
+        "label": "Q",
+        "x": 1.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 38,
+        "code": "KeyW",
+        "label": "W",
+        "x": 2.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 39,
+        "code": "KeyE",
+        "label": "E",
+        "x": 3.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 40,
+        "code": "KeyR",
+        "label": "R",
+        "x": 4.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 41,
+        "code": "KeyT",
+        "label": "T",
+        "x": 5.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 42,
+        "code": "KeyY",
+        "label": "Y",
+        "x": 6.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 43,
+        "code": "KeyU",
+        "label": "U",
+        "x": 7.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 44,
+        "code": "KeyI",
+        "label": "I",
+        "x": 8.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 45,
+        "code": "KeyO",
+        "label": "O",
+        "x": 9.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 46,
+        "code": "KeyP",
+        "label": "P",
+        "x": 10.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 47,
+        "code": "BracketLeft",
+        "label": "[",
+        "x": 11.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 48,
+        "code": "BracketRight",
+        "label": "]",
+        "x": 12.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 49,
+        "code": "Backslash",
+        "label": "\\",
+        "x": 13.5,
+        "y": 2.31,
+        "w": 1.34,
+        "h": 1
+      },
+      {
+        "index": 50,
+        "code": "Numpad7",
+        "label": "7",
+        "x": 15.05,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 51,
+        "code": "Numpad8",
+        "label": "8",
+        "x": 16.05,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 52,
+        "code": "Numpad9",
+        "label": "9",
+        "x": 17.05,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 53,
+        "code": "NumpadAdd",
+        "label": "+",
+        "x": 18.05,
+        "y": 2.31,
+        "w": 1,
+        "h": 2.04
+      },
+      {
+        "index": 54,
+        "code": "CapsLock",
+        "label": "Caps",
+        "x": 0.0,
+        "y": 3.34,
+        "w": 1.8,
+        "h": 1
+      },
+      {
+        "index": 55,
+        "code": "KeyA",
+        "label": "A",
+        "x": 1.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 56,
+        "code": "KeyS",
+        "label": "S",
+        "x": 2.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 57,
+        "code": "KeyD",
+        "label": "D",
+        "x": 3.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 58,
+        "code": "KeyF",
+        "label": "F",
+        "x": 4.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 59,
+        "code": "KeyG",
+        "label": "G",
+        "x": 5.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 60,
+        "code": "KeyH",
+        "label": "H",
+        "x": 6.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 61,
+        "code": "KeyJ",
+        "label": "J",
+        "x": 7.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 62,
+        "code": "KeyK",
+        "label": "K",
+        "x": 8.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 63,
+        "code": "KeyL",
+        "label": "L",
+        "x": 9.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 64,
+        "code": "Semicolon",
+        "label": ";",
+        "x": 10.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 65,
+        "code": "Quote",
+        "label": "'",
+        "x": 11.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 66,
+        "code": "Enter",
+        "label": "Enter",
+        "x": 12.8,
+        "y": 3.34,
+        "w": 2.08,
+        "h": 1
+      },
+      {
+        "index": 67,
+        "code": "Numpad4",
+        "label": "4",
+        "x": 15.09,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 68,
+        "code": "Numpad5",
+        "label": "5",
+        "x": 16.09,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 69,
+        "code": "Numpad6",
+        "label": "6",
+        "x": 17.09,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 70,
+        "code": "ShiftLeft",
+        "label": "Shift",
+        "x": 0.0,
+        "y": 4.36,
+        "w": 2.31,
+        "h": 1
+      },
+      {
+        "index": 71,
+        "code": "KeyZ",
+        "label": "Z",
+        "x": 2.31,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 72,
+        "code": "KeyX",
+        "label": "X",
+        "x": 3.32,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 73,
+        "code": "KeyC",
+        "label": "C",
+        "x": 4.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 74,
+        "code": "KeyV",
+        "label": "V",
+        "x": 5.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 75,
+        "code": "KeyB",
+        "label": "B",
+        "x": 6.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 76,
+        "code": "KeyN",
+        "label": "N",
+        "x": 7.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 77,
+        "code": "KeyM",
+        "label": "M",
+        "x": 8.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 78,
+        "code": "Comma",
+        "label": ",",
+        "x": 9.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 79,
+        "code": "Period",
+        "label": ".",
+        "x": 10.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 80,
+        "code": "Slash",
+        "label": "/",
+        "x": 11.3,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 81,
+        "code": "ShiftRight",
+        "label": "Shift",
+        "x": 12.3,
+        "y": 4.36,
+        "w": 1.6,
+        "h": 1
+      },
+      {
+        "index": 82,
+        "code": "ArrowUp",
+        "label": "↑",
+        "x": 13.88,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 83,
+        "code": "Numpad1",
+        "label": "1",
+        "x": 15.09,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 84,
+        "code": "Numpad2",
+        "label": "2",
+        "x": 16.09,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 85,
+        "code": "Numpad3",
+        "label": "3",
+        "x": 17.09,
+        "y": 4.36,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 86,
+        "code": "NumpadEnter",
+        "label": "Enter",
+        "x": 18.09,
+        "y": 4.36,
+        "w": 1,
+        "h": 2.04
+      },
+      {
+        "index": 87,
+        "code": "ControlLeft",
+        "label": "Ctrl",
+        "x": 0.0,
+        "y": 5.4,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 88,
+        "code": "MetaLeft",
+        "label": "⌘",
+        "x": 1.25,
+        "y": 5.4,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 89,
+        "code": "AltLeft",
+        "label": "Opt",
+        "x": 2.5,
+        "y": 5.4,
+        "w": 1.25,
+        "h": 1
+      },
+      {
+        "index": 90,
+        "code": "Space",
+        "label": "",
+        "x": 3.75,
+        "y": 5.4,
+        "w": 6.06,
+        "h": 1
+      },
+      {
+        "index": 91,
+        "code": "AltRight",
+        "label": "Opt",
+        "x": 9.82,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 92,
+        "code": "Fn",
+        "label": "Fn",
+        "x": 10.82,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 93,
+        "code": "ControlRight",
+        "label": "Ctrl",
+        "x": 11.82,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 94,
+        "code": "ArrowLeft",
+        "label": "←",
+        "x": 13.02,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 95,
+        "code": "ArrowDown",
+        "label": "↓",
+        "x": 14.02,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 96,
+        "code": "ArrowRight",
+        "label": "→",
+        "x": 15.02,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 97,
+        "code": "Numpad0",
+        "label": "0",
+        "x": 16.25,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 98,
+        "code": "NumpadDecimal",
+        "label": ".",
+        "x": 17.25,
+        "y": 5.4,
+        "w": 1,
+        "h": 1
+      }
+    ],
+    "rgbWriteIndices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98
+    ]
+  },
+  "node100-lp": {
+    "name": "NODE100 LP",
+    "vendorId": 6645,
+    "productIds": [
+      4151
+    ],
+    "keyCount": 103,
+    "sideCount": 5,
+    "canvasCount": 103,
+    "rows": 6,
+    "columns": 19,
+    "extraKeys": 5,
+    "qualifiedFirmware": "1.0.7.6",
+    "minimumVersion": "1.0.7.6",
+    "businessId": "1996166496133054465",
+    "globalPalette": true,
+    "functionRow": true,
+    "unmappedIndices": [],
+    "layout": [
+      {
+        "index": 0,
+        "code": "Escape",
+        "label": "Esc",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 1,
+        "code": "F1",
+        "label": "F1",
+        "x": 1.24,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 2,
+        "code": "F2",
+        "label": "F2",
+        "x": 2.24,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 3,
+        "code": "F3",
+        "label": "F3",
+        "x": 3.24,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 4,
+        "code": "F4",
+        "label": "F4",
+        "x": 4.24,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 5,
+        "code": "F5",
+        "label": "F5",
+        "x": 5.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 6,
+        "code": "F6",
+        "label": "F6",
+        "x": 6.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 7,
+        "code": "F7",
+        "label": "F7",
+        "x": 7.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 8,
+        "code": "F8",
+        "label": "F8",
+        "x": 8.41,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 9,
+        "code": "F9",
+        "label": "F9",
+        "x": 9.6,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 10,
+        "code": "F10",
+        "label": "F10",
+        "x": 10.6,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 11,
+        "code": "F11",
+        "label": "F11",
+        "x": 11.6,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 12,
+        "code": "F12",
+        "label": "F12",
+        "x": 12.6,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 13,
+        "code": "Insert",
+        "label": "Ins",
+        "x": 13.82,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 14,
+        "code": "Delete",
+        "label": "Del",
+        "x": 14.82,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 15,
+        "code": "ShowDesktop",
+        "label": "桌面",
+        "x": 16.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 16,
+        "code": "ControlCenter",
+        "label": "控制",
+        "x": 17.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 17,
+        "code": "TaskManager",
+        "label": "任务",
+        "x": 18.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 18,
+        "code": "LaunchCalculator",
+        "label": "Calc",
+        "x": 19.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 19,
+        "code": "Backquote",
+        "label": "`",
+        "x": 0.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 20,
+        "code": "Digit1",
+        "label": "1",
+        "x": 1.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 21,
+        "code": "Digit2",
+        "label": "2",
+        "x": 2.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 22,
+        "code": "Digit3",
+        "label": "3",
+        "x": 3.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 23,
+        "code": "Digit4",
+        "label": "4",
+        "x": 4.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 24,
+        "code": "Digit5",
+        "label": "5",
+        "x": 5.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 25,
+        "code": "Digit6",
+        "label": "6",
+        "x": 6.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 26,
+        "code": "Digit7",
+        "label": "7",
+        "x": 7.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 27,
+        "code": "Digit8",
+        "label": "8",
+        "x": 8.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 28,
+        "code": "Digit9",
+        "label": "9",
+        "x": 9.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 29,
+        "code": "Digit0",
+        "label": "0",
+        "x": 10.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 30,
+        "code": "Minus",
+        "label": "−",
+        "x": 11.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 31,
+        "code": "Equal",
+        "label": "=",
+        "x": 12.0,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 32,
+        "code": "Backspace",
+        "label": "⌫",
+        "x": 13.0,
+        "y": 1.26,
+        "w": 1.82,
+        "h": 1
+      },
+      {
+        "index": 33,
+        "code": "Home",
+        "label": "Home",
+        "x": 14.82,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 34,
+        "code": "NumLock",
+        "label": "Num",
+        "x": 16.01,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 35,
+        "code": "NumpadDivide",
+        "label": "/",
+        "x": 17.01,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 36,
+        "code": "NumpadMultiply",
+        "label": "×",
+        "x": 18.01,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 37,
+        "code": "NumpadSubtract",
+        "label": "−",
+        "x": 19.01,
+        "y": 1.26,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 38,
+        "code": "Tab",
+        "label": "Tab",
+        "x": 0.0,
+        "y": 2.29,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 39,
+        "code": "KeyQ",
+        "label": "Q",
+        "x": 1.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 40,
+        "code": "KeyW",
+        "label": "W",
+        "x": 2.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 41,
+        "code": "KeyE",
+        "label": "E",
+        "x": 3.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 42,
+        "code": "KeyR",
+        "label": "R",
+        "x": 4.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 43,
+        "code": "KeyT",
+        "label": "T",
+        "x": 5.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 44,
+        "code": "KeyY",
+        "label": "Y",
+        "x": 6.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 45,
+        "code": "KeyU",
+        "label": "U",
+        "x": 7.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 46,
+        "code": "KeyI",
+        "label": "I",
+        "x": 8.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 47,
+        "code": "KeyO",
+        "label": "O",
+        "x": 9.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 48,
+        "code": "KeyP",
+        "label": "P",
+        "x": 10.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 49,
+        "code": "BracketLeft",
+        "label": "[",
+        "x": 11.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 50,
+        "code": "BracketRight",
+        "label": "]",
+        "x": 12.5,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 51,
+        "code": "Backslash",
+        "label": "\\",
+        "x": 13.5,
+        "y": 2.29,
+        "w": 1.33,
+        "h": 1
+      },
+      {
+        "index": 52,
+        "code": "End",
+        "label": "End",
+        "x": 14.82,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 53,
+        "code": "Numpad7",
+        "label": "7",
+        "x": 16.01,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 54,
+        "code": "Numpad8",
+        "label": "8",
+        "x": 17.01,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 55,
+        "code": "Numpad9",
+        "label": "9",
+        "x": 18.01,
+        "y": 2.29,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 56,
+        "code": "NumpadAdd",
+        "label": "+",
+        "x": 19.01,
+        "y": 2.29,
+        "w": 1,
+        "h": 2.04
+      },
+      {
+        "index": 57,
+        "code": "CapsLock",
+        "label": "Caps",
+        "x": 0.0,
+        "y": 3.33,
+        "w": 1.8,
+        "h": 1
+      },
+      {
+        "index": 58,
+        "code": "KeyA",
+        "label": "A",
+        "x": 1.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 59,
+        "code": "KeyS",
+        "label": "S",
+        "x": 2.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 60,
+        "code": "KeyD",
+        "label": "D",
+        "x": 3.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 61,
+        "code": "KeyF",
+        "label": "F",
+        "x": 4.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 62,
+        "code": "KeyG",
+        "label": "G",
+        "x": 5.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 63,
+        "code": "KeyH",
+        "label": "H",
+        "x": 6.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 64,
+        "code": "KeyJ",
+        "label": "J",
+        "x": 7.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 65,
+        "code": "KeyK",
+        "label": "K",
+        "x": 8.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 66,
+        "code": "KeyL",
+        "label": "L",
+        "x": 9.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 67,
+        "code": "Semicolon",
+        "label": ";",
+        "x": 10.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 68,
+        "code": "Quote",
+        "label": "'",
+        "x": 11.8,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 69,
+        "code": "Enter",
+        "label": "Enter",
+        "x": 12.8,
+        "y": 3.33,
+        "w": 2.06,
+        "h": 1
+      },
+      {
+        "index": 70,
+        "code": "PageUp",
+        "label": "PgUp",
+        "x": 14.86,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 71,
+        "code": "Numpad4",
+        "label": "4",
+        "x": 16.06,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 72,
+        "code": "Numpad5",
+        "label": "5",
+        "x": 17.06,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 73,
+        "code": "Numpad6",
+        "label": "6",
+        "x": 18.06,
+        "y": 3.33,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 74,
+        "code": "ShiftLeft",
+        "label": "Shift",
+        "x": 0.0,
+        "y": 4.37,
+        "w": 2.3,
+        "h": 1
+      },
+      {
+        "index": 75,
+        "code": "KeyZ",
+        "label": "Z",
+        "x": 2.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 76,
+        "code": "KeyX",
+        "label": "X",
+        "x": 3.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 77,
+        "code": "KeyC",
+        "label": "C",
+        "x": 4.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 78,
+        "code": "KeyV",
+        "label": "V",
+        "x": 5.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 79,
+        "code": "KeyB",
+        "label": "B",
+        "x": 6.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 80,
+        "code": "KeyN",
+        "label": "N",
+        "x": 7.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 81,
+        "code": "KeyM",
+        "label": "M",
+        "x": 8.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 82,
+        "code": "Comma",
+        "label": ",",
+        "x": 9.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 83,
+        "code": "Period",
+        "label": ".",
+        "x": 10.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 84,
+        "code": "Slash",
+        "label": "/",
+        "x": 11.3,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 85,
+        "code": "ShiftRight",
+        "label": "Shift",
+        "x": 12.3,
+        "y": 4.37,
+        "w": 1.56,
+        "h": 1
+      },
+      {
+        "index": 86,
+        "code": "ArrowUp",
+        "label": "↑",
+        "x": 13.86,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 87,
+        "code": "PageDown",
+        "label": "PgDn",
+        "x": 14.86,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 88,
+        "code": "Numpad1",
+        "label": "1",
+        "x": 16.06,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 89,
+        "code": "Numpad2",
+        "label": "2",
+        "x": 17.06,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 90,
+        "code": "Numpad3",
+        "label": "3",
+        "x": 18.06,
+        "y": 4.37,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 91,
+        "code": "NumpadEnter",
+        "label": "Enter",
+        "x": 19.06,
+        "y": 4.37,
+        "w": 1,
+        "h": 2.04
+      },
+      {
+        "index": 92,
+        "code": "ControlLeft",
+        "label": "Ctrl",
+        "x": 0.0,
+        "y": 5.41,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 93,
+        "code": "MetaLeft",
+        "label": "⌘",
+        "x": 1.25,
+        "y": 5.41,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 94,
+        "code": "AltLeft",
+        "label": "Opt",
+        "x": 2.5,
+        "y": 5.41,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 95,
+        "code": "Space",
+        "label": "",
+        "x": 3.75,
+        "y": 5.41,
+        "w": 6.5,
+        "h": 1
+      },
+      {
+        "index": 96,
+        "code": "AltRight",
+        "label": "Opt",
+        "x": 10.25,
+        "y": 5.41,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 97,
+        "code": "Fn",
+        "label": "Fn",
+        "x": 11.5,
+        "y": 5.41,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 98,
+        "code": "ArrowLeft",
+        "label": "←",
+        "x": 13.06,
+        "y": 5.41,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 99,
+        "code": "ArrowDown",
+        "label": "↓",
+        "x": 14.06,
+        "y": 5.41,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 100,
+        "code": "ArrowRight",
+        "label": "→",
+        "x": 15.06,
+        "y": 5.41,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 101,
+        "code": "Numpad0",
+        "label": "0",
+        "x": 16.26,
+        "y": 5.41,
+        "w": 2.04,
+        "h": 1
+      },
+      {
+        "index": 102,
+        "code": "NumpadDecimal",
+        "label": ".",
+        "x": 18.3,
+        "y": 5.41,
+        "w": 1,
+        "h": 1
+      }
+    ],
+    "rgbWriteIndices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      37,
+      36,
+      35,
+      34,
+      33,
+      32,
+      31,
+      30,
+      29,
+      28,
+      27,
+      26,
+      25,
+      24,
+      23,
+      22,
+      21,
+      20,
+      19,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      73,
+      72,
+      71,
+      70,
+      69,
+      68,
+      67,
+      66,
+      65,
+      64,
+      63,
+      62,
+      61,
+      60,
+      59,
+      58,
+      57,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      102,
+      101,
+      100,
+      99,
+      98,
+      97,
+      96,
+      95,
+      94,
+      93,
+      92
+    ]
+  },
+  "node100-hp": {
+    "name": "NODE100 HP",
+    "vendorId": 6645,
+    "productIds": [
+      4150
+    ],
+    "keyCount": 109,
+    "sideCount": 5,
+    "canvasCount": 109,
+    "rows": 6,
+    "columns": 19,
+    "extraKeys": 5,
+    "qualifiedFirmware": "1.0.7.6",
+    "minimumVersion": "1.0.7.6",
+    "businessId": "1996166247217889282",
+    "globalPalette": true,
+    "functionRow": true,
+    "unmappedIndices": [],
+    "layout": [
+      {
+        "index": 0,
+        "code": "Escape",
+        "label": "Esc",
+        "x": 0.0,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 1,
+        "code": "F1",
+        "label": "F1",
+        "x": 1.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 2,
+        "code": "F2",
+        "label": "F2",
+        "x": 2.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 3,
+        "code": "F3",
+        "label": "F3",
+        "x": 3.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 4,
+        "code": "F4",
+        "label": "F4",
+        "x": 4.26,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 5,
+        "code": "F5",
+        "label": "F5",
+        "x": 5.48,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 6,
+        "code": "F6",
+        "label": "F6",
+        "x": 6.48,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 7,
+        "code": "F7",
+        "label": "F7",
+        "x": 7.48,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 8,
+        "code": "F8",
+        "label": "F8",
+        "x": 8.48,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 9,
+        "code": "F9",
+        "label": "F9",
+        "x": 9.72,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 10,
+        "code": "F10",
+        "label": "F10",
+        "x": 10.72,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 11,
+        "code": "F11",
+        "label": "F11",
+        "x": 11.72,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 12,
+        "code": "F12",
+        "label": "F12",
+        "x": 12.72,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 13,
+        "code": "LockScreen",
+        "label": "锁定",
+        "x": 13.96,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 14,
+        "code": "PrintScreen",
+        "label": "截图",
+        "x": 15.2,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 15,
+        "code": "ScrollLock",
+        "label": "ScrLk",
+        "x": 16.2,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 16,
+        "code": "Pause",
+        "label": "Pause",
+        "x": 17.2,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 17,
+        "code": "ShowDesktop",
+        "label": "桌面",
+        "x": 18.44,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 18,
+        "code": "ControlCenter",
+        "label": "控制",
+        "x": 19.44,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 19,
+        "code": "TaskManager",
+        "label": "任务",
+        "x": 20.44,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 20,
+        "code": "LaunchCalculator",
+        "label": "Calc",
+        "x": 21.44,
+        "y": 0.0,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 21,
+        "code": "Backquote",
+        "label": "`",
+        "x": 0.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 22,
+        "code": "Digit1",
+        "label": "1",
+        "x": 1.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 23,
+        "code": "Digit2",
+        "label": "2",
+        "x": 2.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 24,
+        "code": "Digit3",
+        "label": "3",
+        "x": 3.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 25,
+        "code": "Digit4",
+        "label": "4",
+        "x": 4.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 26,
+        "code": "Digit5",
+        "label": "5",
+        "x": 5.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 27,
+        "code": "Digit6",
+        "label": "6",
+        "x": 6.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 28,
+        "code": "Digit7",
+        "label": "7",
+        "x": 7.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 29,
+        "code": "Digit8",
+        "label": "8",
+        "x": 8.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 30,
+        "code": "Digit9",
+        "label": "9",
+        "x": 9.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 31,
+        "code": "Digit0",
+        "label": "0",
+        "x": 10.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 32,
+        "code": "Minus",
+        "label": "−",
+        "x": 11.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 33,
+        "code": "Equal",
+        "label": "=",
+        "x": 12.0,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 34,
+        "code": "Backspace",
+        "label": "⌫",
+        "x": 13.0,
+        "y": 1.28,
+        "w": 1.96,
+        "h": 1
+      },
+      {
+        "index": 35,
+        "code": "Insert",
+        "label": "Ins",
+        "x": 15.2,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 36,
+        "code": "Home",
+        "label": "Home",
+        "x": 16.2,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 37,
+        "code": "PageUp",
+        "label": "PgUp",
+        "x": 17.2,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 38,
+        "code": "NumLock",
+        "label": "Num",
+        "x": 18.44,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 39,
+        "code": "NumpadDivide",
+        "label": "/",
+        "x": 19.44,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 40,
+        "code": "NumpadMultiply",
+        "label": "×",
+        "x": 20.44,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 41,
+        "code": "NumpadSubtract",
+        "label": "−",
+        "x": 21.44,
+        "y": 1.28,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 42,
+        "code": "Tab",
+        "label": "Tab",
+        "x": 0.0,
+        "y": 2.31,
+        "w": 1.5,
+        "h": 1
+      },
+      {
+        "index": 43,
+        "code": "KeyQ",
+        "label": "Q",
+        "x": 1.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 44,
+        "code": "KeyW",
+        "label": "W",
+        "x": 2.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 45,
+        "code": "KeyE",
+        "label": "E",
+        "x": 3.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 46,
+        "code": "KeyR",
+        "label": "R",
+        "x": 4.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 47,
+        "code": "KeyT",
+        "label": "T",
+        "x": 5.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 48,
+        "code": "KeyY",
+        "label": "Y",
+        "x": 6.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 49,
+        "code": "KeyU",
+        "label": "U",
+        "x": 7.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 50,
+        "code": "KeyI",
+        "label": "I",
+        "x": 8.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 51,
+        "code": "KeyO",
+        "label": "O",
+        "x": 9.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 52,
+        "code": "KeyP",
+        "label": "P",
+        "x": 10.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 53,
+        "code": "BracketLeft",
+        "label": "[",
+        "x": 11.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 54,
+        "code": "BracketRight",
+        "label": "]",
+        "x": 12.5,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 55,
+        "code": "Backslash",
+        "label": "\\",
+        "x": 13.5,
+        "y": 2.31,
+        "w": 1.46,
+        "h": 1
+      },
+      {
+        "index": 56,
+        "code": "Delete",
+        "label": "Del",
+        "x": 15.2,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 57,
+        "code": "End",
+        "label": "End",
+        "x": 16.2,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 58,
+        "code": "PageDown",
+        "label": "PgDn",
+        "x": 17.2,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 59,
+        "code": "Numpad7",
+        "label": "7",
+        "x": 18.44,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 60,
+        "code": "Numpad8",
+        "label": "8",
+        "x": 19.44,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 61,
+        "code": "Numpad9",
+        "label": "9",
+        "x": 20.44,
+        "y": 2.31,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 62,
+        "code": "NumpadAdd",
+        "label": "+",
+        "x": 21.44,
+        "y": 2.31,
+        "w": 1,
+        "h": 2.0
+      },
+      {
+        "index": 63,
+        "code": "CapsLock",
+        "label": "Caps",
+        "x": 0.0,
+        "y": 3.34,
+        "w": 1.8,
+        "h": 1
+      },
+      {
+        "index": 64,
+        "code": "KeyA",
+        "label": "A",
+        "x": 1.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 65,
+        "code": "KeyS",
+        "label": "S",
+        "x": 2.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 66,
+        "code": "KeyD",
+        "label": "D",
+        "x": 3.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 67,
+        "code": "KeyF",
+        "label": "F",
+        "x": 4.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 68,
+        "code": "KeyG",
+        "label": "G",
+        "x": 5.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 69,
+        "code": "KeyH",
+        "label": "H",
+        "x": 6.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 70,
+        "code": "KeyJ",
+        "label": "J",
+        "x": 7.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 71,
+        "code": "KeyK",
+        "label": "K",
+        "x": 8.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 72,
+        "code": "KeyL",
+        "label": "L",
+        "x": 9.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 73,
+        "code": "Semicolon",
+        "label": ";",
+        "x": 10.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 74,
+        "code": "Quote",
+        "label": "'",
+        "x": 11.8,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 75,
+        "code": "Enter",
+        "label": "Enter",
+        "x": 12.8,
+        "y": 3.34,
+        "w": 2.2,
+        "h": 1
+      },
+      {
+        "index": 76,
+        "code": "Numpad4",
+        "label": "4",
+        "x": 18.6,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 77,
+        "code": "Numpad5",
+        "label": "5",
+        "x": 19.6,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 78,
+        "code": "Numpad6",
+        "label": "6",
+        "x": 20.6,
+        "y": 3.34,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 79,
+        "code": "ShiftLeft",
+        "label": "Shift",
+        "x": 0.0,
+        "y": 4.38,
+        "w": 2.3,
+        "h": 1
+      },
+      {
+        "index": 80,
+        "code": "KeyZ",
+        "label": "Z",
+        "x": 2.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 81,
+        "code": "KeyX",
+        "label": "X",
+        "x": 3.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 82,
+        "code": "KeyC",
+        "label": "C",
+        "x": 4.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 83,
+        "code": "KeyV",
+        "label": "V",
+        "x": 5.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 84,
+        "code": "KeyB",
+        "label": "B",
+        "x": 6.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 85,
+        "code": "KeyN",
+        "label": "N",
+        "x": 7.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 86,
+        "code": "KeyM",
+        "label": "M",
+        "x": 8.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 87,
+        "code": "Comma",
+        "label": ",",
+        "x": 9.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 88,
+        "code": "Period",
+        "label": ".",
+        "x": 10.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 89,
+        "code": "Slash",
+        "label": "/",
+        "x": 11.3,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 90,
+        "code": "ShiftRight",
+        "label": "Shift",
+        "x": 12.3,
+        "y": 4.38,
+        "w": 2.74,
+        "h": 1
+      },
+      {
+        "index": 91,
+        "code": "ArrowUp",
+        "label": "↑",
+        "x": 16.32,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 92,
+        "code": "Numpad1",
+        "label": "1",
+        "x": 18.6,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 93,
+        "code": "Numpad2",
+        "label": "2",
+        "x": 19.6,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 94,
+        "code": "Numpad3",
+        "label": "3",
+        "x": 20.6,
+        "y": 4.38,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 95,
+        "code": "NumpadEnter",
+        "label": "Enter",
+        "x": 21.6,
+        "y": 4.38,
+        "w": 1,
+        "h": 2.0
+      },
+      {
+        "index": 96,
+        "code": "ControlLeft",
+        "label": "Ctrl",
+        "x": 0.0,
+        "y": 5.42,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 97,
+        "code": "MetaLeft",
+        "label": "⌘",
+        "x": 1.25,
+        "y": 5.42,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 98,
+        "code": "AltLeft",
+        "label": "Opt",
+        "x": 2.49,
+        "y": 5.42,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 99,
+        "code": "Space",
+        "label": "",
+        "x": 3.73,
+        "y": 5.42,
+        "w": 6.5,
+        "h": 1
+      },
+      {
+        "index": 100,
+        "code": "AltRight",
+        "label": "Opt",
+        "x": 10.22,
+        "y": 5.42,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 101,
+        "code": "MetaRight",
+        "label": "⌘",
+        "x": 11.48,
+        "y": 5.42,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 102,
+        "code": "Fn",
+        "label": "Fn",
+        "x": 12.72,
+        "y": 5.42,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 103,
+        "code": "ControlRight",
+        "label": "Ctrl",
+        "x": 13.96,
+        "y": 5.42,
+        "w": 1.24,
+        "h": 1
+      },
+      {
+        "index": 104,
+        "code": "ArrowLeft",
+        "label": "←",
+        "x": 15.44,
+        "y": 5.42,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 105,
+        "code": "ArrowDown",
+        "label": "↓",
+        "x": 16.44,
+        "y": 5.42,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 106,
+        "code": "ArrowRight",
+        "label": "→",
+        "x": 17.44,
+        "y": 5.42,
+        "w": 1,
+        "h": 1
+      },
+      {
+        "index": 107,
+        "code": "Numpad0",
+        "label": "0",
+        "x": 18.68,
+        "y": 5.42,
+        "w": 2.04,
+        "h": 1
+      },
+      {
+        "index": 108,
+        "code": "NumpadDecimal",
+        "label": ".",
+        "x": 20.72,
+        "y": 5.42,
+        "w": 1,
+        "h": 1
+      }
+    ],
+    "rgbWriteIndices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      41,
+      40,
+      39,
+      38,
+      37,
+      36,
+      35,
+      34,
+      33,
+      32,
+      31,
+      30,
+      29,
+      28,
+      27,
+      26,
+      25,
+      24,
+      23,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      78,
+      77,
+      76,
+      75,
+      74,
+      73,
+      72,
+      71,
+      70,
+      69,
+      68,
+      67,
+      63,
+      66,
+      19,
+      61,
+      20,
+      65,
+      64,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      94,
+      62,
+      22,
+      91,
+      21,
+      92,
+      93,
+      108,
+      107,
+      106,
+      105,
+      104,
+      103,
+      102,
+      101,
+      95,
+      100,
+      99,
+      98,
+      97,
+      96
+    ]
+  }
+}

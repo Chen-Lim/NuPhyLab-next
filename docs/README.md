@@ -4,6 +4,7 @@
 
 - [直接下载最新版安装包 / Download the latest installer](https://github.com/bohu8264/NuPhyLab-next/releases/latest/download/NuPhyLab-macOS-AppleSilicon.dmg)
 - [最新发行说明 / Latest release notes](https://github.com/bohu8264/NuPhyLab-next/releases/latest)
+- [各型号固件要求与兼容范围 / Model firmware requirements and compatibility](KEYBOARD_COMPATIBILITY.md)
 - [中文 / English 首页](../README.md)
 - [中文安装、使用与开发指南](../README.zh-CN.md)
 - [English installation, usage and development guide](../README.en.md)
@@ -18,6 +19,7 @@
 
 ## 分版记录 / Version history
 
+- [1.2.40 发行说明 / Release notes](https://github.com/bohu8264/NuPhyLab-next/releases/tag/v1.2.40)
 - [1.2.39 发行说明 / Release notes](RELEASE_1.2.39.md)
 - [1.2.15 发行说明 / Release notes](RELEASE_1.2.15.md)
 - [1.2.14 发行说明 / Release notes](RELEASE_1.2.14.md)

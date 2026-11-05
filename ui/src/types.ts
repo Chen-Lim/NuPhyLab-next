@@ -1,3 +1,5 @@
+import {blank} from '../../shared/layout.mjs';
+import type {KeyboardModel} from '../../shared/layout.mjs';
 export type Key = {
   index: number;
   code: string;
@@ -27,7 +29,7 @@ export type Animation = {
 };
 export type Scene = {
   id?: string;
-  modelId?: "air75-v3" | "kick75";
+  modelId?: KeyboardModel;
   name: string;
   colors: string[];
   animation: Animation;
@@ -116,7 +118,7 @@ export type AppState = {
   lightPower?: {sleeping:boolean;reason:"duration"|"idle"|null;remainingMs:number|null;idleMs:number;systemIdleAvailable:boolean|null};
   connectionWake?: {active:boolean;status:string;elapsedMs:number;durationMs:number;sessionId:string|null};
   firmware?: {
-    modelId?: "air75-v3" | "kick75" | null;
+    modelId?: KeyboardModel | null;
     modelName?: string;
     minimumRequired?: string | null;
     latestConfirmed?: boolean;
@@ -148,7 +150,7 @@ export type AppState = {
     connectionSessionId?: string;
     connection?: {status:"ready"|"paused"|"waiting"|"reconnecting"|"attention"|"updateRequired";attempts:number};
     armed: boolean;
-    modelId?: "air75-v3" | "kick75";
+    modelId?: KeyboardModel;
     model?: string;
     keyLedCount?: number;
     capabilities?: {perKey?: boolean; stockEffects?: boolean; functionKeyAdaptation?: boolean; [key: string]: unknown};
@@ -214,4 +216,4 @@ export const DEFAULT_ANIMATION: Animation = {
   speed: 4,
   loop: true,
 };
-export const blankColors = () => Array<string>(84).fill("#000000");
+export const blankColors = () => blank();

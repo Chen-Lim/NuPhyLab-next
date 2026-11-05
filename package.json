@@ -1,9 +1,9 @@
 {
   "name": "nuphy-lab",
-  "version": "1.2.39",
+  "version": "1.2.40",
   "private": true,
   "type": "module",
-  "description": "NuPhy Lab for NuPhy Air75 V3 and Kick75",
+  "description": "NuPhy Lab lighting and AI keyboard controls",
   "scripts": {
     "setup": "npm --prefix ui install",
     "build:native": "node scripts/build-native.mjs",

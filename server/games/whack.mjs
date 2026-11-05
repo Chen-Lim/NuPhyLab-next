@@ -1,18 +1,19 @@
-import { blank, layout, LED_COUNT } from "../../shared/layout.mjs";
+import {canvasCountForLayout} from '../../shared/keyboard-models.mjs';
+import { blank, layout } from "../../shared/layout.mjs";
 
 const ROUND_MS = 30_000;
 
 export class WhackGame {
   constructor(random = Math.random, keys = layout) {
     this.random = random;
+    this.canvasCount = canvasCountForLayout(keys.filter(key=>key.controllable!==false));
     this.pads = keys
       .filter(
         (key) =>
           /^Key[A-Z]$/.test(key.code) &&
           key.controllable !== false &&
           Number.isInteger(key.index) &&
-          key.index >= 0 &&
-          key.index < LED_COUNT - 1,
+          key.index >= 0,
       )
       .map(({ index, code }) => ({ index, code }));
     if (!this.pads.length) throw new TypeError("Whack requires letter keys");
@@ -94,7 +95,7 @@ export class WhackGame {
   }
 
   render() {
-    const colors = blank();
+    const colors = Array(this.canvasCount).fill("#000000");
     if (
       (this.status === "running" || this.status === "paused") &&
       this.target !== null

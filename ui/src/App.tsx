@@ -1,3 +1,5 @@
+import {getKeyboardProfile,isKeyboardModel} from '../../shared/keyboard-models.mjs';
+import {getLayoutModel} from '../../shared/layout.mjs';
 import {nativeLightingOnly} from '../../shared/device-status.mjs';
 import {deriveConnectionDisplay} from '../../shared/connection-display.mjs';
 import {friendlyConnectionError,keyRecoveryProblem} from './KeyRecoveryPanel';
@@ -108,7 +110,7 @@ export default function App() {
     [],
   );
   const { state, layout, serviceError, command, readState, refresh, exiting } = useAirApi(notify);
-  const modelId = layout.length === 80 ? "kick75" : "air75-v3";
+  const modelId = isKeyboardModel(state?.device.modelId) ? state.device.modelId : getLayoutModel();
   const nativeOnly = nativeLightingOnly(state);
   const connectionDisplay=presentConnectionDisplay(deriveConnectionDisplay({state,serviceError,canvasModelId:layout.length ? modelId : null,keyRecoveryProblem:keyRecoveryProblem(state)}));
   const libraryPlayContext=`${modelId}:${state?.device.connectionSessionId ?? ''}:${Boolean(state?.device.connected)}`;
@@ -123,7 +125,7 @@ export default function App() {
     libraryPlayRequest.current=null;directLibraryPlay.current=null;
     setPendingLibraryPlay(null);setLibraryPlayBusy(false);
   },[libraryPlayContext,Boolean(serviceError),exiting]);
-  const draftKey = (model: string) => model === "kick75" ? "nuphylab-draft-kick75-v1" : "air-studio-draft-v1";
+  const draftKey = (model: string) => model === "air75-v3" ? "air-studio-draft-v1" : `nuphylab-draft-${model}-v1`;
   useEffect(()=>{if(page!=="codex")setFocusCodexColors(false);},[page]);
   useCodexKeys(state,command,notify);
   useEffect(()=>{const value=state?.settings.language;if(value === "en" || value === "zh-CN") setLanguage(value);},[state?.settings.language]);
@@ -146,7 +148,7 @@ export default function App() {
     setDraftStorageIssue(null);
     try {
       const saved = localStorage.getItem(draftKey(modelId));
-      if (saved !== null) restored = parseDraftRecord(saved);
+      if (saved !== null) restored = parseDraftRecord(saved,modelId);
       blockedDraftKeys.current.delete(draftKey(modelId));
     } catch {
       blockedDraftKeys.current.add(draftKey(modelId));
@@ -283,7 +285,7 @@ export default function App() {
     try {
       const raw=localStorage.getItem(draftKey(modelId));
       if(raw===null)throw new Error('Missing draft');
-      load(parseDraftRecord(raw),{restoreKey:draftKey(modelId)});
+      load(parseDraftRecord(raw,modelId),{restoreKey:draftKey(modelId)});
     } catch {notify('暂时无法读取本机草稿。原记录已保留，请重试读取。');}
   };
   const creative = ["studio", "audio", "offline"].includes(page);
@@ -396,7 +398,7 @@ export default function App() {
         <label className="form-field">{tr('作品名称')}<input aria-label={tr('保存作品名称')} aria-invalid={!saveName.trim()&&Boolean(saveError)} value={saveName} disabled={saveBusy} maxLength={80} onChange={event=>{setSaveName(event.target.value);setSaveError('');}} onKeyDown={event=>{if(event.key==='Enter'&&!event.nativeEvent.isComposing){event.preventDefault();run(save());}}}/></label>
         {!saveName.trim()&&<p className="overlay-field-error">{tr('请输入作品名称。')}</p>}
         {draft.id&&<label className="checkbox-field"><input type="checkbox" checked={saveCopy} disabled={saveBusy} onChange={event=>setSaveCopy(event.target.checked)}/>{tr('另存为新作品')}</label>}
-        <p className="muted">{tr('图案、颜色、动画与触发规则一起保存。')}</p><p className="muted">{tr('输出亮度是全局设置，不随作品保存。')}</p><p className="muted">{tr('保存到')}{' '}{modelId==='kick75'?'Kick75':'Air75 V3'} · {tr('我的作品')}</p>
+        <p className="muted">{tr('图案、颜色、动画与触发规则一起保存。')}</p><p className="muted">{tr('输出亮度是全局设置，不随作品保存。')}</p><p className="muted">{tr('保存到')}{' '}{getKeyboardProfile(modelId).name} · {tr('我的作品')}</p>
         {saveError&&saveName.trim()&&<div className="overlay-error" role="alert"><CircleAlert size={14}/><span>{tr(saveError)}</span></div>}
       </Modal>}
     </div>

@@ -1,3 +1,4 @@
+import {getKeyboardProfile,isKeyboardModel} from './keyboard-models.mjs';
 // Pure presentation derived from v7 spec/connection-display.json. No commands or effects.
 import {nativeLightingOnly, sidebarDeviceIdentity} from './device-status.mjs';
 
@@ -503,7 +504,7 @@ export function deriveConnectionDisplay({state=null,serviceError='',canvasModelI
   const workBody=reason?pair(`${reason.body.zh}${COMMON.offlineCapabilities.zh}`,`${reason.body.en} ${COMMON.offlineCapabilities.en}`):base.workBody ?? null;
   const primaryAction=reason?.action ?? base.primaryAction;
   const devicePrimaryAction=reason?.devicePrimary ?? primaryAction;
-  const modelName=canvasModelId==='kick75'?'Kick75':canvasModelId==='air75-v3'?'Air75 V3':null;
+  const modelName=isKeyboardModel(canvasModelId)?getKeyboardProfile(canvasModelId).name:null;
   return freeze({
     stateId,reasonId,tone,serviceFresh,freshUsb,header,sidebar,
     sidebarLabel:COMMON.sidebarLabel,workTitle,workBody,

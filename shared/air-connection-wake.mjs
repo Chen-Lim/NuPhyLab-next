@@ -1,4 +1,5 @@
-import { airLayout, LED_COUNT } from "./layout.mjs";
+import {airLayout,getLayoutForModel} from './layout.mjs';
+import {getCanvasCount} from './keyboard-models.mjs';
 
 // The approved 2.2-second choreography plays at half speed.
 export const AIR_CONNECTION_WAKE_DURATION_MS = 4400;
@@ -15,8 +16,9 @@ const ease = value => {
   return t * t * (3 - 2 * t);
 };
 
+function createRenderer(layout,count) {
 // Capture geometry without sorting or rewriting the shared physical layout.
-const keyCenters = airLayout.map(key => ({
+const keyCenters = layout.map(key => ({
   index: key.index,
   row: key.y,
   x: key.x + key.w / 2,
@@ -25,13 +27,14 @@ const left = Math.min(...keyCenters.map(key => key.x));
 const right = Math.max(...keyCenters.map(key => key.x));
 const top = Math.min(...keyCenters.map(key => key.row));
 const bottom = Math.max(...keyCenters.map(key => key.row));
-const rows = Array.from({ length: 6 }, (_, row) => {
+const physicalRows = [...new Set(keyCenters.map(key=>key.row))].sort((a,b)=>a-b);
+const rows = physicalRows.map(row => {
   const keys = keyCenters.filter(key => key.row === row);
   const rowLeft = Math.min(...keys.map(key => key.x));
   const rowRight = Math.max(...keys.map(key => key.x));
   return keys.map(key => ({
     ...key,
-    rowPosition: (key.x - rowLeft) / (rowRight - rowLeft),
+    rowPosition: (key.x - rowLeft) / (rowRight - rowLeft || 1),
   }));
 });
 const diagonalKeys = keyCenters.map(key => ({
@@ -63,21 +66,22 @@ function writeWhiteWave(colors, powers, envelope = 1) {
  * Times are elapsed wall-clock milliseconds, including the half-speed playback.
  * Only the 83 mapped key LEDs participate; slot 83 is always black.
  */
-export function renderAirConnectionWake(elapsedMs) {
-  const colors = Array(LED_COUNT).fill("#000000");
+return function render(elapsedMs) {
+  const colors = Array(count).fill("#000000");
   if (!Number.isFinite(elapsedMs) || elapsedMs <= 0
     || elapsedMs >= AIR_CONNECTION_WAKE_DURATION_MS) return colors;
 
   const time = elapsedMs * PLAYBACK_SPEED;
   if (time < DIAGONAL_START_MS) {
-    const group = Math.floor(time / ROW_STAGE_MS);
-    const local = time - group * ROW_STAGE_MS;
+    const stageMs=DIAGONAL_START_MS/Math.ceil(rows.length/2);
+    const group = Math.floor(time / stageMs);
+    const local = time - group * stageMs;
     const startDelay = group === 0 ? START_FADE_MS : 0;
-    const progress = clamp((local - startDelay) / (ROW_STAGE_MS - startDelay));
+    const progress = clamp((local - startDelay) / (stageMs - startDelay));
     const envelope = ease(time / START_FADE_MS);
-    for (const row of [group, 5 - group]) {
+    for (const row of new Set([group, rows.length - 1 - group])) {
       // Upper rows alternate right/left/right; lower rows mirror them.
-      const reverse = (group === 1) !== (row >= 3);
+      const reverse = (group === 1) !== (row >= Math.ceil(rows.length/2));
       const powers = rows[row].map(key => ({
         index: key.index,
         power: wavePower(progress - (reverse ? 1 - key.rowPosition : key.rowPosition),
@@ -95,4 +99,12 @@ export function renderAirConnectionWake(elapsedMs) {
     writeWhiteWave(colors, powers, envelope);
   }
   return colors;
+}
+
+}
+const renderers = new Map([['air75-v3',createRenderer(airLayout,84)]]);
+export const renderAirConnectionWake = elapsedMs => renderers.get('air75-v3')(elapsedMs);
+export function renderConnectionWake(modelId,elapsedMs) {
+  if(!renderers.has(modelId))renderers.set(modelId,createRenderer(getLayoutForModel(modelId),getCanvasCount(modelId)));
+  return renderers.get(modelId)(elapsedMs);
 }

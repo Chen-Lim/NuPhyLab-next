@@ -1,5 +1,5 @@
 // Air75 V3 / Kick75 user-space HID bridge. No firmware or session-key setters.
-// The sole keymap write is a journaled factory F4 lease with verified restoration.
+// Keymap writes are limited to journaled factory function-key leases with full restoration.
 // Build: swiftc -O native/HIDBridge.swift -o native/air75-hid-bridge
 import Foundation
 import CryptoKit
@@ -338,26 +338,75 @@ func parseColors(_ value: Any?, count: Int) throws -> [UInt8] {
 
 // Device profiles keep the USB identity, protocol schema and restoration
 // namespace together. A Kick is never treated as an Air with fewer LEDs.
-enum USBKeyboardModel: String {
+enum USBKeyboardModel: String, CaseIterable {
     case air75 = "air75-v3", kick75 = "kick75"
+    case node75LP = "node75-lp"
+    case node75HP = "node75-hp"
+    case node100LP = "node100-lp"
+    case node100HP = "node100-hp"
+    case air65 = "air65-v3"
+    case air100 = "air100-v3"
+
+    static let productIDs = [0x1028, 0x1026, 0x1027, 0x1030, 0x1031, 0x102b, 0x102d, 0x1037, 0x1036]
     static func identify(vendor: Int, product: Int) -> USBKeyboardModel? {
         guard vendor == 0x19f5 else { return nil }
-        switch product { case 0x1028: return .air75; case 0x1026,0x1027: return .kick75; default: return nil }
+        switch product { case 0x1028: return .air75; case 0x1026,0x1027: return .kick75;
+        case 0x1030: return .node75LP
+        case 0x1031: return .node75HP
+        case 0x102b: return .air65
+        case 0x102d: return .air100
+        case 0x1037: return .node100LP
+        case 0x1036: return .node100HP
+        default: return nil }
     }
-    var name: String { self == .air75 ? "Air75 V3 ANSI" : "Kick75 ANSI" }
-    var keyCount: Int { self == .air75 ? 84 : 80 }
-    var sideCount: Int { self == .air75 ? 20 : 5 }
-    var columns: UInt8 { self == .air75 ? 16 : 15 }
+    var name: String { switch self { case .air75: return "Air75 V3 ANSI"; case .kick75: return "Kick75 ANSI";
+        case .node75LP: return "NODE75 LP ANSI"
+        case .node75HP: return "NODE75 HP ANSI"
+        case .air65: return "Air65 V3 ANSI"
+        case .air100: return "Air100 V3 ANSI"
+        case .node100LP: return "NODE100 LP ANSI"
+        case .node100HP: return "NODE100 HP ANSI"
+    } }
+    var keyCount: Int { switch self { case .air75: return 84; case .kick75: return 80; case .node75LP: return 84; case .node75HP: return 82; case .air65: return 68; case .air100: return 99; case .node100LP: return 103; case .node100HP: return 109 } }
+    var sideCount: Int { switch self { case .air75: return 20; case .kick75: return 5; case .node75LP: return 5; case .node75HP: return 5; case .air65: return 20; case .air100: return 20; case .node100LP: return 5; case .node100HP: return 5 } }
+    var rows: UInt8 { switch self { case .air75: return 6; case .kick75: return 6; case .node75LP: return 6; case .node75HP: return 6; case .air65: return 5; case .air100: return 6; case .node100LP: return 6; case .node100HP: return 6 } }
+    var columns: UInt8 { switch self { case .air75: return 16; case .kick75: return 15; case .node75LP: return 16; case .node75HP: return 16; case .air65: return 15; case .air100: return 18; case .node100LP: return 19; case .node100HP: return 19 } }
+    var extraKeys: Int { switch self { case .air75: return 2; case .kick75: return 2; case .node75LP: return 5; case .node75HP: return 5; case .air65: return 2; case .air100: return 2; case .node100LP: return 5; case .node100HP: return 5 } }
+    // D2 returns matrix-scan order; D8 addresses the physical palette.
+    // Exact tables come from each qualified firmware's initialized matrix map.
+    var rgbWriteIndices:[Int] { switch self {
+        case .node75LP: return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,59,58,57,56,55,54,53,52,51,50,49,48,47,46,60,61,62,63,64,65,66,67,68,69,70,71,72,73,83,82,81,80,79,78,77,76,75,74]
+        case .node75HP: return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,58,57,56,55,54,53,52,51,50,49,48,47,46,45,59,60,61,62,63,64,65,66,67,68,69,70,71,72,81,80,79,78,77,76,75,74,73]
+        case .node100LP: return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,73,72,71,70,69,68,67,66,65,64,63,62,61,60,59,58,57,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,102,101,100,99,98,97,96,95,94,93,92]
+        case .node100HP: return [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,78,77,76,75,74,73,72,71,70,69,68,67,63,66,19,61,20,65,64,79,80,81,82,83,84,85,86,87,88,89,90,94,62,22,91,21,92,93,108,107,106,105,104,103,102,101,95,100,99,98,97,96]
+        default: return Array(0..<keyCount)
+    } }
+    var canvasCount: Int { max(84,keyCount) }
     var totalCount: Int { keyCount + sideCount }
-    var matrixKeyCount: Int { 6 * Int(columns) }
-    var keymapKeyCount: Int { matrixKeyCount + 2 } // A0 extra=2, including the rotary encoder.
+    var matrixKeyCount: Int { Int(rows) * Int(columns) }
+    var keymapKeyCount: Int { matrixKeyCount + extraKeys }
+    var globalPalette: Bool { self != .air75 }
+    var protocolName: String { self == .air75 ? "air75-s4" : rawValue + "-s4" }
+    var sideModeLimit: UInt8 { sideCount == 5 ? 3 : 4 }
+    var qualifiedFirmware: String { switch self { case .air75: return "1.0.23.6"; case .kick75: return "4.0.18.6";
+        case .node75LP: return "1.0.10.6"
+        case .node75HP: return "1.0.10.6"
+        case .air65: return "1.0.5.6"
+        case .air100: return "1.0.6.6"
+        case .node100LP: return "1.0.7.6"
+        case .node100HP: return "1.0.7.6"
+    } }
+    var minimumFirmware: String { self == .air75 ? "1.0.16.6" : qualifiedFirmware }
+    func hasQualifiedFirmware(_ firmware:[UInt8]) -> Bool {
+        guard firmware.count == 8,firmware[3] == 0xaa,firmware[5] == 0 else { return false }
+        return S4.firmwareVersion(firmware) == qualifiedFirmware
+    }
     func supportsFunctionKeyAdaptation(_ firmware:[UInt8]) -> Bool {
-        if self == .air75 { return S4.supportsPerKey(firmware) }
-        return firmware.count == 8 && Array(firmware.prefix(6)) == [18,0,4,170,6,0]
+        self != .air65 && S4.supportsPerKey(firmware,model:self)
     }
     func validGeometry(_ value: [UInt8]) -> Bool {
-        value.count == 8 && value[0] <= 1 && Array(value[1...4]) == [8,4,6,columns] &&
-            (value[5] & 0x80 == 0 || value[5] & 0x7f == 2)
+        value.count == 8 && value[0] <= 1 && Array(value[1...4]) == [8,4,rows,columns] &&
+            (value[5] & 0x80 != 0 ? Int(value[5] & 0x7f) == extraKeys : extraKeys == 2)
     }
 }
 
@@ -371,6 +420,7 @@ enum S4 {
     // preset shapes extend D5/D6 from 17 to 22 bytes at 1.0.17.6. Keep minor
     // releases open, but require the same protocol family and read-only probes.
     static func stateLength(_ firmware: [UInt8], model: USBKeyboardModel = .air75) -> Int? {
+        if model != .air75 && model != .kick75 { return model.hasQualifiedFirmware(firmware) ? 17 : nil }
         if model == .kick75 {
             guard firmware.count == 8, firmware[3] == 0xaa, firmware[2] == 4, firmware[1] == 0, [UInt8(15),18].contains(firmware[0]), firmware[4] == 6, firmware[5] == 0 else { return nil }
             return 17
@@ -383,7 +433,7 @@ enum S4 {
         // Official 4.0.18.6 adds D8 and mode 21; 4.0.15.6 dispatches
         // D8 to UNKNOWN_COMMAND. Keep this independently qualified version
         // exact until another Kick firmware has been inspected and tested.
-        if model == .kick75 { return firmware.count == 8 && Array(firmware.prefix(6)) == [18,0,4,170,6,0] }
+        if model != .air75 { return model.hasQualifiedFirmware(firmware) }
         return stateLength(firmware, model: model) != nil && (firmware[1] > 0 || firmware[0] >= 16)
     }
     static func renderedCustomByte(_ value: UInt8, index: Int, firmware: [UInt8], model: USBKeyboardModel = .air75) -> UInt8 {
@@ -412,7 +462,7 @@ enum S4 {
     static func validState(_ state: [UInt8], firmware: [UInt8], model: USBKeyboardModel = .air75) -> Bool {
         guard let length = stateLength(firmware, model: model), state.count == length else { return false }
         return state[0] <= (model == .kick75 ? (supportsPerKey(firmware,model:model) ? 21 : 20) : (length == 22 ? 22 : 21)) && state[1] <= 100 && state[2] <= 4 &&
-            state[3] <= 3 && state[4] <= 1 && state[9] <= (model == .kick75 ? 3 : 4) && state[10] <= 100 &&
+            state[3] <= 3 && state[4] <= 1 && state[9] <= model.sideModeLimit && state[10] <= 100 &&
             state[11] <= 4 && state[12] <= 1 && (length == 17 || (state[17] <= 7 && state[21] <= 4))
     }
     static func readableState(_ state: [UInt8], firmware: [UInt8], model: USBKeyboardModel = .air75) -> Bool {
@@ -494,7 +544,11 @@ enum S4 {
         // Official Air75 V3 1.0.16.6: both D6 dispatch tables skip offsets
         // 5 and 13; D5 leaves these palette-index slots unpopulated. They are
         // not restorable configuration. Every other byte remains strict.
-        let unusedPaletteSlots = model == .air75 && Array(firmware.prefix(6)) == [0x10, 0, 1, 0xaa, 6, 0]
+        // The six additional qualified S4 firmwares allocate 17 bytes for D5
+        // but never fill offsets 5/13; both D6 tables skip those entries.
+        // They are heap residue, not configuration. Other bytes stay exact.
+        let qualifiedAdditional = model != .air75 && model != .kick75 && model.hasQualifiedFirmware(firmware)
+        let unusedPaletteSlots = (model == .air75 && Array(firmware.prefix(6)) == [0x10, 0, 1, 0xaa, 6, 0]) || qualifiedAdditional
         // 1.0.23.6 D5 now mirrors shape at offset 5, but still never populates
         // offset 13. Its D6 dispatch table skips 13 (official binary 0x44424).
         let unusedSidePalette = model == .air75 && Array(firmware.prefix(6)) == [23,0,1,0xaa,6,0]
@@ -542,12 +596,12 @@ enum S4 {
             throw failure("INVALID_FRAME", "Command, length, or address is outside the bridge's allowlist.")
         }
         if command == 0xb3 {
-            // No generic keymap writer: only standard F4 <-> factory Spotlight,
-            // one aligned key in the Mac base layer. Geometry is checked again
-            // by the lease before this lower-level envelope can be constructed.
-            guard length == 2, address >= 0, address < 192, address % 2 == 0,
-                  handle == 0, payload == [0,61] || payload == [126,7] else {
-                throw failure("INVALID_FRAME", "Only the journaled factory F4 lease is permitted.")
+            // One aligned function-key slot in the Mac base matrix. The caller
+            // additionally requires its exact model, factory map and durable lease.
+            let value=payload.count==2 ? Int(payload[0])<<8 | Int(payload[1]) : -1
+            guard length == 2, address >= 0, address < 228, address % 2 == 0,
+                  handle == 0, (58...69).contains(value) || [105,106,32262,32263,32264,32278,172,174,171,168,170,169].contains(value) else {
+                throw failure("INVALID_FRAME", "Only journaled factory function-key leases are permitted.")
             }
         }
         // Inspected AIR 1.0.23.6: F3 is a board-global four-byte read;
@@ -731,6 +785,10 @@ struct LightingJournals {
     }
 }
 
+struct FunctionKeyAssignment: Codable, Equatable {
+    let position: Int
+    let target: Int
+}
 struct FunctionKeyBackup: Codable, Equatable {
     let firmware: [UInt8]
     let serial: String
@@ -742,6 +800,10 @@ struct FunctionKeyBackup: Codable, Equatable {
     var modelId: String? = nil
     var productID: Int? = nil
     var keymapKeyCount: Int? = nil
+    // Schema extension for qualified NODE/AIR models with shared media inputs.
+    // Original records without this field remain the single F4 lease.
+    var leased: [FunctionKeyAssignment]? = nil
+    var assignments: [FunctionKeyAssignment] { leased ?? [FunctionKeyAssignment(position:position,target:61)] }
 }
 
 // Sleep enable is board-global, unlike the two independent RGB profiles.
@@ -827,7 +889,7 @@ final class Air75Device {
         if model == .air75 { base = baseBackupURL }
         else {
             let identity = journalIdentity
-            base = baseBackupURL.deletingLastPathComponent().appendingPathComponent("devices/kick75-\(String(productID,radix:16))-\(identity)").appendingPathComponent(baseBackupURL.lastPathComponent)
+            base = baseBackupURL.deletingLastPathComponent().appendingPathComponent("devices/\(model.rawValue)-\(String(productID,radix:16))-\(identity)").appendingPathComponent(baseBackupURL.lastPathComponent)
         }
         return LightingJournals(legacyURL: base, model: model, productID: productID)
     }
@@ -884,7 +946,7 @@ final class Air75Device {
         let code:Any,message:Any
         if lost {code="KEY_LEASE_BACKUP";message="本进程曾修改 F4，但原恢复记录缺失，无法确认恢复；已停止后续键位修改。"}
         else if let error=keyRecoveryError {code=error.code;message=error.message}
-        else if pending && !active {code="KEY_LEASE_CONFIRMATION_REQUIRED";message="检测到上次 F4 适配记录，请确认当前仍是原键盘后恢复。其他功能可继续使用。"}
+        else if pending && !active {code="KEY_LEASE_CONFIRMATION_REQUIRED";message="检测到上次功能键适配记录，请确认当前仍是原键盘后恢复。其他功能可继续使用。"}
         else {code=NSNull();message=NSNull()}
         return ["status":status,"pending":pending,"blocking":pending && !active,"ownsCurrentHandle":ownsFunctionKeyChanges,
                 "unownedHistory":pending && !ownsCurrentFunctionKeyLease && !lost,
@@ -896,6 +958,9 @@ final class Air75Device {
     private let testExchange: (([UInt8]) throws -> [UInt8])?
     private let testLocation: (() -> Int)?
     private let testSerial: (() -> String)?
+    private let testUptime: (() -> TimeInterval)?
+    private var functionKeyDeadline: TimeInterval?
+    private var transactionUptime: TimeInterval {testUptime?() ?? ProcessInfo.processInfo.systemUptime}
     private var testConnected = false
     private(set) var firmware = [UInt8]()
     private(set) var ledCount = 0
@@ -909,17 +974,17 @@ final class Air75Device {
     var deferredProfiles: [UInt8] { journals.profiles.filter { $0 != lightingProfile } }
     var hasPendingBackups: Bool { recoveryPending || !deferredProfiles.isEmpty }
     var boardSleepLeasePending: Bool { (model == .air75 && boardSleepJournal.exists) || sleepMutationAttempted }
-    private var supportsBoardSleepLease: Bool { supportsConnectionWake && !serial.isEmpty }
+    private var supportsBoardSleepLease: Bool { model == .air75 && supportsConnectionWake && !serial.isEmpty }
     private var boardSleepLeaseStatus: [String: Any] {
         ["supported":supportsBoardSleepLease,"active":connected && sleepLeaseGeneration == connectionGeneration && boardSleepLeasePending,
          "pending":boardSleepLeasePending,"ownsChanges":sleepMutationAttempted,
          "backupPath":boardSleepJournal.url.path]
     }
 
-    init(backupURL: URL, testModel: USBKeyboardModel = .air75, testLocation: (() -> Int)? = nil, testSerial: (() -> String)? = nil, testExchange: (([UInt8]) throws -> [UInt8])? = nil) {
+    init(backupURL: URL, testModel: USBKeyboardModel = .air75, testLocation: (() -> Int)? = nil, testSerial: (() -> String)? = nil, testUptime: (() -> TimeInterval)? = nil, testExchange: (([UInt8]) throws -> [UInt8])? = nil) {
         baseBackupURL = backupURL
-        model = testModel; productID = testModel == .air75 ? 0x1028 : 0x1026
-        self.testExchange = testExchange; self.testLocation = testLocation; self.testSerial = testSerial
+        model = testModel; productID = [USBKeyboardModel.air75:0x1028,.kick75:0x1026,.node75LP:0x1030,.node75HP:0x1031,.node100LP:0x1037,.node100HP:0x1036,.air65:0x102b,.air100:0x102d][testModel]!
+        self.testExchange = testExchange; self.testLocation = testLocation; self.testSerial = testSerial; self.testUptime = testUptime
     }
     deinit { closeTransport(); inputBuffer.deallocate() }
 
@@ -939,13 +1004,25 @@ final class Air75Device {
     private func requireConnected() throws {
         guard connected else { throw failure("NOT_CONNECTED", "Connect Air75 V3 or Kick75 by USB first.") }
     }
+    private func adoptConnectionIdentity(_ nextModel:USBKeyboardModel,_ nextProduct:Int,_ nextSerial:String,_ nextLocation:Int) {
+        let nextIdentity = nextSerial.isEmpty ? "location-\(nextLocation)" : nextSerial.utf8.map { String(format:"%02x",$0) }.joined()
+        if nextProduct != productID || nextSerial != serial || nextIdentity != journalIdentity {
+            // Keep the old namespace on disk, but never carry its in-memory
+            // ownership into another namespace (including empty-serial ports).
+            backup=nil;mutationAttempted=false;functionKeyMutationAttempted=false;functionKeyOwnerConnection=nil
+            firstPaintVerified=false;lastPaint=nil;firmware=[];keyRecoveryError=nil
+            sleepMutationAttempted=false;sleepLeaseGeneration=nil;sleepLeaseOriginal=nil
+        }
+        model=nextModel;productID=nextProduct;serial=nextSerial;journalIdentity=nextIdentity
+        connectionGeneration += 1
+    }
     private func openTransport() throws {
         guard !hasLostFunctionKeyRecovery else {throw failure("KEY_LEASE_BACKUP","本进程修改过 F4，但原恢复记录缺失，无法确认恢复；已停止重新连接。")}
         closeTransport()
         if testExchange != nil {
             let nextSerial = testSerial?() ?? "self-test"
-            if serial != nextSerial { sleepMutationAttempted = false; sleepLeaseGeneration = nil; sleepLeaseOriginal = nil }
-            connectionGeneration += 1; testConnected = true; serial = nextSerial; journalIdentity = "self-test"; return
+            adoptConnectionIdentity(model,productID,nextSerial,testLocation?() ?? 1)
+            testConnected=true;return
         }
         lockFD = Darwin.open("/tmp/air75-studio-hid-\(getuid()).lock", O_CREAT | O_RDWR | O_CLOEXEC | O_NOFOLLOW, S_IRUSR | S_IWUSR)
         guard lockFD >= 0, flock(lockFD, LOCK_EX | LOCK_NB) == 0 else {
@@ -953,7 +1030,7 @@ final class Air75Device {
             throw failure("HID_IN_USE", "Another Air75 Studio helper already owns the keyboard connection.")
         }
         let m = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-        let matches = [0x1028,0x1026,0x1027].map { product in
+        let matches = USBKeyboardModel.productIDs.map { product in
             [kIOHIDVendorIDKey: 0x19f5, kIOHIDProductIDKey: product, kIOHIDTransportKey:"USB",
              kIOHIDPrimaryUsagePageKey: 1, kIOHIDPrimaryUsageKey: 0] as [String:Any]
         }
@@ -962,7 +1039,7 @@ final class Air75Device {
         // Frequent absent-device checks must not open/close every HID interface
         // or register input callbacks. Open only after one candidate is found.
         guard let all = IOHIDManagerCopyDevices(m) as? Set<IOHIDDevice> else {
-            closeTransport(); throw failure("DEVICE_NOT_FOUND", "等待 Air75 V3 / Kick75 ANSI：请连接数据线，并将键盘切到有线模式。")
+            closeTransport(); throw failure("DEVICE_NOT_FOUND", "等待键盘连接：请连接支持的 NuPhy 键盘，并切到有线模式。")
         }
         let candidates = all.filter {
             USBKeyboardModel.identify(vendor: propertyInt($0, kIOHIDVendorIDKey) ?? 0, product: propertyInt($0, kIOHIDProductIDKey) ?? 0) != nil &&
@@ -970,7 +1047,7 @@ final class Air75Device {
             propertyInt($0, kIOHIDMaxInputReportSizeKey) == 64 && propertyInt($0, kIOHIDMaxOutputReportSizeKey) == 64
         }
         guard !candidates.isEmpty else {
-            closeTransport(); throw failure("DEVICE_NOT_FOUND", "等待 Air75 V3 / Kick75 ANSI：请连接数据线，并将键盘切到有线模式。")
+            closeTransport(); throw failure("DEVICE_NOT_FOUND", "等待键盘连接：请连接支持的 NuPhy 键盘，并切到有线模式。")
         }
         guard candidates.count == 1, let selected = candidates.first else {
             closeTransport()
@@ -986,14 +1063,8 @@ final class Air75Device {
         let nextProduct = propertyInt(selected,kIOHIDProductIDKey) ?? 0
         let nextModel = USBKeyboardModel.identify(vendor: 0x19f5, product: nextProduct)!
         let nextSerial = IOHIDDeviceGetProperty(selected, kIOHIDSerialNumberKey as CFString) as? String ?? ""
-        if nextProduct != productID || nextSerial != serial {
-            // Durable records remain at their original device namespace.
-            backup = nil; mutationAttempted = false; functionKeyMutationAttempted = false; firstPaintVerified = false; lastPaint = nil; firmware = []
-            sleepMutationAttempted = false; sleepLeaseGeneration = nil; sleepLeaseOriginal = nil
-        }
-        model = nextModel; productID = nextProduct; serial = nextSerial
-        device = selected; removed = false; connectionGeneration += 1
-        journalIdentity = serial.isEmpty ? "location-\(locationId)" : serial.utf8.map { String(format: "%02x",$0) }.joined()
+        adoptConnectionIdentity(nextModel,nextProduct,nextSerial,propertyInt(selected,kIOHIDLocationIDKey) ?? 0)
+        device=selected;removed=false
         let context = Unmanaged.passUnretained(self).toOpaque()
         IOHIDDeviceRegisterInputReportCallback(selected, inputBuffer, 64, { context, result, _, _, reportID, report, count in
             guard let context = context else { return }
@@ -1021,19 +1092,34 @@ final class Air75Device {
     }
     private func exchange(_ frame: [UInt8], timeout: TimeInterval = 0.65) throws -> [UInt8] {
         try requireConnected()
-        if let testExchange = testExchange { return try testExchange(frame) }
+        func remainingBudget() throws -> TimeInterval {
+            guard let deadline=functionKeyDeadline else {return timeout}
+            let remaining=deadline-transactionUptime
+            guard remaining>0 else {throw failure("KEY_LEASE_TIMEOUT","功能键操作已超时，原键位记录已保留；未继续修改键盘。")}
+            return min(timeout,remaining)
+        }
+        _ = try remainingBudget()
+        if let testExchange = testExchange {
+            let reply=try testExchange(frame)
+            _ = try remainingBudget()
+            return reply
+        }
         guard let d = device else { throw failure("NOT_CONNECTED", "Connect Air75 V3 or Kick75 by USB first.") }
         // Flush already delivered reports. Never resend an uncertain write or
         // send undocumented opcodes to unstick a desynchronized session.
         pump(0.001)
         replies.removeAll(keepingCapacity: true)
+        let frameBudget=try remainingBudget()
+        // Count the synchronous send against this frame and the whole command.
+        // Starting a new wait after SetReport would renew a nearly spent budget.
+        let deadline = ProcessInfo.processInfo.systemUptime + frameBudget
         let sent = frame.withUnsafeBufferPointer {
             IOHIDDeviceSetReport(d, kIOHIDReportTypeOutput, CFIndex(0), $0.baseAddress!, 64)
         }
+        _ = try remainingBudget()
         guard sent == kIOReturnSuccess else {
             throw failure("HID_WRITE_FAILED", "HID output failed (\(String(format: "0x%08x", sent))); reconnect the cable and close other lighting apps.")
         }
-        let deadline = ProcessInfo.processInfo.systemUptime + timeout
         while ProcessInfo.processInfo.systemUptime < deadline {
             if removed { throw failure("DISCONNECTED", "Keyboard unplugged during a transaction; backup retained.") }
             while !replies.isEmpty {
@@ -1048,11 +1134,16 @@ final class Air75Device {
                                           address: Int(frame[5] ^ key) | Int(frame[6] ^ key) << 8,
                                           handle: frame[7] ^ key, key: key)
                     }
-                    return reply
-                } catch { diagnostic("Ignored unmatched HID reply: \(error)") }
+                } catch { diagnostic("Ignored unmatched HID reply: \(error)");continue }
+                // Late success is also a timeout. Keep this outside the
+                // malformed-reply catch so it cannot be ignored or renewed.
+                _ = try remainingBudget()
+                guard ProcessInfo.processInfo.systemUptime < deadline else {break}
+                return reply
             }
             _ = CFRunLoopRunInMode(.defaultMode, 0.002, true)
         }
+        _ = try remainingBudget()
         throw failure("HID_TIMEOUT", "No valid \(String(format: "%02X", frame[1])) response. Stop other HID clients and reconnect; no blind write retry was performed.")
     }
     private func request(_ command: UInt8, length: Int, address: Int = 0, payload: [UInt8] = []) throws -> [UInt8] {
@@ -1193,12 +1284,12 @@ final class Air75Device {
     }
     private var capabilities: [String: Any] {
         ["perKey": protocolReady && S4.supportsPerKey(firmware, model: model), "sideWholeZone": protocolReady,
-         "sidePixels": false, "mainWholeZone": protocolReady, "stockEffects": protocolReady && model == .kick75, "perKeyFirmwareRequired": model == .kick75 ? "4.0.18.6" : "1.0.16.6", "functionKeyAdaptation": protocolReady && model.supportsFunctionKeyAdaptation(firmware), "protocol": model == .air75 ? "air75-s4" : "kick75-s4", "stateBytes": S4.stateLength(firmware, model: model) ?? 0,
+         "sidePixels": false, "mainWholeZone": protocolReady, "stockEffects": protocolReady && model == .kick75, "perKeyFirmwareRequired": model.minimumFirmware, "functionKeyAdaptation": protocolReady && model.supportsFunctionKeyAdaptation(firmware), "protocol": model.protocolName, "stateBytes": S4.stateLength(firmware, model: model) ?? 0,
          "readProbeVerified": protocolReady, "connectionWake": supportsConnectionWake,"boardSleepLease":supportsBoardSleepLease]
     }
     private var supportsConnectionWake: Bool {
-        connected && protocolReady && model == .air75 && productID == 0x1028 && ledCount == 104 &&
-            firmware.count == 8 && Array(firmware.prefix(6)) == [23,0,1,170,6,0]
+        connected && protocolReady && ledCount == model.totalCount &&
+            model.hasQualifiedFirmware(firmware) && S4.supportsPerKey(firmware,model:model)
     }
     private func requireBoardSleepSupport(refreshIdentity: Bool = false) throws {
         try requireConnected()
@@ -1388,28 +1479,72 @@ final class Air75Device {
                 "firmwareVersion":S4.firmwareVersion(firmware),"readOnly":true,
                 "geometryVerified":true,"modelId":model.rawValue,"productId":productID,
                 "matrixKeyCount":model.matrixKeyCount,"keymapKeyCount":model.keymapKeyCount,
-                "protocol":model == .air75 ? "air75-s4-keymap" : "kick75-s4-keymap",
+                "protocol":model.protocolName + "-keymap",
                 "functionKeyLeaseSupported":model.supportsFunctionKeyAdaptation(firmware) && keyRecovery["blocking"] as? Bool != true,
                 "functionKeyLease":hasFunctionKeyBackup && ownsCurrentFunctionKeyLease && keyRecoveryError == nil,
                 "unownedFunctionKeyHistory":hasFunctionKeyBackup && !ownsCurrentFunctionKeyLease && !hasLostFunctionKeyRecovery,
                 "keyRecovery":keyRecovery]
     }
+    private let factoryFunctionValues = [105,106,32262,32263,32264,32278,172,174,171,168,170,169]
+    private var isolatesSharedFunctionInputs:Bool { model != .air75 && model != .kick75 && model != .air65 }
+    private func validFunctionAssignments(_ saved:FunctionKeyBackup,_ defaults:[[Int]]) -> Bool {
+        guard defaults.count == 2, defaults.allSatisfy({$0.count == model.keymapKeyCount}) else {return false}
+        return saved.assignments.allSatisfy { item in
+            defaults[1].firstIndex(of:item.target) == item.position && defaults[1].lastIndex(of:item.target) == item.position &&
+            defaults[0][item.position] == saved.original[item.position] && saved.original[item.position] == factoryFunctionValues[item.target-58]
+        }
+    }
+    private func plannedFunctionAssignments(_ active:[Int],_ defaults:[[Int]],_ keys:[String]) throws -> [FunctionKeyAssignment] {
+        var result=[FunctionKeyAssignment]()
+        for target in 58...69 where keys.contains("F\(target-57)") {
+            guard let position=defaults[1].firstIndex(of:target),defaults[1].lastIndex(of:target)==position,position<model.matrixKeyCount else {
+                throw failure("KEYMAP_UNSUPPORTED","无法确认功能键的物理位置。")
+            }
+            let original=factoryFunctionValues[target-58]
+            guard active[position]==original,defaults[0][position]==original else {continue}
+            let shared = isolatesSharedFunctionInputs && active.filter{$0==original}.count>1
+            if target==61 || shared {result.append(FunctionKeyAssignment(position:position,target:target))}
+        }
+        return result
+    }
     private func loadFunctionKeyBackup() throws -> FunctionKeyBackup {
         let record:FunctionKeyBackup
         do { record = try JSONDecoder().decode(FunctionKeyBackup.self,from:Data(contentsOf:functionKeyBackupURL)) }
-        catch { throw failure("KEY_LEASE_BACKUP", "F4 原键位备份无法读取，已保留文件并停止修改。") }
+        catch { throw failure("KEY_LEASE_BACKUP", "功能键原键位备份无法读取，已保留文件并停止修改。") }
         guard (record.modelId ?? USBKeyboardModel.air75.rawValue) == model.rawValue,
               (record.productID ?? 0x1028) == productID,
               (record.keymapKeyCount ?? 98) == model.keymapKeyCount,
-              record.firmware.count == 6,record.locationId > 0,(0..<model.matrixKeyCount).contains(record.position),
+              record.firmware.count == 6,record.locationId > 0,
               record.original.count == model.keymapKeyCount,record.original.allSatisfy({(0...65535).contains($0)}),
-              record.original[record.position] == 32263 else {
-            throw failure("KEY_LEASE_BACKUP", "F4 原键位备份格式无效，已停止修改。")
+              !record.assignments.isEmpty,record.assignments.count<=12,
+              record.position==record.assignments[0].position,
+              Set(record.assignments.map{$0.position}).count==record.assignments.count,
+              Set(record.assignments.map{$0.target}).count==record.assignments.count,
+              record.leased == nil || isolatesSharedFunctionInputs,
+              record.assignments.allSatisfy({item in (0..<model.matrixKeyCount).contains(item.position) &&
+                  (58...69).contains(item.target) && record.original[item.position]==factoryFunctionValues[item.target-58]}) else {
+            throw failure("KEY_LEASE_BACKUP", "功能键原键位备份格式无效，已停止修改。")
         }
         return record
     }
-    private func writeFunctionKey(_ position:Int,_ value:Int) throws {
-        guard (0..<model.matrixKeyCount).contains(position),[61,32263].contains(value) else { throw failure("KEY_LEASE_INVALID", "Invalid F4 lease.") }
+    private func verifyFunctionKeyTransaction(_ saved:FunctionKeyBackup,_ journal:Data,_ generation:UInt64,_ location:Int) throws {
+        try requireConnected();try readIdentity()
+        guard protocolReady,model.supportsFunctionKeyAdaptation(firmware),generation==connectionGeneration,location==locationId,
+              ownsCurrentFunctionKeyLease,saved.serial==serial,
+              saved.firmware==Array(firmware.prefix(6)),try loadFunctionKeyBackup()==saved,
+              try Data(contentsOf:functionKeyBackupURL)==journal else {
+            throw failure("KEY_LEASE_CHANGED","连接或原键位记录已改变，已停止修改并保留备份。")
+        }
+    }
+    private func writeFunctionKey(_ position:Int,_ value:Int,expected:Int,saved:FunctionKeyBackup,journal:Data,generation:UInt64,location:Int) throws {
+        guard (0..<model.matrixKeyCount).contains(position),((58...69).contains(value) || factoryFunctionValues.contains(value)) else { throw failure("KEY_LEASE_INVALID", "Invalid F4 lease.") }
+        // A multi-key transaction can yield to other control clients between
+        // writes. Check the actual next slot, never reuse the first snapshot.
+        let current=try request(0xb2,length:2,address:position*2)
+        guard current == [UInt8(expected>>8),UInt8(expected&255)] else {
+            throw failure("KEY_LEASE_CHANGED","功能键已被重新配置，已停止修改并保留新配置。")
+        }
+        try verifyFunctionKeyTransaction(saved,journal,generation,location)
         let bytes=[UInt8(value >> 8),UInt8(value & 255)]
         _ = try request(0xb3,length:2,address:position*2,payload:bytes)
         // The ACK can precede the keymap commit. Read again, never blind-retry a write.
@@ -1420,52 +1555,76 @@ final class Air75Device {
         }
         throw failure("KEY_LEASE_VERIFY", "F4 配置未通过回读检查，原键位备份已保留。")
     }
-    func prepareFunctionKey() throws -> [String:Any] {
-        do {return try performFunctionKeyPreparation()}
+    // The parent JSON request waits 12 seconds. One native key operation has
+    // eight seconds total, including reads and rollback; nested calls cannot
+    // renew it. Expiry retains recovery data and prevents any later USB frame.
+    private func withFunctionKeyBudget<T>(_ operation:()throws->T) throws -> T {
+        let previous=functionKeyDeadline
+        if previous == nil {functionKeyDeadline=transactionUptime+8}
+        defer {functionKeyDeadline=previous}
+        return try operation()
+    }
+    func prepareFunctionKey(_ keys:[String] = ["F4"]) throws -> [String:Any] {
+        guard !keys.isEmpty,keys.allSatisfy({ key in (1...12).contains(where:{key=="F\($0)"}) }) else {throw failure("KEY_LEASE_INVALID","Invalid function keys")}
+        do {return try withFunctionKeyBudget {try performFunctionKeyPreparation(keys)}}
         catch {
             if hasFunctionKeyBackup || functionKeyMutationAttempted {keyRecoveryError=(error as? BridgeError) ?? failure("KEY_RECOVERY_REQUIRED",error.localizedDescription)}
             throw error
         }
     }
-    private func performFunctionKeyPreparation() throws -> [String:Any] {
+    private func performFunctionKeyPreparation(_ keys:[String]) throws -> [String:Any] {
         let map = try readKeymap()
-        guard let mode=map["mode"] as? Int,let active=map["active"] as? [Int],let defaults=map["defaults"] as? [[Int]],
-              let position=defaults[1].firstIndex(of:61),defaults[1].lastIndex(of:61)==position,position<model.matrixKeyCount else {
-            throw failure("KEYMAP_UNSUPPORTED", "无法确认 F4 的物理位置。")
+        guard let mode=map["mode"] as? Int,let active=map["active"] as? [Int],let defaults=map["defaults"] as? [[Int]] else {
+            throw failure("KEYMAP_UNSUPPORTED", "无法确认功能键的物理位置。")
         }
         if hasFunctionKeyBackup {
             guard ownsCurrentFunctionKeyLease else {
-                let error=failure("KEY_LEASE_CONFIRMATION_REQUIRED","检测到上次 F4 适配记录，请先确认当前仍是原键盘并恢复。")
+                let error=failure("KEY_LEASE_CONFIRMATION_REQUIRED","检测到上次功能键适配记录，请先确认当前仍是原键盘并恢复。")
                 keyRecoveryError=error;throw error
             }
             let saved = try loadFunctionKeyBackup()
+            var expected=saved.original
+            for item in saved.assignments {expected[item.position]=item.target}
             guard mode==0,saved.serial==serial,saved.locationId==locationId,
-                  saved.firmware==Array(firmware.prefix(6)),saved.position==position,
-                  active[position]==61,active.indices.allSatisfy({$0==position || active[$0]==saved.original[$0]}) else {
+                  saved.firmware==Array(firmware.prefix(6)),validFunctionAssignments(saved,defaults),active==expected else {
                 throw failure("KEY_LEASE_CHANGED", "键盘配置已改变，请关闭模式并恢复原键位后重试。")
             }
+            let next=try plannedFunctionAssignments(saved.original,defaults,keys)
+            if next != saved.assignments {
+                _ = try restoreFunctionKey()
+                return try performFunctionKeyPreparation(keys)
+            }
             functionKeyMutationAttempted=true;functionKeyOwnerConnection=connectionGeneration;keyRecoveryError=nil
-            return ["leased":true,"verified":true]
+            return ["leased":true,"verified":true,"keys":saved.assignments.map{"F\($0.target-57)"}]
         }
-        guard mode==0,active[position]==32263,defaults[0][position]==32263 else {
-            return ["leased":false,"verified":true]
-        }
+        guard mode==0 else {return ["leased":false,"verified":true,"keys":[]]}
+        let assignments=try plannedFunctionAssignments(active,defaults,keys)
+        guard let first=assignments.first else {return ["leased":false,"verified":true,"keys":[]]}
         guard protocolReady,model.supportsFunctionKeyAdaptation(firmware),locationId>0 else { throw failure("KEYMAP_UNSUPPORTED", "键盘未通过功能键兼容检查。") }
-        let record=FunctionKeyBackup(firmware:Array(firmware.prefix(6)),serial:serial,locationId:locationId,position:position,original:active,
-                                     modelId:model.rawValue,productID:productID,keymapKeyCount:model.keymapKeyCount)
+        let record=FunctionKeyBackup(firmware:Array(firmware.prefix(6)),serial:serial,locationId:locationId,position:first.position,original:active,
+                                     modelId:model.rawValue,productID:productID,keymapKeyCount:model.keymapKeyCount,leased:isolatesSharedFunctionInputs ? assignments : nil)
         try FileManager.default.createDirectory(at:functionKeyBackupURL.deletingLastPathComponent(),withIntermediateDirectories:true,attributes:[.posixPermissions:0o700])
         try JSONEncoder().encode(record).write(to:functionKeyBackupURL,options:.atomic)
         try FileManager.default.setAttributes([.posixPermissions:0o600],ofItemAtPath:functionKeyBackupURL.path)
         let journalHandle = try FileHandle(forWritingTo:functionKeyBackupURL)
         do { try journalHandle.synchronize(); try journalHandle.close() } catch { try? journalHandle.close(); throw error }
-        guard try loadFunctionKeyBackup() == record else { throw failure("KEY_LEASE_BACKUP","F4 原键位备份未通过落盘校验，未修改键位。") }
+        guard try loadFunctionKeyBackup() == record else { throw failure("KEY_LEASE_BACKUP","功能键原键位备份未通过落盘校验，未修改键位。") }
         functionKeyMutationAttempted=true; functionKeyOwnerConnection=connectionGeneration; keyRecoveryError=nil
-        do { try writeFunctionKey(position,61) }
-        catch { _ = try? restoreFunctionKey();throw error }
-        return ["leased":true,"verified":true]
+        let journal=try Data(contentsOf:functionKeyBackupURL),generation=connectionGeneration,location=locationId
+        do {
+            var expected=active
+            for item in assignments {
+                guard try keyLayer(0xb2,0)==expected else {throw failure("KEY_LEASE_CHANGED","键盘配置已改变，已停止接管并保留新配置。")}
+                try writeFunctionKey(item.position,item.target,expected:expected[item.position],saved:record,journal:journal,generation:generation,location:location)
+                expected[item.position]=item.target
+            }
+            try verifyFunctionKeyTransaction(record,journal,generation,location)
+            guard try keyLayer(0xb2,0)==expected else {throw failure("KEY_LEASE_VERIFY","功能键适配未通过完整键位回读。")}
+        } catch { _ = try? restoreFunctionKey();throw error }
+        return ["leased":true,"verified":true,"keys":assignments.map{"F\($0.target-57)"}]
     }
     func restoreFunctionKey() throws -> [String:Any] {
-        do {return try performAutomaticFunctionKeyRestore()}
+        do {return try withFunctionKeyBudget {try performAutomaticFunctionKeyRestore()}}
         catch {
             keyRecoveryError=(error as? BridgeError) ?? failure("KEY_RECOVERY_REQUIRED",error.localizedDescription)
             throw error
@@ -1474,39 +1633,50 @@ final class Air75Device {
     private func performAutomaticFunctionKeyRestore() throws -> [String:Any] {
         guard hasFunctionKeyBackup else {
             guard !functionKeyMutationAttempted else {
-                throw failure("KEY_LEASE_BACKUP","本轮 F4 临时键位的原备份缺失，无法确认恢复；已停止后续修改。")
+                throw failure("KEY_LEASE_BACKUP","本轮 功能键临时键位的原备份缺失，无法确认恢复；已停止后续修改。")
             }
             return ["restored":true]
         }
         guard connected else {return ["restored":false,"deferred":true]}
         guard ownsCurrentFunctionKeyLease else {
-            let error=failure("KEY_LEASE_CONFIRMATION_REQUIRED","检测到上次 F4 适配记录或 USB 接口已改变，请确认同一把键盘后恢复。")
+            let error=failure("KEY_LEASE_CONFIRMATION_REQUIRED","检测到上次功能键适配记录或 USB 接口已改变，请确认同一把键盘后恢复。")
             keyRecoveryError=error;throw error
         }
-        guard protocolReady else {throw compatibilityError ?? failure("UNSUPPORTED_PROTOCOL","键盘兼容性尚未确认，F4 原键位备份已保留，未修改键位。")}
+        guard protocolReady else {throw compatibilityError ?? failure("UNSUPPORTED_PROTOCOL","键盘兼容性尚未确认，功能键原键位备份已保留，未修改键位。")}
         let saved=try loadFunctionKeyBackup(),map=try readKeymap()
-        guard let defaults=map["defaults"] as? [[Int]],defaults[1][saved.position]==61,
-              defaults[0][saved.position]==32263,saved.serial==serial,saved.locationId==locationId else {
-            throw failure("KEY_LEASE_DEVICE", "请将原键盘接回原 USB 接口以恢复 F4。备份已保留。")
+        guard let defaults=map["defaults"] as? [[Int]],validFunctionAssignments(saved,defaults),
+              saved.serial==serial,saved.locationId==locationId else {
+            throw failure("KEY_LEASE_DEVICE", "请将原键盘接回原 USB 接口以恢复功能键。备份已保留。")
         }
-        let current = try keyLayer(0xb2,0)
-        if current[saved.position]==61 {
-            guard saved.firmware==Array(firmware.prefix(6)),current.indices.allSatisfy({$0==saved.position || current[$0]==saved.original[$0]}) else {
-                throw failure("KEY_LEASE_CHANGED", "键盘配置已改变，F4 原键位备份已保留，未覆盖新配置。")
+        let current = try keyLayer(0xb2,0),positions=Set(saved.assignments.map{$0.position})
+        guard saved.firmware==Array(firmware.prefix(6)),current.indices.allSatisfy({positions.contains($0) || current[$0]==saved.original[$0]}) else {
+            throw failure("KEY_LEASE_CHANGED", "键盘配置已改变，原键位备份已保留，未覆盖新配置。")
+        }
+        let journal=try Data(contentsOf:functionKeyBackupURL),generation=connectionGeneration,location=locationId
+        var expected=current,external=false
+        for item in saved.assignments {
+            let latest=try keyLayer(0xb2,0)
+            try verifyFunctionKeyTransaction(saved,journal,generation,location)
+            guard latest.count==saved.original.count,latest.indices.allSatisfy({positions.contains($0) || latest[$0]==saved.original[$0]}) else {
+                throw failure("KEY_LEASE_CHANGED","键盘配置已改变，原键位备份已保留，未覆盖新配置。")
             }
-            try writeFunctionKey(saved.position,32263)
-        } else if current[saved.position] != 32263 {
-            // Another configurator deliberately replaced F4. Preserve its edit
-            // and retain our exact old record in history instead of overwriting.
+            expected=latest
+            external = external || saved.assignments.contains {latest[$0.position] != $0.target && latest[$0.position] != saved.original[$0.position]}
+            if latest[item.position]==item.target {
+                try writeFunctionKey(item.position,saved.original[item.position],expected:item.target,saved:saved,journal:journal,generation:generation,location:location)
+                expected[item.position]=saved.original[item.position]
+            }
+        }
+        try verifyFunctionKeyTransaction(saved,journal,generation,location)
+        guard try keyLayer(0xb2,0)==expected else {throw failure("KEY_LEASE_VERIFY","功能键恢复未通过完整键位回读。")}
+        if external {
+            // Preserve explicit edits while restoring all other owned positions.
             let dir=functionKeyBackupURL.deletingLastPathComponent().appendingPathComponent("key-recovery-history")
             try FileManager.default.createDirectory(at:dir,withIntermediateDirectories:true)
             try FileManager.default.moveItem(at:functionKeyBackupURL,to:dir.appendingPathComponent("function-key-\(UUID().uuidString).json"))
-            functionKeyMutationAttempted=false
-            return ["restored":true,"externalChangePreserved":true]
-        }
-        try FileManager.default.removeItem(at:functionKeyBackupURL)
+        } else {try FileManager.default.removeItem(at:functionKeyBackupURL)}
         functionKeyMutationAttempted=false;functionKeyOwnerConnection=nil;keyRecoveryError=nil;functionKeyRecoveryPreview=nil
-        return ["restored":true,"verified":true]
+        return ["restored":true,"verified":true,"externalChangePreserved":external]
     }
     private var currentFunctionKeyRecoveryIdentity:[String:Any] {
         ["model":model.name,"firmware":S4.firmwareVersion(firmware),"port":locationId]
@@ -1519,8 +1689,7 @@ final class Air75Device {
         guard protocolReady,model.supportsFunctionKeyAdaptation(firmware),saved.serial==serial,
               saved.firmware==Array(firmware.prefix(6)),defaults.count==2,
               defaults[0].count==model.keymapKeyCount,defaults[1].count==model.keymapKeyCount,
-              defaults[1].firstIndex(of:61)==saved.position,defaults[1].lastIndex(of:61)==saved.position,
-              defaults[0][saved.position]==32263,mac==saved.original,
+              validFunctionAssignments(saved,defaults),mac==saved.original,
               try Data(contentsOf:functionKeyBackupURL)==data else {return false}
         let directory=functionKeyBackupURL.deletingLastPathComponent().appendingPathComponent("key-recovery-history")
         try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true,attributes:[.posixPermissions:0o700])
@@ -1571,32 +1740,32 @@ final class Air75Device {
         }
         let map=try readKeymap(),mac=try keyLayer(0xb2,0)
         let defaults=map["defaults"] as? [[Int]] ?? []
-        let positionOK=defaults.count==2 && defaults[0].count==model.keymapKeyCount && defaults[1].count==model.keymapKeyCount &&
-            defaults[1].firstIndex(of:61)==saved.position && defaults[1].lastIndex(of:61)==saved.position && defaults[0][saved.position]==32263
+        let positionOK=validFunctionAssignments(saved,defaults)
         let firmwareOK=saved.firmware==Array(firmware.prefix(6))
         let serialOK=saved.serial==serial
-        let otherKeysOK=mac.count==saved.original.count && mac.indices.allSatisfy{$0==saved.position || mac[$0]==saved.original[$0]}
-        let valueOK=mac.indices.contains(saved.position) && [61,32263].contains(mac[saved.position])
+        let positions=Set(saved.assignments.map{$0.position})
+        let otherKeysOK=mac.count==saved.original.count && mac.indices.allSatisfy{positions.contains($0) || mac[$0]==saved.original[$0]}
+        let valueOK=saved.assignments.allSatisfy{mac.indices.contains($0.position) && [$0.target,saved.original[$0.position]].contains(mac[$0.position])}
         let recordOK=(try Data(contentsOf:functionKeyBackupURL))==data
         let protocolOK=protocolReady && model.supportsFunctionKeyAdaptation(firmware)
         let checks:[[String:Any]]=[
             ["id":"identity","label":"键盘型号、产品及键位结构与原记录一致","passed":true],
             ["id":"firmware","label":"当前固件与原记录一致","passed":firmwareOK],
             ["id":"serial","label":"USB 标识与原记录一致（仍需确认同一把实体键盘）","passed":serialOK],
-            ["id":"position","label":"原厂 F4 位置和功能已验证","passed":positionOK],
-            ["id":"otherKeys","label":"除 F4 外全部原键位保持一致","passed":otherKeysOK],
-            ["id":"f4Value","label":"F4 当前为已知临时键或原始功能","passed":valueOK],
+            ["id":"position","label":"临时功能键的位置和原功能已验证","passed":positionOK],
+            ["id":"otherKeys","label":"临时功能键以外的全部原键位保持一致","passed":otherKeysOK],
+            ["id":"f4Value","label":"当前为已知临时键或原始功能","passed":valueOK],
             ["id":"record","label":"原恢复记录未被更改","passed":recordOK],
-            ["id":"protocol","label":"当前协议允许安全恢复 F4","passed":protocolOK],
+            ["id":"protocol","label":"当前协议允许安全恢复功能键","passed":protocolOK],
             ["id":"port","label":"USB 接口与记录相同（换接口时需确认同一把键盘）","passed":saved.locationId==locationId,"required":false]
         ]
         let canConfirm=firmwareOK && serialOK && positionOK && otherKeysOK && valueOK && recordOK && protocolOK
-        let alreadyRestored=valueOK && mac[saved.position]==32263
+        let alreadyRestored=valueOK && mac==saved.original
         let action=alreadyRestored ? "archiveVerifiedOriginal" : "restore"
         let token=UUID().uuidString
         if canConfirm {
             functionKeyRecoveryPreview=FunctionKeyRecoveryPreview(token:token,journal:data,saved:saved,mac:mac,firmware:Array(firmware.prefix(6)),serial:serial,location:locationId,generation:connectionGeneration,action:action)
-            keyRecoveryError=failure("KEY_LEASE_CONFIRMATION_REQUIRED","请确认当前仍是原键盘；恢复操作只会还原 F4，其他键位保持不变。")
+            keyRecoveryError=failure("KEY_LEASE_CONFIRMATION_REQUIRED","请确认当前仍是原键盘；恢复操作只会还原临时功能键，其他键位保持不变。")
         } else {keyRecoveryError=failure("KEY_RECOVERY_MISMATCH","当前键盘或配置与原恢复记录不一致，已保留备份，未修改任何键位。")}
         return ["token":canConfirm ? token : NSNull() as Any,
                 "original":["model":model.name,"firmware":S4.firmwareVersion(saved.firmware+[0,0]),"port":saved.locationId],
@@ -1604,7 +1773,7 @@ final class Air75Device {
                 "checks":checks,"canConfirm":canConfirm,"action":action,"alreadyRestored":alreadyRestored,"recovery":keyRecovery]
     }
     func confirmFunctionKeyRecovery(_ command:[String:Any]) throws -> [String:Any] {
-        do {return try performConfirmedFunctionKeyRecovery(command)}
+        do {return try withFunctionKeyBudget {try performConfirmedFunctionKeyRecovery(command)}}
         catch {
             if hasFunctionKeyBackup || functionKeyMutationAttempted {keyRecoveryError=(error as? BridgeError) ?? failure("KEY_RECOVERY_REQUIRED",error.localizedDescription)}
             throw error
@@ -1626,16 +1795,21 @@ final class Air75Device {
         let defaults=map["defaults"] as? [[Int]] ?? []
         let saved=try loadFunctionKeyBackup()
         guard saved==preview.saved,Array(firmware.prefix(6))==preview.firmware,saved.firmware==preview.firmware,
-              mac==preview.mac,defaults.count==2,defaults[1].firstIndex(of:61)==saved.position,
-              defaults[1].lastIndex(of:61)==saved.position,defaults[0][saved.position]==32263,
+              mac==preview.mac,validFunctionAssignments(saved,defaults),
               protocolReady,model.supportsFunctionKeyAdaptation(firmware),
               try Data(contentsOf:functionKeyBackupURL)==preview.journal else {
             throw failure("KEY_RECOVERY_STALE","键盘配置已改变，请重新检查后确认。原备份已保留。")
         }
         let shouldWrite=preview.action=="restore"
+        var writtenPositions=[Int]()
         if shouldWrite {
             functionKeyMutationAttempted=true;functionKeyOwnerConnection=connectionGeneration
-            try writeFunctionKey(saved.position,32263)
+            var expected=mac
+            for item in saved.assignments where mac[item.position] == item.target {
+                guard try keyLayer(0xb2,0)==expected else {throw failure("KEY_RECOVERY_STALE","键盘配置已改变，请重新检查后确认。原备份已保留。")}
+                try writeFunctionKey(item.position,saved.original[item.position],expected:item.target,saved:saved,journal:preview.journal,generation:preview.generation,location:preview.location)
+                expected[item.position]=saved.original[item.position];writtenPositions.append(item.position)
+            }
         }
         let restored=try keyLayer(0xb2,0)
         guard restored==saved.original,try Data(contentsOf:functionKeyBackupURL)==preview.journal else {
@@ -1648,7 +1822,7 @@ final class Air75Device {
         let archive=directory.appendingPathComponent("function-key-confirmed-\(UUID().uuidString).json")
         let audit:[String:Any]=["action":preview.action,"sameKeyboardConfirmed":true,"originalPort":saved.locationId,
                                "currentPort":locationId,"model":model.rawValue,"firmware":S4.firmwareVersion(firmware),
-                               "writtenPositions":shouldWrite ? [saved.position] : [],"verifiedKeymapEntries":restored.count,
+                               "writtenPositions":writtenPositions,"verifiedKeymapEntries":restored.count,
                                "archive":archive.lastPathComponent,"confirmedAt":ISO8601DateFormatter().string(from:Date())]
         let auditData=try JSONSerialization.data(withJSONObject:audit,options:[.prettyPrinted,.sortedKeys])
         let auditURL=archive.appendingPathExtension("audit.json")
@@ -1695,7 +1869,7 @@ final class Air75Device {
     }
     private func ensureBackup(requirePerKey: Bool = true) throws {
         _ = try requireConnected()
-        if requirePerKey, model == .kick75, !deferredProfiles.isEmpty {
+        if requirePerKey, model.globalPalette, !deferredProfiles.isEmpty {
             // Kick's D8 palette is global, while D5/D6 state is per profile.
             // Do not create a second profile's baseline from a leased palette.
             throw failure("RECOVERY_REQUIRED", "请先切回原 Mac/Win 档位恢复灯效，再控制另一档位。")
@@ -1804,7 +1978,7 @@ final class Air75Device {
         mutationAttempted = true
         do {
             try writeStateVerified(next)
-            if next.count == 22 || model == .kick75, let saved = backup, saved.customColors == nil {
+            if next.count == 22 || model.globalPalette, let saved = backup, saved.customColors == nil {
                 // Capture the board's loaded custom palette before the first
                 // D8 can change it. The state-only journal already protects
                 // crashes during this temporary switch to custom mode.
@@ -1924,7 +2098,7 @@ final class Air75Device {
                 sideIndicatorObserved = reportBlackout("settle\(Int(delay * 1000))ms", rendered, observed) || sideIndicatorObserved
             }
             guard nonblackKeys(rendered).isEmpty else {
-                throw failure("COLOR_VERIFY_FAILED", "Connection-wake preparation did not verify all 84 main key slots black; diagnostic pixel evidence was retained.")
+                throw failure("COLOR_VERIFY_FAILED", "Connection-wake preparation did not verify all \(model.keyCount) main key slots black; diagnostic pixel evidence was retained.")
             }
             guard S4.ownedStateMatches(ready, observed, firmware: firmware, model: model),
                   let durable = backup, try loadBackup() == durable else {
@@ -1948,7 +2122,7 @@ final class Air75Device {
     }
     private func writeRGB(_ colors: [UInt8], previous: [UInt8]? = nil) throws {
         try verifyLightingProfileForWrite()
-        guard colors.count == model.keyCount * 3 else { throw failure("INVALID_COLORS", "Expected RGB data for 84 keys.") }
+        guard colors.count == model.keyCount * 3 else { throw failure("INVALID_COLORS", "Expected RGB data for \(model.keyCount) keys.") }
         // D8 carries independent index/R/G/B records. Keep the proven 13-record
         // packet size, but do not resend 84 LEDs when only task keys change.
         // First paint, explicit verification and restoration always use a full
@@ -1960,7 +2134,7 @@ final class Air75Device {
         for start in stride(from: 0, to: changed.count, by: 13) {
             let end = min(start + 13, changed.count)
             var records = [UInt8]()
-            for index in changed[start..<end] { records += [UInt8(index)] + Array(colors[(index * 3)..<(index * 3 + 3)]) }
+            for index in changed[start..<end] { records += [UInt8(model.rgbWriteIndices[index])] + Array(colors[(index * 3)..<(index * 3 + 3)]) }
             let echoed = try request(0xd8, length: records.count, payload: records)
             guard echoed == records else { throw failure("COLOR_ACK_MISMATCH", "D8 did not echo the complete indexed RGB records.") }
         }
@@ -1968,7 +2142,7 @@ final class Air75Device {
     }
     func paint(_ colors: [UInt8], verify: Bool) throws -> [String: Any] {
         guard armed else { throw failure("NOT_ARMED", "Call arm before painting the key LEDs.") }
-        guard colors.count == 252 || colors.count == model.keyCount * 3 else { throw failure("INVALID_COLORS", "Invalid canvas size.") }
+        guard colors.count == model.canvasCount * 3 || colors.count == model.keyCount * 3 else { throw failure("INVALID_COLORS", "Invalid canvas size.") }
         let colors = Array(colors.prefix(model.keyCount * 3))
         if colors == lastPaint && !verify { return ["painted": model.keyCount, "skipped": true, "verification": "unchanged"] }
         do {
@@ -3991,12 +4165,12 @@ final class JSONServer {
         case "readBoardSleep": return try device.readBoardSleep()
         case "acquireBoardSleepLease": return try device.acquireBoardSleepLease()
         case "releaseBoardSleepLease": return try device.releaseBoardSleepLease()
-        case "paint": return try device.paint(parseColors(command["colors"], count: 84), verify: command["verify"] as? Bool ?? false)
+        case "paint": return try device.paint(parseColors(command["colors"], count: device.model.canvasCount), verify: command["verify"] as? Bool ?? false)
         case "readColors": return ["colors": hexColors(try device.readRGB()), "ledCount": device.ledCount,
                                    "customColorScale": device.customColorScale]
         case "nativeLighting": return try device.nativeLighting(command)
         case "readKeymap": return try device.readKeymap()
-        case "prepareFunctionKey": return try device.prepareFunctionKey()
+        case "prepareFunctionKey": return try device.prepareFunctionKey(command["keys"] as? [String] ?? ["F4"])
         case "restoreFunctionKey": return try device.restoreFunctionKey()
         case "previewFunctionKeyRecovery": return try device.previewFunctionKeyRecovery()
         case "confirmFunctionKeyRecovery": return try device.confirmFunctionKeyRecovery(command)
@@ -4074,7 +4248,7 @@ final class JSONServer {
             if device.controlReady && device.ownsFunctionKeyChanges {keysDeferred = try device.restoreFunctionKey()["deferred"] as? Bool == true}
             else if device.hasFunctionKeyBackup {
                 guard !device.ownsFunctionKeyChanges else {
-                    throw failure("KEY_RECOVERY_REQUIRED","当前键盘兼容性尚未确认，F4 临时键位尚未恢复，原备份已保留。")
+                    throw failure("KEY_RECOVERY_REQUIRED","当前键盘兼容性尚未确认，功能键临时键位尚未恢复，原备份已保留。")
                 }
                 // Merely identifying an incompatible keyboard never claims an
                 // older journal or touches its keymap during a clean exit.
@@ -4093,6 +4267,128 @@ final class JSONServer {
     }
 }
 
+func testSharedFunctionInputLifecycle(_ check:@escaping (Bool,String)throws->Void) throws {
+    for model in [USBKeyboardModel.node75LP,.node75HP,.node100LP,.node100HP,.air100] {
+        let directory=FileManager.default.temporaryDirectory.appendingPathComponent("nuphylab-shared-input-test-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
+        defer {try? FileManager.default.removeItem(at:directory)}
+        let factory=[105,106,32262,32263,32264,32278,172,174,171,168,170,169]
+        var original=Array(repeating:0,count:model.keymapKeyCount),win=original
+        for i in 0..<12 {original[i+1]=factory[i];win[i+1]=58+i}
+        let expectedPositions=model == .air100 ? [4,11,12] : [4,9,10,11,12]
+        let gestures=model == .air100 ? [170,169] : [32283,168,171,170,169]
+        original.replaceSubrange(model.matrixKeyCount..<model.keymapKeyCount,with:gestures)
+        win.replaceSubrange(model.matrixKeyCount..<model.keymapKeyCount,with:gestures)
+        var mac=original,writes=0,failAt=0,editAt=0,port=1
+        var usbSerial="self-test"
+        var clock:TimeInterval=0,slowAfter:Int?=nil,frameCost:TimeInterval=0
+        let version=model.qualifiedFirmware.split(separator:".").map{UInt8($0)!}
+        let firmware:[UInt8]=[version[2],version[1],version[0],170,version[3],0,0,0]
+        let device=Air75Device(backupURL:directory.appendingPathComponent("lighting.json"),testModel:model,testLocation:{port},testSerial:{usbSerial},testUptime:{clock},testExchange:{frame in
+            let op=frame[1],n=Int(frame[4]),address=Int(frame[5]) | Int(frame[6])<<8
+            if let slowAfter=slowAfter,writes>=slowAfter {clock+=frameCost}
+            var payload=[UInt8]()
+            switch op {
+            case 0xa1:payload=firmware
+            case 0xa0:payload=[0,8,4,model.rows,model.columns,0x80 | UInt8(model.extraKeys),0,0]
+            case 0xd1:payload=[UInt8(model.totalCount)]
+            case 0xd5:payload=[1,50,4,0,1,0,0,5,128,2,20,2,1,0,255,0,0]
+            case 0xd2:payload=Array(repeating:0,count:n)
+            case 0xb1,0xb2:
+                let layerBytes=model.keymapKeyCount*2,layer=address/layerBytes,offset=address%layerBytes
+                let keys=layer==4 ? win : op==0xb1 ? original : mac
+                let bytes=keys.flatMap{[UInt8($0>>8),UInt8($0&255)]}
+                payload=Array(bytes[offset..<offset+n])
+            case 0xb3:
+                try check(n==2 && frame[7]==0 && expectedPositions.contains(address/2),"shared-input lease never addresses touch/encoder or ordinary typing positions")
+                let value=Int(frame[8])<<8 | Int(frame[9])
+                try check(value==57+address/2 || value==original[address/2],"only corresponding F usage or original factory value may be written")
+                writes+=1;mac[address/2]=value;payload=Array(frame[8..<8+n])
+                if writes==editAt {mac[expectedPositions[1]]=4}
+                if writes==failAt {throw failure("HID_TIMEOUT","injected lost ACK after partial lease")}
+            default:throw failure("SELF_TEST","Unexpected shared lease operation")
+            }
+            var reply=[UInt8](repeating:0,count:64);reply[0]=0xaa;reply[1]=op
+            reply.replaceSubrange(4..<8,with:frame[4..<8]);reply.replaceSubrange(8..<8+n,with:payload);reply[3]=S4.checksum(reply);return reply
+        })
+        _ = try device.connect()
+        let keys=(1...12).map{"F\($0)"}
+        let prepared=try device.prepareFunctionKey(keys)
+        try check(prepared["keys"] as? [String] == expectedPositions.map{"F\($0)"},"model exposes only F4 and actual shared-media F keys")
+        try check(writes==expectedPositions.count && Array(mac.suffix(model.extraKeys))==gestures,"all touch/encoder factory gestures stay byte-identical")
+        var expected=original;for position in expectedPositions {expected[position]=57+position}
+        try check(mac==expected,"complete map contains only the bounded F-row changes")
+        let same=writes;_ = try device.prepareFunctionKey(keys)
+        try check(writes==same,"polling verified shared row performs zero repeated writes")
+        _ = try device.restoreFunctionKey()
+        try check(mac==original && !device.hasFunctionKeyBackup,"normal mode exit restores all matrix and gesture entries")
+        // A failed second write must undo the first and the uncertain second.
+        failAt=writes+2
+        do {_ = try device.prepareFunctionKey(keys);throw failure("SELF_TEST","partial shared lease accepted")}
+        catch let error as BridgeError {try check(error.code=="HID_TIMEOUT","partial write failure remains visible")}
+        try check(mac==original && !device.hasFunctionKeyBackup,"partial/uncertain shared lease rolls back completely")
+        failAt=0
+        let beforeSlow=writes,startClock=clock
+        slowAfter=writes+1;frameCost=0.51
+        do {_ = try device.prepareFunctionKey(keys);throw failure("SELF_TEST","slow multi-key transaction exceeded its budget")}
+        catch let error as BridgeError {try check(error.code=="KEY_LEASE_TIMEOUT","one native deadline covers slow frames and nested rollback")}
+        try check(clock-startClock<8.52 && writes>beforeSlow && device.hasFunctionKeyBackup,"deadline retains uncertain partial lease before parent twelve-second timeout")
+        let afterTimeout=writes
+        slowAfter=nil;frameCost=0
+        try check(writes==afterTimeout,"expired operation emits no asynchronous follow-on writes")
+        _ = try device.restoreFunctionKey()
+        try check(mac==original && !device.hasFunctionKeyBackup,"later explicit restore uses a new budget to recover original")
+        editAt=writes+1
+        do {_ = try device.prepareFunctionKey(keys);throw failure("SELF_TEST","interleaved external acquire edit accepted")}
+        catch let error as BridgeError {try check(error.code=="KEY_LEASE_CHANGED","interleaved acquire edit stops remaining writes")}
+        var externallyEdited=original;externallyEdited[expectedPositions[1]]=4
+        try check(mac==externallyEdited && !device.hasFunctionKeyBackup,"acquire rollback preserves newer external edit and restores earlier writes")
+        editAt=0;mac=original
+        _ = try device.prepareFunctionKey(keys)
+        editAt=writes+1
+        let interleavedRestore=try device.restoreFunctionKey()
+        try check(mac==externallyEdited && interleavedRestore["externalChangePreserved"] as? Bool == true && !device.hasFunctionKeyBackup,"per-write restore preserves interleaved external edit and archives original")
+        editAt=0;mac=original
+        _ = try device.prepareFunctionKey(keys)
+        _ = try device.prepareFunctionKey(["F11"])
+        var onlyVolume=original;onlyVolume[11]=68
+        try check(mac==onlyVolume,"changing bindings retires obsolete leases before taking a new one")
+        _ = try device.restoreFunctionKey()
+        _ = try device.prepareFunctionKey(keys)
+        mac[11]=4
+        let preserved=try device.restoreFunctionKey()
+        var edited=original;edited[11]=4
+        try check(mac==edited && preserved["externalChangePreserved"] as? Bool == true && !device.hasFunctionKeyBackup,"external F-row edit is retained while every other leased key is restored")
+        mac=original
+        _ = try device.prepareFunctionKey(keys);device.didRemove();_ = try device.connect()
+        try check(device.keyRecovery["blocking"] as? Bool == true,"replug cannot assume ownership of earlier firmware changes")
+        let preview=try device.previewFunctionKeyRecovery()
+        try check(preview["canConfirm"] as? Bool == true,"full matrix and gesture readback qualifies same-board recovery")
+        _ = try device.confirmFunctionKeyRecovery(["token":preview["token"]!,"sameKeyboard":true])
+        try check(mac==original && !device.hasFunctionKeyBackup,"confirmed recovery restores entire shared row and leaves gestures intact")
+        _ = try device.prepareFunctionKey(keys);device.didRemove();_ = try device.connect()
+        let changedPreview=try device.previewFunctionKeyRecovery()
+        editAt=writes+1
+        do {_ = try device.confirmFunctionKeyRecovery(["token":changedPreview["token"]!,"sameKeyboard":true]);throw failure("SELF_TEST","confirmed recovery overwrote interleaved edit")}
+        catch let error as BridgeError {try check(error.code=="KEY_RECOVERY_STALE","confirmed recovery detects changed whole map before next write")}
+        try check(mac[expectedPositions[1]]==4 && device.hasFunctionKeyBackup,"confirmed recovery retains new edit and pending original")
+        editAt=0;_ = try device.restoreFunctionKey();mac=original
+        // The fake uses the same namespace selection as production, including
+        // a device with no serial moving away and back to its original port.
+        usbSerial="";device.didRemove();_ = try device.connect()
+        _ = try device.prepareFunctionKey(keys)
+        let originalURL=device.functionKeyBackupURL,beforePortMove=writes
+        port=2;device.didRemove();_ = try device.connect()
+        try check(!device.hasLostFunctionKeyRecovery && !device.hasFunctionKeyBackup && FileManager.default.fileExists(atPath:originalURL.path) && writes==beforePortMove,"empty-serial new port never inherits ownership or loses old original")
+        port=1;device.didRemove();_ = try device.connect()
+        try check(device.hasFunctionKeyBackup && !device.hasLostFunctionKeyRecovery && !device.ownsFunctionKeyChanges && writes==beforePortMove,"return to empty-serial original port remains recoverable without restarting")
+        let returnPreview=try device.previewFunctionKeyRecovery()
+        _ = try device.confirmFunctionKeyRecovery(["token":returnPreview["token"]!,"sameKeyboard":true])
+        try check(mac==original && !device.hasFunctionKeyBackup,"same-board confirmation completes empty-serial return recovery")
+        _ = try device.disconnect()
+    }
+}
+
 func testFunctionKeyLifecycle(_ check:@escaping (Bool,String)throws->Void, model:USBKeyboardModel = .air75) throws {
     let dir=FileManager.default.temporaryDirectory.appendingPathComponent("nuphylab-function-lease-test-\(UUID().uuidString)")
     try FileManager.default.createDirectory(at:dir,withIntermediateDirectories:true)
@@ -4103,14 +4399,15 @@ func testFunctionKeyLifecycle(_ check:@escaping (Bool,String)throws->Void, model
     let factory=[105,106,32262,32263,32264,32278,172,174,171,168,170,169]
     for i in 0..<12 {mac[i+1]=factory[i];win[i+1]=58+i}
     let original=mac
-    let initialFirmware:[UInt8] = model == .air75 ? [23,0,1,170,6,0,0,0] : [18,0,4,170,6,0,0,0]
+    let version = model.qualifiedFirmware.split(separator:".").map{UInt8($0)!}
+    let initialFirmware:[UInt8] = [version[2],version[1],version[0],170,version[3],0,0,0]
     var currentFirmware=initialFirmware,mode:UInt8=0,writes=0,denyWrite=false,failAck=false
     let device=Air75Device(backupURL:dir.appendingPathComponent("lighting.json"),testModel:model,testExchange:{ frame in
         let op=frame[1],n=Int(frame[4]),address=Int(frame[5]) | Int(frame[6]) << 8
         var payload=[UInt8]()
         switch op {
         case 0xa1: payload=currentFirmware
-        case 0xa0: payload=[mode,8,4,6,model.columns,2,0,0]
+        case 0xa0: payload=[mode,8,4,model.rows,model.columns,0x80 | UInt8(model.extraKeys),0,0]
         case 0xd1: payload=[UInt8(model.totalCount)]
         case 0xd5: payload=model == .air75 ? [6,25,4,0,1,0,0,1,64,4,60,0,1,0,255,0,0,0,0,0,0,0] : [6,25,4,0,1,0,0,1,64,2,60,0,1,0,255,0,0]
         case 0xd2: payload=Array(repeating:0,count:n)
@@ -4136,7 +4433,7 @@ func testFunctionKeyLifecycle(_ check:@escaping (Bool,String)throws->Void, model
     journal=device.functionKeyBackupURL
     let initialMap=try device.readKeymap()
     try check(initialMap["matrixKeyCount"] as? Int == model.matrixKeyCount && initialMap["keymapKeyCount"] as? Int == model.keymapKeyCount,"model-specific matrix excludes only its encoder entries")
-    try check(initialMap["functionKeyLeaseSupported"] as? Bool == true && initialMap["protocol"] as? String == (model == .air75 ? "air75-s4-keymap" : "kick75-s4-keymap"),"function-key protocol capability belongs to the identified model")
+    try check(initialMap["functionKeyLeaseSupported"] as? Bool == true && initialMap["protocol"] as? String == (model.protocolName + "-keymap"),"function-key protocol capability belongs to the identified model")
     try check(try device.prepareFunctionKey()["leased"] as? Bool == true,"factory F4 leased")
     try check(mac[4]==61 && writes==1,"only factory F4 becomes standard F4")
     _ = try device.prepareFunctionKey()
@@ -4202,7 +4499,7 @@ func testFunctionKeyLifecycle(_ check:@escaping (Bool,String)throws->Void, model
         try check(!KeyAdaptation.validMappings([row],bluetooth:true),"factory special usage is not guessed for Bluetooth")
         try check(KeyAdaptation.serviceAcceptsSource(src,conforms:{p,u in p==page && u==(page==1 ? 0x80 : 1)}),"special usage targets its own HID service collection")
     }
-    for (address,payload):(Int,[UInt8]) in [(1,[0,61]),(196,[0,61]),(8,[0,4]),(8,[])] {
+    for (address,payload):(Int,[UInt8]) in [(1,[0,61]),(228,[0,61]),(8,[0,4]),(8,[])] {
         do {_ = try S4.frame(command:0xb3,length:2,address:address,payload:payload,key:0);throw failure("SELF_TEST","arbitrary B3 accepted")}
         catch let error as BridgeError {try check(error.code=="INVALID_FRAME","B3 cannot write arbitrary keys/layers")}
     }
@@ -5280,10 +5577,12 @@ func testKickLifecycle(_ check: (Bool,String) throws -> Void) throws {
     let upgraded = Air75Device(backupURL:base,testModel:.kick75,testExchange:{try latest.exchange($0)})
     let identified = try upgraded.connect()
     try check((identified["capabilities"] as? [String:Any])?["perKey"] as? Bool == true,"qualified Kick 4.0.18.6 exposes its D8 capability")
-    let beforeConnectionWake = latest.writes
-    try check((identified["capabilities"] as? [String:Any])?["connectionWake"] as? Bool == false,"qualified Kick never advertises AIR connection-wake preparation")
-    do { _ = try upgraded.armConnectionWake(); throw failure("SELF_TEST","Kick accepted AIR connection wake") }
-    catch let error as BridgeError { try check(error.code == "CONNECTION_WAKE_UNSUPPORTED" && latest.writes == beforeConnectionWake,"Kick rejects AIR connection wake before mutation") }
+    try check((identified["capabilities"] as? [String:Any])?["connectionWake"] as? Bool == true,"qualified Kick exposes connection wake")
+    try check((identified["capabilities"] as? [String:Any])?["boardSleepLease"] as? Bool == false,"Kick does not inherit AIR sleep writes")
+    _ = try upgraded.armConnectionWake()
+    try check(latest.colors.prefix(240).allSatisfy{$0 == 0},"Kick wake starts with a verified black main palette")
+    _ = try upgraded.restore()
+    try check(latest.state == originalState && latest.colors == originalColors && !upgraded.recoveryPending,"Kick wake restores its exact original state and palette")
     _ = try upgraded.arm()
     let captured = try upgraded.journals.read(upgraded.backupURL,serial:"self-test")
     try check(captured.customColors == Array(originalColors.prefix(240)),"new Kick captures its global original palette before any D8 write")
@@ -5302,6 +5601,94 @@ func testKickLifecycle(_ check: (Bool,String) throws -> Void) throws {
     try check(latest.state == dimmed && latest.colors == originalColors,"Kick raw custom rendering can restore a dimmed mode21 baseline without the AIR legacy restriction")
     _ = try upgraded.disconnect()
 
+}
+
+// Model-parametric transport fixtures: no HID device is opened by these checks.
+func testAdditionalModelLifecycles(_ check: (Bool,String) throws -> Void) throws {
+    final class Board {
+        let model:USBKeyboardModel
+        var firmware:[UInt8]
+        var state:[UInt8] = [6,50,2,0,1,0,0,5,128,0,60,2,0,0,255,0,0]
+        var colors:[UInt8]
+        var writes=0, profile:UInt8=0
+        var indices=Set<Int>()
+        init(_ model:USBKeyboardModel) {
+            self.model=model
+            let v=model.qualifiedFirmware.split(separator:".").map{UInt8($0)!}
+            firmware=[v[2],v[1],v[0],170,v[3],0,0,0]
+            colors=(0..<(model.totalCount*3)).map{UInt8($0 % 127)}
+        }
+        func exchange(_ frame:[UInt8]) throws -> [UInt8] {
+            let cmd=frame[1],n=Int(frame[4]),address=Int(frame[5]) | Int(frame[6]) << 8
+            var payload:[UInt8]
+            switch cmd {
+            case 0xa1:payload=firmware
+            case 0xa0:payload=[profile,8,4,model.rows,model.columns,UInt8(128+model.extraKeys),0,0]
+            case 0xd1:payload=[UInt8(model.totalCount)]
+            case 0xd5:payload=state;payload[5]=UInt8(writes % 255);payload[13]=UInt8((writes+19) % 255)
+            case 0xd2:payload=Array(colors[address..<(address+n)])
+            case 0xb1,0xb2:payload=Array(repeating:0,count:n)
+            case 0xd6:
+                writes+=1;payload=Array(frame[8..<(8+n)])
+                for i in 0..<n where ![5,13].contains(address+i) {state[address+i]=payload[i]}
+            case 0xd8:
+                writes+=1;payload=Array(frame[8..<(8+n)])
+                for offset in stride(from:0,to:n,by:4) {
+                    let i=Int(payload[offset])
+                    guard i<model.keyCount else {throw failure("SELF_TEST","D8 touched non-key slot")}
+                    indices.insert(i)
+                    // D2 compacts the immutable firmware matrix map.
+                    guard let logical=model.rgbWriteIndices.firstIndex(of:i) else {throw failure("SELF_TEST","unknown physical RGB address")}
+                    colors.replaceSubrange(logical*3..<(logical*3+3),with:payload[(offset+1)..<(offset+4)])
+                }
+            default:throw failure("SELF_TEST","Unexpected model fixture command")
+            }
+            guard payload.count==n else {throw failure("SELF_TEST","Model fixture reply size")}
+            var reply=[UInt8](repeating:0,count:64);reply[0]=0xaa;reply[1]=cmd
+            reply.replaceSubrange(4..<8,with:frame[4..<8]);reply.replaceSubrange(8..<(8+n),with:payload)
+            reply[3]=S4.checksum(reply);return reply
+        }
+    }
+    let dir=FileManager.default.temporaryDirectory.appendingPathComponent("nuphylab-model-test-\(UUID().uuidString)")
+    try FileManager.default.createDirectory(at:dir,withIntermediateDirectories:true)
+    defer {try? FileManager.default.removeItem(at:dir)}
+    var paths=Set<String>()
+    for model in USBKeyboardModel.allCases where model != .air75 && model != .kick75 {
+        let board=Board(model),originalState=Board(model).state,originalColors=Board(model).colors
+        let device=Air75Device(backupURL:dir.appendingPathComponent("original.json"),testModel:model,testExchange:board.exchange)
+        let info=try device.connect(),caps=info["capabilities"] as? [String:Any] ?? [:]
+        try check(info["modelId"] as? String == model.rawValue && device.ledCount==model.totalCount,"\(model) exact USB/LED identity")
+        try check(caps["perKey"] as? Bool == true && caps["connectionWake"] as? Bool == true && caps["boardSleepLease"] as? Bool == false,"\(model) qualified lighting without AIR sleep commands")
+        let map=try device.readKeymap()
+        try check(map["keymapKeyCount"] as? Int == model.keymapKeyCount && map["matrixKeyCount"] as? Int == model.matrixKeyCount,"\(model) full matrix and all touchbar/encoder entries")
+        try check(caps["functionKeyAdaptation"] as? Bool == (model != .air65),"\(model) physical function-row capability")
+        for offset in 0..<17 {
+            var changed=originalState;changed[offset] ^= 1
+            try check(S4.statesMatch(originalState,changed,firmware:board.firmware,model:model) == [5,13].contains(offset),"\(model) only the proven unpopulated fields may drift")
+        }
+        _ = try device.armConnectionWake()
+        try check(board.colors.prefix(model.keyCount*3).allSatisfy{$0==0},"\(model) wake black frame verified")
+        try check(paths.insert(device.backupURL.path).inserted,"\(model) distinct recovery namespace")
+        let paint=(0..<(model.canvasCount*3)).map{UInt8($0 % 251)}
+        _ = try device.paint(paint,verify:true)
+        try check(board.indices==Set(0..<model.keyCount) && Array(board.colors.prefix(model.keyCount*3))==Array(paint.prefix(model.keyCount*3)),"\(model) every key including indices above 83 receives exact RGB")
+        try check(Array(board.colors.suffix(model.sideCount*3))==Array(originalColors.suffix(model.sideCount*3)),"\(model) per-key writes exclude side LEDs")
+        board.profile=1;_ = try device.status();let beforeProfile=board.writes
+        do {_ = try device.arm();throw failure("SELF_TEST","cross-profile global palette lease")}
+        catch let error as BridgeError {try check(error.code=="RECOVERY_REQUIRED" && board.writes==beforeProfile,"\(model) retains global palette owner across profile switch")}
+        board.profile=0;_ = try device.status();_ = try device.restore()
+        try check(board.state==originalState && board.colors==originalColors && !device.recoveryPending,"\(model) exact state and palette restored")
+        _ = try device.disconnect()
+        for versionDelta:UInt8 in [255,1] {
+            let unqualified=Board(model);unqualified.firmware[0] &+= versionDelta
+            let reader=Air75Device(backupURL:dir.appendingPathComponent("unknown.json"),testModel:model,testExchange:unqualified.exchange)
+            let status=try reader.connect()
+            try check(status["readOnly"] as? Bool == true,"\(model) unqualified older/future firmware stays read-only")
+            do {_ = try reader.armConnectionWake();throw failure("SELF_TEST","unknown firmware armed")}
+            catch let error as BridgeError {try check(error.code=="CONNECTION_WAKE_UNSUPPORTED" && unqualified.writes==0,"\(model) no unknown-firmware writes")}
+            _ = try reader.disconnect()
+        }
+    }
 }
 
 func selfTest() throws {
@@ -5659,13 +6046,15 @@ func selfTest() throws {
         }
     }
     try testKickLifecycle(check)
+    try testAdditionalModelLifecycles(check)
+    try testSharedFunctionInputLifecycle(check)
     try testConnectionRecoveryProbes(check)
     try testIdentifiedReadOnlyLifecycle(check)
     try testConnectionWakeLifecycle(check)
     try testBoardSleepLifecycle(check)
     try testFirmwareUpgradeLifecycle(check)
     try testFunctionKeyLifecycle(check)
-    try testFunctionKeyLifecycle(check,model:.kick75)
+    for model in USBKeyboardModel.allCases where model != .air75 && model != .air65 {try testFunctionKeyLifecycle(check,model:model)}
     try testFunctionKeyRecoveryLifecycle(check,model:.air75)
     try testFunctionKeyRecoveryLifecycle(check,model:.kick75)
     emit(["ok": true, "selfTest": "passed", "checks": checks, "hardwareOpened": false, "inputMonitorOpened": false])

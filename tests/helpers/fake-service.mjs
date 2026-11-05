@@ -17,6 +17,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { LEGACY_COMMAND_IDS } from '../../shared/codex-keys.mjs';
 
+const modelsURL = new URL('../../shared/keyboard-models.mjs',import.meta.url).href;
 const mainURL = new URL("../../server/main.mjs", import.meta.url);
 const codexURL = new URL("../../server/codex.mjs", import.meta.url).href;
 const firmwareURL = new URL("../../server/firmware.mjs", import.meta.url).href;
@@ -68,14 +69,17 @@ export async function fakeService(t, initialControl = {}, options = {}) {
 import {createInterface} from 'node:readline';
 import {readFileSync,appendFileSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
+import {getKeyboardProfile} from ${JSON.stringify(modelsURL)};
 const controlFile=${JSON.stringify(controlFile)}, logFile=${JSON.stringify(logFile)};
 const configuration=()=>{try{return JSON.parse(readFileSync(controlFile,'utf8'));}catch{return {};}};
+const profile=()=>getKeyboardProfile(configuration().modelId??'air75-v3');
 const initial=configuration();
+let lightingModel=initial.modelId??'air75-v3';
 let connected=false,armed=false,pending=false,failedGeneration=0,disconnectGeneration=0,triggerGeneration=0,triggerCode=null;
 let recoveryConfirmed=false,recoveryPreviewSequence=0,recoveryPreviewToken=null;
 let simulatedDictating=initial.dictationInitiallyRecording===true,simulatedDictationOwner=null,simulatedFast=false;
 const original=initial.originalLightingState??[1,100,0,0,0,0,0,0,0,2,65,0,0,0,19,51,68];
-const originalColors=initial.originalColors??Array(104).fill('#000000');
+let originalColors=initial.originalColors??Array(profile().keyCount+profile().sideCount).fill('#000000');
 // Service-level transaction double only: this does not simulate electrical
 // visibility between native D6/D8 packets or prove flash-free first capture.
 const modelVisibleLighting=initial.connectionWake===true||initial.recordVisibleWrites===true||Object.hasOwn(initial,'originalColors')||Object.hasOwn(initial,'initialColors');
@@ -107,12 +111,12 @@ let colors=[...(initial.initialColors??originalColors)];
 const log=(entry)=>appendFileSync(logFile,JSON.stringify(entry)+'\\n');
 const send=(entry)=>process.stdout.write(JSON.stringify(entry)+'\\n');
 const visible=(operation,extra={})=>{if(configuration().recordVisibleWrites)log({event:'simulatedVisibleWrite',operation,colors:[...colors],state:[...lighting],...extra});};
-const sideColors=(color,brightness)=>Array(20).fill('#'+[1,3,5].map(start=>Math.round(parseInt(color.slice(start,start+2),16)*brightness/100).toString(16).padStart(2,'0')).join(''));
+const sideColors=(color,brightness)=>Array(profile().sideCount).fill('#'+[1,3,5].map(start=>Math.round(parseInt(color.slice(start,start+2),16)*brightness/100).toString(16).padStart(2,'0')).join(''));
 const codexLaunchedAt=Date.now();
 const permissions=()=>({inputMonitoring:false,accessibility:false,canPostEvents:false,...configuration().permissions,promptsRequested:false});
 const keyRecovery=()=>recoveryConfirmed?{status:'none',pending:false,blocking:false}:configuration().keyRecovery??{status:functionKeyLease?'active':'none',pending:functionKeyLease,blocking:false};
 const selectProfile=()=>{const next=configuration().lightingProfile??0;if(next!==lightingProfile){lightingProfile=next;armed=false;pending=pendingProfiles.has(next);lighting=[...original];}};
-const state=()=>({...configuration().outputIdentity,keyRecovery:keyRecovery(),functionKeyRecoveryPending:keyRecovery().pending,connected,identified:configuration().outputIdentity?.identified??connected,firmwareDetectionAvailable:connected,readOnly:configuration().readOnly===true,error:configuration().readOnly?'灯位数量校验失败：应为 85，实际为 218。已停止灯效写入。':null,errorCode:configuration().readOnly?'WRONG_LED_COUNT':null,armed,recoveryPending:pending,needsRestore:pending,deferredProfiles:[...pendingProfiles].filter(p=>p!==lightingProfile),lightingProfile,state:[...lighting],firmwareVersion:configuration().firmwareVersion??'1.0.16.6',functionRowSessionId:configuration().consumerBridge?consumerSession:undefined,modelId:configuration().modelId??'air75-v3',model:configuration().modelId==='kick75'?'Kick75 ANSI':'Air75 V3 ANSI',keyLedCount:configuration().outputIdentity?.keyLedCount??(configuration().modelId==='kick75'?80:84),capabilities:{...(configuration().consumerBridge?{consumerControlVersion:1}:{}),...(Object.hasOwn(configuration(),'readProbeVerified')?{readProbeVerified:configuration().readProbeVerified}:{}),...(Object.hasOwn(configuration(),'connectionWake')?{connectionWake:configuration().connectionWake}:{}),perKey:configuration().readOnly?false:configuration().compatible??true,mainWholeZone:configuration().readOnly?false:configuration().mainWholeZone??false,functionKeyAdaptation:configuration().readOnly?false:configuration().functionKeyAdaptation??true},permissions:permissions()});
+const state=()=>({...configuration().outputIdentity,keyRecovery:keyRecovery(),functionKeyRecoveryPending:keyRecovery().pending,connected,identified:configuration().outputIdentity?.identified??connected,firmwareDetectionAvailable:connected,readOnly:configuration().readOnly===true,error:configuration().readOnly?'灯位数量校验失败：应为 85，实际为 218。已停止灯效写入。':null,errorCode:configuration().readOnly?'WRONG_LED_COUNT':null,armed,recoveryPending:pending,needsRestore:pending,deferredProfiles:[...pendingProfiles].filter(p=>p!==lightingProfile),lightingProfile,state:[...lighting],firmwareVersion:configuration().firmwareVersion??'1.0.16.6',functionRowSessionId:configuration().consumerBridge?consumerSession:undefined,modelId:configuration().modelId??'air75-v3',model:profile().name+' ANSI',keyLedCount:configuration().outputIdentity?.keyLedCount??profile().keyCount,capabilities:{...(configuration().consumerBridge?{consumerControlVersion:1}:{}),...(Object.hasOwn(configuration(),'readProbeVerified')?{readProbeVerified:configuration().readProbeVerified}:{}),...(Object.hasOwn(configuration(),'connectionWake')?{connectionWake:configuration().connectionWake}:{}),perKey:configuration().readOnly?false:configuration().compatible??true,mainWholeZone:configuration().readOnly?false:configuration().mainWholeZone??false,functionKeyAdaptation:configuration().readOnly?false:configuration().functionKeyAdaptation??true},permissions:permissions()});
 if(configuration().recordHelperPid)log({event:'simulatedHelperStarted',pid:process.pid});
 const answer=(request,result)=>{
  const delay=configuration().operationDelays?.[request.op];
@@ -135,7 +139,7 @@ input.on('line',line=>{
  const request=JSON.parse(line);log(request);
  if(!connected&&!['connect','status','quit','disconnect','restore','restoreKeys','restoreFunctionKey','triggerMonitor','permissions','openPermissionSettings','bluetoothDevices','shortcut','codexControl','codexProcess','codexPrepare'].includes(request.op)&&!(['adaptKeys','keyMappingStatus'].includes(request.op)&&request.transport==='bluetooth'&&configuration().bluetoothDevices?.length===1)){reject(request,'simulated not connected');return;}
  switch(request.op){
-  case 'connect':if(configuration().present===false){reject(request,'not present','DEVICE_NOT_FOUND');break;}selectProfile();connected=true;answer(request,state());break;
+  case 'connect':if(lightingModel!==(configuration().modelId??'air75-v3')){lightingModel=configuration().modelId??'air75-v3';originalColors=Array(profile().keyCount+profile().sideCount).fill('#000000');colors=[...originalColors];}if(configuration().present===false){reject(request,'not present','DEVICE_NOT_FOUND');break;}selectProfile();connected=true;answer(request,state());break;
   case 'status':{selectProfile();const snapshot=state();if(configuration().connectionWakeFailure)log({event:'simulatedWakeFailureStatus',connected:snapshot.connected,armed:snapshot.armed,recoveryPending:snapshot.recoveryPending,needsRestore:snapshot.needsRestore});answer(request,snapshot);break;}
   case 'permissions':answer(request,permissions());break;
   case 'readInputConnection':answer(request,consumerConnection());break;
@@ -188,7 +192,7 @@ input.on('line',line=>{
   case 'keyMappingStatus':answer(request,{verified:!configuration().mappingLost});break;
   case 'readKeymap':{
    if(configuration().consumerBridge){answer(request,consumerKeymap());break;}
-   const standard=Array(configuration().modelId==='kick75'?92:98).fill(0);for(let i=1;i<=12;i++)standard[i]=57+i;
+   const standard=Array(profile().rows*profile().columns+profile().extraKeys).fill(0);for(let i=1;i<=12;i++)standard[i]=57+i;
    const map=structuredClone(configuration().keymap??{mode:0,locationId:1,firmwareVersion:configuration().firmwareVersion??'1.0.16.6',active:standard,defaults:[standard,standard]});
    if(functionKeyLease){map.active[map.defaults[1].indexOf(61)]=61;map.functionKeyLease=true;}if(keyRecovery().blocking){map.functionKeyLeaseSupported=false;map.functionKeyLease=false;map.keyRecovery=keyRecovery();}
    const keymapDelayMs=configuration().keymapDelayMs;
@@ -255,10 +259,10 @@ input.on('line',line=>{
   case 'armConnectionWake':{
    if(configuration().connectionWake!==true){reject(request,'Connection wake takeover is unavailable.','CONNECTION_WAKE_UNSUPPORTED');break;}
    const reusedJournal=pending,previousColors=[...colors];
-   const custom=configuration().originalCustomColors,quietPreparation=reusedJournal&&Array.isArray(custom)&&custom.length===252&&custom.every(value=>Number.isInteger(value)&&value>=0&&value<=255);
+   const custom=configuration().originalCustomColors,quietPreparation=reusedJournal&&Array.isArray(custom)&&custom.length===profile().keyCount*3&&custom.every(value=>Number.isInteger(value)&&value>=0&&value<=255);
    // Log the completed transaction, not the transient capture path. Native
    // first capture can expose the old palette and reports quietPreparation=false.
-   armed=true;pending=true;pendingProfiles.add(lightingProfile);lighting[0]=21;lighting[1]=100;lighting[4]=1;if(lighting.length===22)lighting.splice(6,3,255,255,255);lighting[10]=0;colors=Array(104).fill('#000000');
+   armed=true;pending=true;pendingProfiles.add(lightingProfile);lighting[0]=21;lighting[1]=100;lighting[4]=1;if(lighting.length===22)lighting.splice(6,3,255,255,255);lighting[10]=0;colors=Array(profile().keyCount+profile().sideCount).fill('#000000');
    const wakeFailure=configuration().connectionWakeFailure;
    if(wakeFailure){
     armed=false;colors[0]='#010203';
@@ -273,14 +277,14 @@ input.on('line',line=>{
    visible('armConnectionWake',{reusedJournal,previousColors,quietPreparation});answer(request,{...state(),verified:true,quietPreparation});break;
   }
   case 'side':
-   if(request.restore){lighting.splice(9,8,...original.slice(9,17));if(modelVisibleLighting)colors=[...colors.slice(0,84),...originalColors.slice(84)];}
-   else{pending=true;pendingProfiles.add(lightingProfile);lighting[9]=2;lighting[10]=request.brightness;lighting.splice(14,3,...[1,3,5].map(i=>parseInt(request.color.slice(i,i+2),16)));if(modelVisibleLighting)colors=[...colors.slice(0,84),...sideColors(request.color,request.brightness)];}
+   if(request.restore){lighting.splice(9,8,...original.slice(9,17));if(modelVisibleLighting)colors=[...colors.slice(0,profile().keyCount),...originalColors.slice(profile().keyCount)];}
+   else{pending=true;pendingProfiles.add(lightingProfile);lighting[9]=2;lighting[10]=request.brightness;lighting.splice(14,3,...[1,3,5].map(i=>parseInt(request.color.slice(i,i+2),16)));if(modelVisibleLighting)colors=[...colors.slice(0,profile().keyCount),...sideColors(request.color,request.brightness)];}
    visible('side');answer(request,{state:[...lighting]});break;
   case 'paint':{
    if(!armed){reject(request,'simulated NOT_ARMED');break;}
    const generation=configuration().failPaint??0;
    if(generation>failedGeneration){failedGeneration=generation;restore();log({event:'simulatedRollback'});reject(request,'simulated paint failure; original lighting restored');}
-   else {const commit=()=>{const keyCount=configuration().modelId==='kick75'?80:84;colors=[...request.colors,...(modelVisibleLighting?colors.slice(keyCount):Array(20).fill('#000000'))];visible('paint');answer(request,{painted:keyCount});};if(configuration().paintDelayMs)setTimeout(commit,configuration().paintDelayMs);else commit();}break;
+   else {const commit=()=>{const keyCount=profile().keyCount;colors=[...request.colors.slice(0,keyCount),...(modelVisibleLighting?colors.slice(keyCount):Array(profile().sideCount).fill('#000000'))];visible('paint');answer(request,{painted:keyCount});};if(configuration().paintDelayMs)setTimeout(commit,configuration().paintDelayMs);else commit();}break;
   }
   case 'restore':if(!connected&&configuration().present===false){reject(request,'simulated not connected','DEVICE_NOT_FOUND');break;}connected=true;restore();answer(request,{...state(),restored:true,verified:true});break;
   case 'disconnect':if(configuration().failDisconnect){reject(request,'原设置尚未恢复，模拟释放失败','RESTORE_REQUIRED');break;}if(!configuration().deferRestore)restore();connected=false;armed=false;answer(request,{...state(),unownedFunctionKeyHistory:configuration().unownedFunctionKeyHistory===true,unsafeWritesNeeded:configuration().unsafeWritesNeeded===true,historicalRecoveryLost:configuration().historicalRecoveryLost===true});break;
@@ -327,6 +331,7 @@ export class ClaudeActionRunner extends RealRunner {
   const fakeFirmware = path.join(dir, "fake-firmware.mjs");
   await writeFile(fakeFirmware, `
 import {readFileSync} from 'node:fs';
+import {getKeyboardProfile} from ${JSON.stringify(modelsURL)};
 import {FirmwareChecker as RealChecker} from ${JSON.stringify(firmwareURL + "?real")};
 export * from ${JSON.stringify(firmwareURL + "?real")};
 export class FirmwareChecker extends RealChecker {
@@ -337,7 +342,7 @@ export class FirmwareChecker extends RealChecker {
    signal.addEventListener('abort',()=>{clearTimeout(t);reject(new Error('aborted'));},{once:true});
   });
   if(c.firmwareOffline) throw new Error('offline');
-  return new Response(JSON.stringify({code:200,data:{businessId:c.modelId==='kick75'?'1930094363885735938':'1930212869851615233',environment:'prod',type:'1',status:'0',versionNumber:c.latestFirmware??(c.modelId==='kick75'?'4.0.18.6':'1.0.16.6')}}));
+  return new Response(JSON.stringify({code:200,data:{businessId:getKeyboardProfile(c.modelId??'air75-v3').businessId,environment:'prod',type:'1',status:'0',versionNumber:c.latestFirmware??(c.modelId&&c.modelId!=='air75-v3'?getKeyboardProfile(c.modelId).qualifiedFirmware:'1.0.16.6')}}));
  }});}
 }
 `);

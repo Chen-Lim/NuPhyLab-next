@@ -1,3 +1,5 @@
+import {isKeyboardModel} from '../../shared/keyboard-models.mjs';
+import {getLayoutModel} from '../../shared/layout.mjs';
 import {friendlyConnectionError} from './KeyRecoveryPanel';
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppState, Key, Notify } from "./types";
@@ -37,7 +39,7 @@ export function useAirApi(notify: Notify) {
   const appliedRefresh = useRef(0);
   const layoutSignature = useRef("");
   const applyLayout = useCallback((keys: Key[], modelId?: string) => {
-    const model = modelId === "kick75" || modelId === "air75-v3" ? modelId : keys.length === 80 ? "kick75" : "air75-v3";
+    const model = isKeyboardModel(modelId) ? modelId : getLayoutModel();
     // Animation thumbnails use the shared module geometry, alongside React.
     setLayoutModel(model);
     const signature = model + JSON.stringify(keys);

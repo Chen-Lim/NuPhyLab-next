@@ -1,0 +1,15 @@
+{
+  "version": "1.2.40",
+  "zh-CN": [
+    "新增 NODE75、NODE100 的 LP / HP 布局，以及 AIR65 V3、AIR100 V3 的 USB 适配和独立作品画布。",
+    "为兼容固件上的支持型号加入连接动画，按型号检查官方固件版本。",
+    "NODE 触摸条保留原手势，AI 模式按需隔离与功能键共用的媒体输入，退出后恢复原键位。",
+    "AIR65 V3 没有实体 F 区，不提供 F1–F12 自动接管。新增型号中，实体检查目前仅覆盖 NODE75 LP；其余型号仍需实机验证。"
+  ],
+  "en": [
+    "Add USB profiles and separate artwork canvases for NODE75 and NODE100 LP / HP, AIR65 V3 and AIR100 V3.",
+    "Add the connection animation to supported models with compatible firmware, with model-specific official firmware checks.",
+    "Preserve NODE touch gestures while separating shared media inputs from AI function keys as needed; restore the original keymap when leaving AI mode.",
+    "AIR65 V3 has no physical function row and does not support automatic F1–F12 takeover. Among newly added models, physical checks currently cover NODE75 LP only; the other models still need hardware validation."
+  ]
+}

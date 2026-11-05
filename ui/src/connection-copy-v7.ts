@@ -1,3 +1,4 @@
+import {getKeyboardProfile,isKeyboardModel} from '../../shared/keyboard-models.mjs';
 import { language } from './i18n';
 import type { ConnectionDisplay, ConnectionDisplayCopy } from '../../shared/connection-display.mjs';
 
@@ -31,8 +32,7 @@ export function connectionSidebar(display: ConnectionDisplay): string {
 }
 
 export function canvasCaption(display: ConnectionDisplay): string {
-  const model = display.canvasModelId === 'kick75' ? 'Kick75'
-    : display.canvasModelId === 'air75-v3' ? 'Air75 V3' : '';
+  const model = isKeyboardModel(display.canvasModelId)?getKeyboardProfile(display.canvasModelId).name:'';
   if (!model) return '';
   const offline = display.stateId !== 'usbReady';
   return connectionCopy({

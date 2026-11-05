@@ -1,3 +1,4 @@
+import {blank,getLayoutModel} from '../../shared/layout.mjs';
 import { rangeStyle } from "./rangeStyle";
 import { t as tr } from "./i18n";
 import { useEffect, useRef, useState } from "react";
@@ -313,7 +314,7 @@ export function GamePanel({
   };
   const sessionStatus = active ? "正在游戏" : paused ? "已暂停" : game?.status === "won" ? "游戏通关" : finished(game) ? "游戏结束" : "尚未开始";
   const resultTitle=type==='pong'&&game?.winner?(game.winner==='left'?'左方获胜':'右方获胜'):type==='whack'?'时间到':game?.status==='won'?(type==='memory'?`挑战完成 · ${game.round??20} 轮`:'胜利'):type==='memory'?'顺序不对或时间已到':'游戏结束';
-  const keyboardColors = game?.status === "idle" || !game ? Array<string>(84).fill("#000000") : state?.colors || [];
+  const keyboardColors = game?.status === "idle" || !game ? blank() : state?.colors || [];
   return <div className="v5-game-layout" data-terminal={finished(game)}>
     <header className="v5-game-header">
         <label className="game-picker">
@@ -365,12 +366,12 @@ export function GamePanel({
     <div className="v5-game-grid">
       <section className="v5-game-canvas">
         {finished(game)?<section className="v5-game-notice v6-game-result" aria-label={tr('本轮结果')} role="status"><h3 title={tr(gameMessage(game,type))}>{tr(resultTitle)}</h3><p>{tr('点击结束游戏后恢复先前灯光。')}</p></section>:!canStart?<div id="game-start-unavailable" className="v5-game-notice v7-game-unavailable" role="status"><h3>{startReason}</h3><p>{connectionCopy({zh:"游戏需要可用的 USB 逐键灯光；规则仍可查看。",en:"Games need available USB per-key lighting. You can still read the rules."})}</p></div>:<div className="v5-game-notice"><span><i className={`status-dot ${active ? "green" : ""}`} />{tr(sessionStatus)}</span><p>{tr(descriptions[type])}</p></div>}
-        <Keyboard layout={layout} colors={keyboardColors}
+        <div className="keyboard-viewport"><Keyboard modelId={getLayoutModel()} layout={layout} colors={keyboardColors}
           onGameKey={active && (type === "whack" || type === "memory") ? index => {
             const code = layout.find(key => key.index === index)?.code;
             if (code && game && canPressGameKey(game, code)) run(send({ op: "gameInput", code, pressed: true }));
           } : undefined}
-          sideColor={state?.device.connected && typeof state.device.sideColor === "string" ? state.device.sideColor : undefined} />
+          sideColor={state?.device.connected && typeof state.device.sideColor === "string" ? state.device.sideColor : undefined} /></div>
         {!finished(game)&&<>{(active||paused)&&<p className="v5-game-feedback" role="status">{tr(gameMessage(game,type))}</p>}
         {tr(type === "whack" && (
           <p className="v5-game-feedback">{tr("命中")}{tr(game?.hits || 0)}{tr("· 错按")}{tr(game?.mistakes || 0)}{tr("· 漏掉")}{tr(" ")}

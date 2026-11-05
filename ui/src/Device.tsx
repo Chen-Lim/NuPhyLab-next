@@ -1,3 +1,5 @@
+import {blank,getLayoutModel} from '../../shared/layout.mjs';
+import {getKeyboardProfile,isKeyboardModel} from '../../shared/keyboard-models.mjs';
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Bluetooth, Cable, ChevronRight, CircleAlert, RotateCcw, Unplug } from "lucide-react";
 import { Button, run } from "./primitives";
@@ -34,9 +36,14 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
   const recovery = keyRecoveryProblem(state);
   const wireless = state?.bluetooth?.connected === true && !device?.connected;
   const connected = device?.connected === true;
-  const recoveryPending=device?.keyRecovery?.pending===true||device?.functionKeyRecoveryPending===true;
+  const keyRecovery=device?.keyRecovery;
+  const activeKeyLease=keyRecovery?.status==='active'&&keyRecovery.ownsCurrentHandle===true
+    &&keyRecovery.blocking===false&&!keyRecovery.error&&!keyRecovery.errorCode&&!keyRecovery.unownedHistory;
+  const recoveryPending=!activeKeyLease&&(keyRecovery?.pending===true||device?.functionKeyRecoveryPending===true);
   const identified = connected || wireless || device?.identified === true;
-  const kick = device?.modelId === "kick75" || layout.length === 80;
+  const kick = device?.modelId === "kick75";
+  const profile=isKeyboardModel(device?.modelId)?getKeyboardProfile(device.modelId):null;
+  const hasModule = device?.modelId === "air75-v3" || device?.modelId === "air65-v3" || device?.modelId === "air100-v3";
   const outdated = firmwarePrompt(state);
   const firmware = state?.firmware;
   const module = state?.settings.airTopRightModule === "keycap" ? "keycap" : "rotary";
@@ -70,7 +77,7 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
     : recovery ? copy("连接尚未完成", "Connection incomplete")
     : device?.readOnly && device.identified ? copy("已识别 · 请检查连接", "Identified · Check connection")
     : connected ? nativeOnly ? copy("USB 已连接 · 当前使用内置灯效", "USB connected · Built-in lighting")
-      : copy("USB 已连接 · 灯光与快捷键可用", "USB connected · Lighting and shortcuts ready")
+      : copy("USB 已连接", "USB connected")
     : copy("未连接", "Disconnected");
   const firmwareUnconfirmed = Boolean(display && !display.freshUsb);
   const firmwareStatus = !connected ? copy("未连接","Disconnected") : outdated ? copy("请更新键盘固件", "Update keyboard firmware")
@@ -125,7 +132,7 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
   }
 
   if (!identified) return <section className="lab-device-page lab-device-offline">
-    <div className="lab-offline-intro"><h2>{copy("连接键盘", "Connect your keyboard")}</h2><p role={!state ? "status" : undefined}>{!state && layout.length===0 ? copy("正在读取键盘布局","Loading keyboard layout") : copy("使用 USB 线连接 Air75 V3 或 Kick75。", "Connect Air75 V3 or Kick75 with a USB cable.")}</p></div>
+    <div className="lab-offline-intro"><h2>{copy("连接键盘", "Connect your keyboard")}</h2><p role={!state ? "status" : undefined}>{!state && layout.length===0 ? copy("正在读取键盘布局","Loading keyboard layout") : copy("使用 USB 线连接支持的 NuPhy 键盘。", "Connect a supported NuPhy keyboard with a USB cable.")}</p></div>
     <div className="lab-connection-guide"><Cable size={28} strokeWidth={1.5} /><div>
       <h3>{copy("灯光播放需要 USB 连接", "USB connection required for lighting")}</h3>
       <ol><li>{copy("将键盘切换到有线模式。", "Switch your keyboard to wired mode.")}</li><li>{copy("使用支持数据传输的 USB 线连接电脑。", "Connect a USB data cable to your computer.")}</li><li>{copy("关闭其他正在连接键盘的软件后重试。", "Close other keyboard apps and try again.")}</li></ol>
@@ -144,12 +151,12 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
       {!display.freshUsb&&display.canvasIdentity&&<p>{connectionCopy(display.canvasIdentity)}</p>}
       {display.stateId==="serviceUnknown"&&onRefresh&&<Button kind="ghost" busy={busy==="refreshService"} disabled={Boolean(busy)} onClick={()=>run(refreshConnection())}>{connectionCopy(display.devicePrimaryCopy)||copy("重新检查","Check again")}</Button>}
     </div>:<div className="lab-device-models" aria-label={copy("当前键盘", "Current keyboard")}>
-      <span className={!kick ? "selected" : ""}>Air75 V3</span><span className={kick ? "selected" : ""}>Kick75</span>
+      <span className="selected">{profile?.name || device?.model || "NuPhy"}</span>
     </div>}
     <div className="lab-device-grid">
       <div className="lab-device-canvas">
         {!display&&<div className={`lab-device-status ${connected && !outdated && !recovery ? "ready" : ""}`} role="status"><i/>{status}</div>}
-        <Keyboard layout={layout} colors={Array(84).fill("#000000")} />
+        <Keyboard modelId={getLayoutModel()} layout={layout} colors={blank()} sideColor={connected && typeof device?.sideColor === 'string' ? device.sideColor : undefined} />
         <div className="lab-device-restore"><Button kind="ghost" icon={<RotateCcw size={16}/>} disabled={!connected || Boolean(busy)} busy={busy === "restore"} onClick={() => run(execute("restore"))}>{copy("恢复键盘原灯效", "Restore keyboard lighting")}</Button></div>
         {recoveryPending&&<div className="function-key-recovery-entry"><p>{copy("部分按键的原功能尚未确认，可先检查当前键盘。","Some original key functions have not been confirmed. Check the connected keyboard first.")}</p><Button kind="ghost" disabled={!connected||Boolean(busy)||Boolean(serviceError)} onClick={event=>{recoveryTrigger.current=event.currentTarget;setRecoveryOpen(true);}}>{copy("检查并恢复按键","Check and restore keys")}</Button></div>}
         {wireless && !display && <p className="lab-device-note">{copy("任务键和命令键继续可用，灯光保持键盘自身的设置。", "Task and command keys remain available. The keyboard keeps its own lighting.")}</p>}
@@ -159,7 +166,7 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
       </div>
       <aside className="lab-device-inspector">
         <h2>{copy(kick ? "设备信息" : "设备配置", kick ? "Device information" : "Device configuration")}</h2>
-        {!kick && <section className="lab-module-section">
+        {hasModule && <section className="lab-module-section">
           <h3>{copy("右上角模块", "Top-right module")}</h3>
           <div className="lab-module-options" role="group" aria-label={copy("右上角模块", "Top-right module")}>
             <button type="button" aria-pressed={module === "rotary"} disabled={!state || Boolean(busy)} onClick={() => run(changeModule("rotary"))}>{copy("旋钮", "Knob")}</button>
@@ -172,7 +179,7 @@ export function Device({ state, command, serviceError, layout = state?.layout ||
           <strong>{firmware?.current || device?.firmware || "—"}</strong>
           <div className={`lab-device-status ${firmwareUnconfirmed?"":outdated ? "attention" : kick && device?.capabilities?.perKey ? "ready" : ""}`}><i/>{firmwareUnconfirmed?copy("上次状态","Last known state"):kick && device?.capabilities?.perKey && !outdated ? copy("逐键灯光可用", "Per-key lighting ready") : firmwareStatus}</div>
         </section>
-        {kick && <section className="lab-kick-capabilities"><h3>{copy("灯光控制", "Lighting control")}</h3><p>{copy("80 个按键与 5 个侧灯", "80 keys and 5 side LEDs")}<br/>{copy("旋钮不参与灯光上色", "Knob is outside the lighting canvas")}</p>{nativeOnly && <p>{copy("升级固件后可使用逐键创作。", "Update firmware to enable per-key creation.")}</p>}</section>}
+        {profile && <section className="lab-kick-capabilities"><h3>{copy("灯光控制", "Lighting control")}</h3><p>{copy(`${layout.length} 个按键灯与 ${profile.sideCount} 个侧灯`, `${layout.length} key lights and ${profile.sideCount} side LEDs`)}<br/>{device?.modelId?.startsWith("node") ? copy("触摸条不参与逐键上色", "Touch bar is outside the per-key lighting canvas") : copy("旋钮不参与灯光上色", "Knob is outside the lighting canvas")}</p>{nativeOnly && <p>{copy("升级固件后可使用逐键创作。", "Update firmware to enable per-key creation.")}</p>}</section>}
         <details className="lab-firmware-details"><summary><ChevronRight size={16}/>{copy("固件信息", "Firmware information")}</summary><div>
           <p>{copy(firmwareUnconfirmed?"上次读取版本":"当前版本", firmwareUnconfirmed?"Last known version":"Current version")} {firmware?.current || device?.firmware || "—"}</p>
           {firmware?.latest && <p>{firmwareUnconfirmed?`${copy("上次状态","Last known state")} · `:""}{copy("官方版本", "Official version")} {firmware.latest}</p>}

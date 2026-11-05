@@ -92,7 +92,7 @@ export class AudioReactive {
     }
     const frame=blank();
     for(const key of layout) {
-      if(key.index>=83)continue;
+      if(key.controllable===false)continue;
       const x=key.x+key.w/2,y=key.y+key.h/2;
       let amount=this.drive;
       if(config.effect==='spectrum') {
