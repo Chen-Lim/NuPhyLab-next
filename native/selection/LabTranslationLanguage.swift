@@ -28,6 +28,7 @@ enum LabTranslationLanguage:String,Codable,CaseIterable {
         }
     }
     func title(in language:AppLanguage)->String {
+        if self == .simplifiedChinese { return "简体中文" }
         guard language == .zh else{return englishName}
         switch self {
         case .simplifiedChinese:return "简体中文"

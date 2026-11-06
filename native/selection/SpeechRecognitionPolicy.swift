@@ -8,6 +8,27 @@ enum SpeechRecognitionPurpose: Sendable { case command }
 /// Recognition hints affect the acoustic/language model. They never rewrite a
 /// transcript, so legitimate homophones remain intact in spoken instructions.
 enum SpeechRecognitionPolicy {
+    /// Interface translations must not select the microphone's language.
+    /// Use this Mac's preferred spoken locale unless the caller supplies one.
+    static func preferredLocaleIdentifier(preferredLanguages: [String] = Locale.preferredLanguages) -> String {
+        guard let preferred = preferredLanguages.first, !preferred.isEmpty else { return "en-US" }
+        let locale = Locale(identifier: preferred)
+        guard let code = locale.language.languageCode?.identifier else { return "en-US" }
+        if code == "zh" {
+            return "zh-" + (locale.region?.identifier ?? (locale.language.script?.identifier == "Hant" ? "TW" : "CN"))
+        }
+        if code == "en", locale.region == nil { return "en-US" }
+        return preferred
+    }
+
+    /// Apple's no-speech result is an empty completed recording, not a lost
+    /// spoken instruction. Never discard a partial or text-bearing failure.
+    static func isEmptyRecognition(domain: String?, code: Int?, transcript: String, incomingText: String?) -> Bool {
+        domain == "kAFAssistantErrorDomain" && code == 1110 &&
+            transcript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            (incomingText ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     static func localeIdentifier(chinese: Bool, preferredLanguages: [String] = Locale.preferredLanguages) -> String {
         let language = chinese ? "zh" : "en"
         return preferredLanguages.first {

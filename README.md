@@ -90,4 +90,4 @@ Open **Labs → Ask about a selection**, choose a service and model in **Setting
 
 Selected text and questions are sent to your configured model service. Images are included only when enabled and needed for the selected action. API keys are stored in the local Keychain.
 
-[设置与使用 / Setup and usage](docs/SELECTION.md) · [界面与翻译语言 / Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [1.2.41 更新说明 / What's new in 1.2.41](docs/RELEASE_1.2.41.md)
+[设置与使用 / Setup and usage](docs/SELECTION.md) · [界面与翻译语言 / Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [1.2.42 更新说明 / What's new in 1.2.42](docs/RELEASE_1.2.42.md)

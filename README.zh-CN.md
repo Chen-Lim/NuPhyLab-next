@@ -52,7 +52,7 @@ F8、F9 需要当前存在审批请求；F12 需要聚焦聊天输入框。命�
 
 选区文字、问题，以及启用后按操作需要附带的图片会发送到自己配置的模型服务。API Key 保存在本机钥匙串。新用户默认关闭框选和语音，可以按需开启。
 
-[完整使用说明](docs/SELECTION.md) · [模型、图片与权限](docs/SELECTION_R2.md) · [界面与翻译语言](docs/SELECTION_LANGUAGES.md) · [1.2.41 更新说明](docs/RELEASE_1.2.41.md)
+[完整使用说明](docs/SELECTION.md) · [模型、图片与权限](docs/SELECTION_R2.md) · [界面与翻译语言](docs/SELECTION_LANGUAGES.md) · [1.2.42 更新说明](docs/RELEASE_1.2.42.md)
 
 ## 更新与兼容
 

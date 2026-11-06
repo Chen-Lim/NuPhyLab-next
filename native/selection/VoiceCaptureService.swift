@@ -46,6 +46,7 @@ import OSLog
         var finalizationTimeout: TimeInterval = 0.02
     }
     var captureTestDriver: CaptureTestDriver?
+    var captureTestLocaleIdentifier: String { activeLocaleIdentifier }
     func receiveTestResult(_ result: VoiceAudioResult, token: UUID) {
         guard captureTestDriver != nil, let lease = audioLease, lease.token == token else { return }
         receive(result, lease: lease)
@@ -81,8 +82,8 @@ import OSLog
         let token = session.begin(objectIDs: objectIDs)
         let lease = VoiceAudioLease(token: token)
         audioLease = lease
-        activePurpose = recognitionPurpose; activeChinese = language == .zh
-        activeLocaleIdentifier = localeIdentifierOverride ?? SpeechRecognitionPolicy.localeIdentifier(chinese: activeChinese)
+        activePurpose = recognitionPurpose
+        activeLocaleIdentifier = localeIdentifierOverride ?? SpeechRecognitionPolicy.preferredLocaleIdentifier()
         activeChinese = Locale(identifier: activeLocaleIdentifier).language.languageCode?.identifier == "zh"
         recognitionContext = VoiceRecognitionContext(SpeechRecognitionPolicy.contextualStrings([],
             purpose: activePurpose, chinese: activeChinese))
@@ -201,19 +202,22 @@ import OSLog
         guard audioLease === lease, lease.isValid, session.generation == token,
               [.recording, .finishing].contains(session.phase) else { return }
         guard permissionsRemainSafe else { safetyCancel(); return }
-        // A failure accompanying a final payload is still an audio failure.
-        // The host must never auto-submit an interim text after failure.
-        if let domain = result.failureDomain, let code = result.failureCode {
+        let emptyRecognition = SpeechRecognitionPolicy.isEmptyRecognition(domain: result.failureDomain,
+            code: result.failureCode, transcript: session.transcript, incomingText: result.text)
+        // Silence resolves to the selected default action. All real failures,
+        // including those carrying interim text, still require user review.
+        if let domain = result.failureDomain, let code = result.failureCode, !emptyRecognition {
             recordDiagnostic(NSError(domain: domain, code: code), stage: "recognition")
             fail(t("本机转录已停止。已识别文字可继续编辑；不会改用网络识别。", "Local transcription stopped. You can edit the text already recognized; network recognition will not be used."), token: token)
             return
         }
-        if let text = result.text, session.update(text, generation: token, final: result.isFinal) {
+        let isFinal = result.isFinal || emptyRecognition
+        if let text = emptyRecognition ? "" : result.text, session.update(text, generation: token, final: isFinal) {
             onTranscript?(session.transcript)
         }
         // An observer may synchronously cancel or replace the session.
         guard audioLease === lease, lease.isValid, session.generation == token else { return }
-        if result.isFinal {
+        if isFinal {
             // A final result with no text must still leave the active phase.
             if session.phase == .finishing { session.finish(generation: token) }
             else if session.phase == .recording { session.stop(); session.finish(generation: token) }

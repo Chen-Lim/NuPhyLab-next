@@ -31,7 +31,9 @@ async function fixture(patch={},component='SelectionLab'){
  return {ui,get instance(){return instance;},state,calls,find,next(fn){nextStatus=fn;},async remount(){instance.unmount();instance=ui.mount(loaded.exports[component]);await ui.settle(instance);},async change(id,value){find(n=>n.props?.id===id).props.onChange({target:{value}});await ui.settle(instance);},async click(label){await find(n=>n.props?.onClick&&textOf(n)===label).props.onClick();await ui.settle(instance);},close(){instance.unmount();}};
 }
 function englishOnly(tree){
- assert.doesNotMatch(textOf(tree),han,textOf(tree));
+ // The requested language endonym is the single deliberate exception.
+ assert.doesNotMatch(textOf(tree).replaceAll('简体中文',''),han,textOf(tree));
+ for(const node of walkAll(tree,n=>textOf(n)==='简体中文'))if(node.type==='option')assert.equal(node.props.value,'zh-CN');
  for(const node of walkAll(tree,()=>true))for(const key of ['aria-label','label','title','placeholder'])if(typeof node.props?.[key]==='string')assert.doesNotMatch(node.props[key],han,key+': '+node.props[key]);
 }
 
@@ -51,7 +53,7 @@ test('translation target defaults safely, persists independently and merges the 
  const f=await fixture();const target=()=>f.find(n=>n.props?.id==='selection-translation-language');
  assert.equal(target().props.value,'zh-CN');const options=walkAll(target(),n=>n.type==='option');assert.equal(options.length,16);
  assert.deepEqual(options.map(n=>n.props.value),translationLanguages.map(x=>x.id));
- assert.deepEqual(options.slice(0,5).map(textOf),['Simplified Chinese','Traditional Chinese','English','Japanese','Korean']);
+ assert.deepEqual(options.slice(0,5).map(textOf),['简体中文','Traditional Chinese','English','Japanese','Korean']);
  f.next(s=>{s.preferences.configuration.model='newer-model';s.preferences.configuration.maximumOutputTokens=8000;s.preferences.shortcut.label='⌥ Q';s.preferences.voiceEnabled=false;});
  await f.change('selection-translation-language','ja');assert.equal(f.state.preferences.translationLanguage,'ja');
  assert.equal(f.state.preferences.configuration.model,'newer-model');assert.equal(f.state.preferences.configuration.maximumOutputTokens,8000);assert.equal(f.state.preferences.shortcut.label,'⌥ Q');assert.equal(f.state.preferences.voiceEnabled,false);

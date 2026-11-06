@@ -45,6 +45,9 @@ for(const language of ['zh-CN','en'])test(`merged About & updates keeps legacy l
  assert.equal(modal.props.title,language==='en'?'Help':'使用帮助');
  modal.props.onClose();await ui.settle(about);assert.equal(walkAll(about.tree,n=>n.type===Modal).length,0);
  tabs()[0].props.onClick();parent.render();assert.equal(tabs().find(n=>n.props['aria-selected']).props.id,'settings-tab-general');
+ const languages=walkAll(parent.tree,n=>n.type==='option');
+ assert.deepEqual(languages.map(textOf),['简体中文','English']);
+ assert.deepEqual(languages.map(n=>n.props.value),['zh-CN','en']);
  parent.update({state,command,initialTab:'about'});assert.equal(tabs().find(n=>n.props['aria-selected']).props.id,'settings-tab-about');
  state.firmware.stale=true;parent.render();assert.equal(walkAll(parent.tree,n=>n.props?.className==='settings-update-dot').length,0);
  if(language==='en'){assert.doesNotMatch(textOf(parent.tree),/[\u3400-\u9fff]/);assert.doesNotMatch(textOf(about.tree),/[\u3400-\u9fff]/);}

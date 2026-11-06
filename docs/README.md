@@ -22,6 +22,7 @@
 
 ## 分版记录 / Version history
 
+- [1.2.42 发行说明 / Release notes](RELEASE_1.2.42.md)
 - [1.2.41 发行说明 / Release notes](RELEASE_1.2.41.md)
 - [1.2.40 发行说明 / Release notes](https://github.com/bohu8264/NuPhyLab-next/releases/tag/v1.2.40)
 - [1.2.39 发行说明 / Release notes](RELEASE_1.2.39.md)

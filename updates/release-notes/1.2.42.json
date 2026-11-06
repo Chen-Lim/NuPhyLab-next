@@ -1,0 +1,13 @@
+{
+  "version": "1.2.42",
+  "zh-CN": [
+    "修复仅框选、未说话时，语音识别的无语音结果阻止翻译、总结与解释的问题。",
+    "界面语言与本机语音识别语言独立；切换界面语言不再中止正在进行的语音操作。",
+    "语言选择中的“简体中文”始终保留中文名称。"
+  ],
+  "en": [
+    "Fix silent selections being blocked by a no-speech recognition result when translating, summarizing or explaining.",
+    "Keep the interface language independent from local speech recognition; changing the interface language no longer cancels an active recording.",
+    "Keep the Simplified Chinese option labeled in Chinese in language menus."
+  ]
+}

@@ -52,7 +52,7 @@ For spoken questions, enable **Hold to speak** and allow Microphone and Speech R
 
 Selected text, questions and any enabled images needed for the selected action are sent to your configured model service. API keys stay in the local Keychain. Selection and voice are disabled by default for new users.
 
-[Full setup and usage](docs/SELECTION.md) · [Models, images and permissions](docs/SELECTION_R2.md) · [Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [What's new in 1.2.41](docs/RELEASE_1.2.41.md)
+[Full setup and usage](docs/SELECTION.md) · [Models, images and permissions](docs/SELECTION_R2.md) · [Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [What's new in 1.2.42](docs/RELEASE_1.2.42.md)
 
 ## Updates and compatibility
 

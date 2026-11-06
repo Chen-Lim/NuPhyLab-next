@@ -15,3 +15,7 @@ Targets include Simplified Chinese, Traditional Chinese, English, Japanese, Kore
 提问中明确指定的目标语言优先于默认设置；普通总结或解释不会因为翻译目标语言而自动变成翻译。
 
 An explicit target language in a question takes precedence over this default. A summary or explanation is not converted into a translation simply because a target language is selected.
+
+语言菜单中的 **简体中文** 始终使用这一中文名称，方便识别。界面语言、翻译目标和本机语音识别语言相互独立；本机语音识别使用此 Mac 的首选语言，切换软件界面语言不会更改当前录音的识别语言。
+
+The **简体中文** option keeps its Chinese name in language menus. The interface language, translation target and local speech-recognition language are independent. Local speech recognition uses this Mac's preferred language; switching the app's interface language does not change the language of an active recording.

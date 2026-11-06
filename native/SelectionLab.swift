@@ -38,7 +38,7 @@ enum LabKeychain {
   guard !value.configuration.model.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else{return "请先在“模型与 API”中选择模型并保存 API Key。"}
   do{let account=try value.configuration.credentialAccount();return LabKeychain.has(account) ? "":"请先在“模型与 API”中保存此服务的 API Key。"}catch{return Self.friendly(error,language:language)}
  }
- private var preferences=LabPreferences();private let input=SelectionHoldMonitor();private let voice=LocalVoiceCapture(localeIdentifier:"zh-CN")
+ private var preferences=LabPreferences();private let input=SelectionHoldMonitor();private let voice=LocalVoiceCapture()
  private var overlays:[SelectionOverlayWindow]=[];private var panel:SelectionResultPanel?;private var task:Task<Void,Never>?;private var utilityTask:Task<Void,Never>?
  private var utilityGeneration=UUID();private var generation=UUID();private var imagePNG:Data?;private var observers:[NSObjectProtocol]=[];private var monitor:Timer?
  private let viewState=SelectionPanelState();private var registrationIssue="";private var hold=LabHoldState();private var selectionRect:NSRect?
@@ -82,8 +82,7 @@ enum LabKeychain {
  }
  func updateLanguage(_ value:AppLanguage){
   guard language != value else{return}
-  if voicePending{cancel()}
-  language=value;viewState.language=value;voice.language=value;voice.localeIdentifier=value == .en ? "en-US":"zh-CN"
+  language=value;viewState.language=value;voice.language=value
   panel?.title=LabText.text("框选回答",language:value)
   for window in overlays{(window.contentView as? SelectionOverlayView)?.language=value}
  }

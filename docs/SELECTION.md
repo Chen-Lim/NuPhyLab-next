@@ -30,6 +30,10 @@ Select a region of the screen with a shortcut and ask your chosen model to trans
 
 Selection and voice start disabled for new users. Enable **Hold to speak** and grant Microphone and Speech Recognition access to dictate a question while holding the shortcut. Speech is transcribed locally; recordings are not uploaded. Text features work with voice off. Selection does not require System Audio access.
 
+开启语音后也可只框选、不说话：未识别到语音时会继续执行选中的翻译、总结或解释。界面语言不改变本机语音识别语言。
+
+You can select without speaking even when voice is enabled. If no speech is recognized, the selected translation, summary or explanation runs normally. The interface language does not change the local speech-recognition language.
+
 “发送图片”位于“按住说话”下方。关闭时只发送本机识别到的文字；开启后，提问可附带选区图片，翻译、总结和解释在没有识别到文字时可附图。“提取文字”只在本机执行。图片输入需要所选模型和接口支持，开启开关并不会使纯文字模型具备看图能力。
 
 The image switch sits below **Hold to speak**. When off, only locally recognized text is sent. When on, questions can include the selected image; translation, summary and explanation may include an image when no text was recognized. Extract Text runs locally. The selected model and endpoint must support images; enabling the switch does not add vision support to a text-only model.
