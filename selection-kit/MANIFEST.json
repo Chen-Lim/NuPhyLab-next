@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "manifestExcludesItself": true,
+  "files": [
+    {
+      "path": "AIKit/Package.swift",
+      "bytes": 397,
+      "sha256": "6264db3c9e5ff1ce8ecbddb4d73e4825d7cf57a72d248341d265dcc077dd8022"
+    },
+    {
+      "path": "AIKit/README.md",
+      "bytes": 7066,
+      "sha256": "6c11bf433b9903296e49e520e182f944342912ed01c05bd34fec13bcafed4601"
+    },
+    {
+      "path": "AIKit/SOURCE-PROVENANCE.json",
+      "bytes": 6068,
+      "sha256": "477b945f61931a97d2c9d04dddf36033ae307d9885ee4b7dc9c5e005fc9fe1f5"
+    },
+    {
+      "path": "AIKit/Sources/LabSelectionAI/AIClient.swift",
+      "bytes": 10662,
+      "sha256": "9b4285c67c5241762e3135762364d87b21567e724263f6eb5fe9a70a649b00e8"
+    },
+    {
+      "path": "AIKit/Sources/LabSelectionAI/AIConfiguration.swift",
+      "bytes": 7796,
+      "sha256": "824ecb69a5ca4fd948101a8676c73f1eaf8b2421517370a7ecf8817e509ca3fa"
+    },
+    {
+      "path": "AIKit/Sources/LabSelectionAI/AIModelListRequest.swift",
+      "bytes": 5363,
+      "sha256": "f1d79db0fe90ba23d18264f789418b19c729116c1f79a6f137614cecf63d98ba"
+    },
+    {
+      "path": "AIKit/Sources/LabSelectionAI/AIRequestBuilder.swift",
+      "bytes": 12094,
+      "sha256": "13c2af81aabea307f1d668af1b956fc9645d256be9d8c4b5fa782ed8e9e1e7ba"
+    },
+    {
+      "path": "AIKit/Sources/LabSelectionAI/AIRequestPrompt.swift",
+      "bytes": 1619,
+      "sha256": "ecf7e1c1b1d054fc22e0aac2c195c6f62cd4edc7cc723842d0e057d1c3e0110b"
+    },
+    {
+      "path": "AIKit/Sources/LabSelectionAI/AIStreamingParser.swift",
+      "bytes": 15555,
+      "sha256": "3752d11a9318b5010581504c0f9159f1388dab262bc5df848837bc832105885e"
+    },
+    {
+      "path": "AIKit/Sources/LabSelectionAI/AIStreamingTransport.swift",
+      "bytes": 7378,
+      "sha256": "9f9d49ee2f7b9bb71769bd58ca5d9261d93067064bc8e8189e95dcfeb3b1cf3c"
+    },
+    {
+      "path": "AIKit/Tests/LabSelectionAITests/ParserTests.swift",
+      "bytes": 9087,
+      "sha256": "e1b9e9fea459a81aee839a29511d79f87bb82d41e4b2ec2d90504e0c26942d8f"
+    },
+    {
+      "path": "AIKit/Tests/LabSelectionAITests/RequestTests.swift",
+      "bytes": 8996,
+      "sha256": "4ed676b9d1324381b17d9e35bb0807c97b010b05f170b6607139008619755d85"
+    },
+    {
+      "path": "AIKit/Tests/LabSelectionAITests/TransportTests.swift",
+      "bytes": 6774,
+      "sha256": "0e082dcb9c5a758923bf1537afa431739489ecf08d1e2a76db5648ed1f6a742e"
+    },
+    {
+      "path": "AIKit/VALIDATION.json",
+      "bytes": 1625,
+      "sha256": "29f4fc89828a675172ac5d13ca90ce4bb19f0382baf3f6eb52c908100b4ec3af"
+    },
+    {
+      "path": "AIKit/Validation/Validation.swift",
+      "bytes": 20507,
+      "sha256": "75226a8f1c7293acd9d7130ab16928b31ef6819c8006095c291b7a71a8c9c6c0"
+    },
+    {
+      "path": "AIKit/Validation/last-run.txt",
+      "bytes": 1683,
+      "sha256": "ef375b03b9566ca77dd0a23e9c677464a335cb713aa1182c9db5fc1289911b76"
+    },
+    {
+      "path": "AIKit/Validation/run.sh",
+      "bytes": 540,
+      "sha256": "926dc70e1bee0477e67c6385483ce75912099e80361b5493a20e7364ca8c7a06"
+    },
+    {
+      "path": "Docs/API调研与接入建议.md",
+      "bytes": 13074,
+      "sha256": "0a315fbe52474a4d31cba0f8d9dfe372db41e035439895f7cc5ef7bbd1296321"
+    },
+    {
+      "path": "Docs/Lab接入指南.md",
+      "bytes": 8643,
+      "sha256": "552f57e25baf29537e23b2debfe5dc3321cacd71200812b5e471e1d64da4b1a2"
+    },
+    {
+      "path": "Docs/research-sources.json",
+      "bytes": 9055,
+      "sha256": "6bac1d1a9e4883b93de4c6753814a37f3fdd824284927aa8ed5700154402c8d2"
+    },
+    {
+      "path": "Docs/现有功能与交付范围.md",
+      "bytes": 6036,
+      "sha256": "dd84d45f221d0c0cbc90ab64944d2e09b7bfcf042d5c006906fde94c14326133"
+    },
+    {
+      "path": "FlowKit/Checks/main.swift",
+      "bytes": 11166,
+      "sha256": "915167ebdc0bd738285d26dc2b535595e57ddcfd5858cd671bee9d4b40e32b7a"
+    },
+    {
+      "path": "FlowKit/Package.swift",
+      "bytes": 697,
+      "sha256": "b99336fd2425381feb100873174951f842e01e7785f21fb36db09acdcb3eb17d"
+    },
+    {
+      "path": "FlowKit/SOURCE-PROVENANCE.json",
+      "bytes": 2829,
+      "sha256": "2742913645cdc967931f928501236aac2b4b68e25715c22a5368bdfd97422718"
+    },
+    {
+      "path": "FlowKit/Sources/LabSelectionFlow/SelectionCoordinator.swift",
+      "bytes": 6205,
+      "sha256": "e496aa29a755d28e56cd232c7a73df0b97d5e5ba8c38a84878233a1945c798c3"
+    },
+    {
+      "path": "FlowKit/Sources/LabSelectionFlow/SelectionSession.swift",
+      "bytes": 10230,
+      "sha256": "6b6614a49908bbf60008964775c145affc9758f478e17ea7b06494682b9f8b71"
+    },
+    {
+      "path": "FlowKit/Tests/LabSelectionFlowTests/SelectionCoordinatorTests.swift",
+      "bytes": 5835,
+      "sha256": "7ab34882dbe7c145ea8217aff9bc082b42d83f6378a1a58e8371cb14cc9b4b7f"
+    },
+    {
+      "path": "FlowKit/Tests/LabSelectionFlowTests/SelectionSessionTests.swift",
+      "bytes": 6969,
+      "sha256": "d49f1aa7be18de3c176bbf70a3617174d2f658dfb5b5865340a914c367b1cdca"
+    },
+    {
+      "path": "HostExample/Package.swift",
+      "bytes": 659,
+      "sha256": "ec72952eaf0f696ef1b04347605d5f9f9db3356f00f762b6145af87d0453a3a5"
+    },
+    {
+      "path": "HostExample/SOURCE-PROVENANCE.json",
+      "bytes": 1882,
+      "sha256": "18c523f21af1124407de9638e38b9c2e7485efde4b46340364161ba811454049"
+    },
+    {
+      "path": "HostExample/Sources/LabSelectionHostExample/SingleSelectionFeature.swift",
+      "bytes": 9314,
+      "sha256": "24d8f42268049977ea40940fcd0c93a0a3e91b4bba80c73c0c52feee7b8fa247"
+    },
+    {
+      "path": "NativeKit/Package.swift",
+      "bytes": 784,
+      "sha256": "a409eafcf9f5a257bd1f1d90fe6cab357b2c81c85f8db41b9930102bf42be082"
+    },
+    {
+      "path": "NativeKit/README.md",
+      "bytes": 10416,
+      "sha256": "9aaef7cfa7c5fe37f18e11c4b50679d8c4b81c1526237346ab0a23a30a442797"
+    },
+    {
+      "path": "NativeKit/Sources/ChordAudioBoundary/ChordAudioBoundary.m",
+      "bytes": 1513,
+      "sha256": "b33a260c35fcb1c3eb7b5dcc4b62317024583b68c142a76dbe969c0faba913bb"
+    },
+    {
+      "path": "NativeKit/Sources/ChordAudioBoundary/include/ChordAudioBoundary.h",
+      "bytes": 517,
+      "sha256": "17251a20f423c7a571a279e35ecc447bf14141d002286d3cf116451a2c58ace0"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/InputBinding.swift",
+      "bytes": 10132,
+      "sha256": "846d5ca39220c69c2570823d54c2754e8234ec3d4fbcca5528b9d5e59855c59c"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/InputBindingPolicy.swift",
+      "bytes": 1759,
+      "sha256": "335b8055ace466dc6446c248588ed56eb8d7ff13a07713de6b874af441ded5a0"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/InputBindingRuntimeState.swift",
+      "bytes": 3590,
+      "sha256": "15a17d6a0a8af66d96fd529a0b3e78e20ad362ec84b65c058d48d61bbcd4a48e"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/InputModifiers.swift",
+      "bytes": 680,
+      "sha256": "0e3c233e8f829753a122ca768c6c60bc80846e6f7c22f4f51f458b9196f6360c"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/IntentInputBridge.swift",
+      "bytes": 9963,
+      "sha256": "76c0805df9aad01b72330ff2b96047f1120f6ad3b63a2453274b59d3096d6a2a"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/IntentInputSource.swift",
+      "bytes": 2349,
+      "sha256": "f453703a3f5ab622f198a459519c7265ef7e78b9cba17b4f9d8d7a31cb7dd566"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/IntentTapRunLoop.swift",
+      "bytes": 6139,
+      "sha256": "0420e3698a1fb01ce810475b960f297fea57c7d764cfc663050bc79ced178e32"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/LocalVoiceCapture.swift",
+      "bytes": 3616,
+      "sha256": "18476890837f89554a543a5fb077b8770b863800dc68307d636a75217d21c6bf"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/ModernSpeechRecognition.swift",
+      "bytes": 12501,
+      "sha256": "c7225691ac3ce2e9f14a65b9db27fc070d69a088593c15944dc8e0d5a3337cc4"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/ModifierEventState.swift",
+      "bytes": 1528,
+      "sha256": "214f96380e79e04f6d868753667b9ea75009cb14387b1102d4f0b293d9e6ae0c"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/NativeCapture.swift",
+      "bytes": 3900,
+      "sha256": "5243b49228576334be4d49491ef420193a09430f61a53ac3788d204189e835ba"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/RegionCaptureService.swift",
+      "bytes": 7140,
+      "sha256": "34d30dcf5c00798eef03d3ef89e91f577376540b01e106d3134937f2f1224f02"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/ScreenAwarenessService.swift",
+      "bytes": 12586,
+      "sha256": "b905ad550bf91c4d25090c006807049b1280fe4ecc08fe002fd8ac7c465f7fc5"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/ScreenshotNetworkImage.swift",
+      "bytes": 3007,
+      "sha256": "ef0351082328710f35262739f43b30cbc517ca99bb8477b791632eea809f300a"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/SelectionHoldMonitor.swift",
+      "bytes": 20243,
+      "sha256": "c6cb698980c859aa5f0a214c5a50cc83e87be8a484e0fc862200dfdde62d92af"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/SelectionModels.swift",
+      "bytes": 3061,
+      "sha256": "4cc6aa4350da46434560cc288673ae94de3527e7de33d61d2dc87104cdb95dac"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/SpeechRecognitionPolicy.swift",
+      "bytes": 4938,
+      "sha256": "fd0e092836b0abc24ca0cd112714701eb8fa2fb94395af9480246b8cfce7f5e3"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/VoiceAudioExecutor.swift",
+      "bytes": 7825,
+      "sha256": "9f215f86a48dd14d0b89ddcbd38edb18d66a7a22679d7c026301b6f037da2ea1"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/VoiceAudioWorker.swift",
+      "bytes": 13146,
+      "sha256": "01a1831ba59110ec52b62188bfba08ec13c2e146c741de02cd842bf2887644bf"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/VoiceCaptureService.swift",
+      "bytes": 18883,
+      "sha256": "27791ca3f52cd0300bdcd74762abd3a5f0d221e136952ca75886f969ebf9b1a1"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/VoiceInputLifecycle.swift",
+      "bytes": 1201,
+      "sha256": "f7f6acac9f953c2978c70fd52d54a142a2474e5d09dc93244dec733c7fceffcb"
+    },
+    {
+      "path": "NativeKit/Sources/LabSelectionNative/VoiceSession.swift",
+      "bytes": 2160,
+      "sha256": "e1dc4317c76c1c6a8b133ebb1044d9de34bbb74bc3e66c79e1cb7f1f7fb953cd"
+    },
+    {
+      "path": "NativeKit/Tests/LabSelectionNativeTests/NativeCoreTests.swift",
+      "bytes": 11759,
+      "sha256": "876ca34de2a444f115547e064a5588ec4b724025642c0d7cbed1772da7ac2764"
+    },
+    {
+      "path": "NativeKit/Validation/main.swift",
+      "bytes": 12982,
+      "sha256": "8e6449cd01d6e38b7ba9c477e399dadeb3df6613e3cefa929c4084d24ca1e1ec"
+    },
+    {
+      "path": "NativeKit/source-provenance.json",
+      "bytes": 15886,
+      "sha256": "fab5792e51291d5e4b2b9f93baeb9019e82f84c9026e566fbc780e8cb9936bc6"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3136,
+      "sha256": "bec54e2d62836b98caede44c401be1604513c83918abd90bfb347a4512f46379"
+    },
+    {
+      "path": "VALIDATION.md",
+      "bytes": 2724,
+      "sha256": "24090808932d9fdd67275256e0f29fb6cf9fe73a1c4288b30736a3f7a3e53fde"
+    },
+    {
+      "path": "Validation/ai-build.log",
+      "bytes": 283,
+      "sha256": "839c21f215ce0ccd8f7f048c05998c13127a0a40983432a6b4e05ee5d91ace5e"
+    },
+    {
+      "path": "Validation/flow-checks.log",
+      "bytes": 748,
+      "sha256": "6ae8de600f4e811738afa2603c33c14eb02e8eb95f2810e4392c970513fd70ed"
+    },
+    {
+      "path": "Validation/flow-xctest-unavailable.log",
+      "bytes": 3988,
+      "sha256": "b96cb6224b2594ff46da86a9d76e7403889d9477114cddb9ce7a68245cbcd957"
+    },
+    {
+      "path": "Validation/host-build.log",
+      "bytes": 2889,
+      "sha256": "bfec75f5f82c0e1ecd15a4f26f0d92181c62a78f2fbdc451c31a82891b01fc87"
+    },
+    {
+      "path": "Validation/native-checks.log",
+      "bytes": 2919,
+      "sha256": "6cd494813cc2e74c4abbeb684fd1e4353f90a6a166d4b83f8e5dc6b7d2f56703"
+    },
+    {
+      "path": "Validation/native-release-build.log",
+      "bytes": 1498,
+      "sha256": "6668bf022a7e4f0a0b8e71347c56169b4073860463f36c55ec6e0988dea62461"
+    },
+    {
+      "path": "Validation/native-xctest-unavailable.log",
+      "bytes": 1673,
+      "sha256": "aaaa55d012c7173d8d956edb16b2c7786b5b74d6553a54b7eac1a0f39242e19b"
+    },
+    {
+      "path": "verify_manifest.py",
+      "bytes": 1735,
+      "sha256": "789ce2ace212f5a708a0db5d0a023d29991a4997dbd2f9e68b0e9ea231f4914f"
+    }
+  ]
+}

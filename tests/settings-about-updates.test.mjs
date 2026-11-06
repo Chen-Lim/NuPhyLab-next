@@ -11,7 +11,7 @@ const stub=name=>Object.defineProperty(()=>null,'name',{value:name});
 for(const language of ['zh-CN','en'])test(`merged About & updates keeps legacy links, firmware notification and help in ${language}`,async t=>{
  const UpdatePreferences=stub('UpdatePreferences'),Modal=stub('Modal');
  const ui=createVMEnvironment({
-  'lucide-react':{},'./primitives':{Button:stub('Button'),Modal,Switch:stub('Switch'),run:value=>value},
+  'lucide-react':{},'./SelectionLab':{SelectionAPISettings:stub('SelectionAPISettings'),SelectionPermissionSettings:stub('SelectionPermissionSettings')},'./primitives':{Button:stub('Button'),Modal,Switch:stub('Switch'),run:value=>value},
   './DurationField':{DurationField:stub('DurationField')},'../../shared/lighting-power.mjs':power,
   './StartupGuide':{useStartupCopy:()=> (zh,en)=>language==='en'?en:zh,OFFICIAL_DRIVER_URL:'https://drive.nuphyio.com/#/setting'},
   './i18n':{useLanguage:()=>language,t:value=>value},'../../package.json':{default:{version:'fixture-version'}},
@@ -30,7 +30,7 @@ for(const language of ['zh-CN','en'])test(`merged About & updates keeps legacy l
  const parent=ui.mount(Settings,{state,command,initialTab:'updates'});
  t.after(()=>parent.unmount());
  const tabs=()=>walkAll(parent.tree,n=>n.props?.role==='tab');
- assert.equal(tabs().length,4);
+ assert.equal(tabs().length,5);
  assert.equal(tabs().filter(n=>textOf(n)===(language==='en'?'About & updates':'关于与更新')).length,1);
  assert.equal(tabs().find(n=>n.props['aria-selected']).props.id,'settings-tab-about');
  assert.equal(walkAll(parent.tree,n=>n.props?.className==='settings-update-dot').length,1);

@@ -108,7 +108,7 @@ print("native-function-observation-passed checks=\\(checks)")
   await writeFile(main,fixture);
   const run=promisify(execFile);
   await run('swiftc',['-module-cache-path',path.join(directory,'module-cache'),main,
-    ...['AppInstance.swift','AudioCapture.swift','KeyGestureGate.swift'].map(name=>decodeURIComponent(new URL('../native/'+name,import.meta.url).pathname)),
+    ...['../tests/fixtures/selection-host-boundary.swift','AppInstance.swift','AudioCapture.swift','KeyGestureGate.swift'].map(name=>decodeURIComponent(new URL('../native/'+name,import.meta.url).pathname)),
     '-o',binary,...['AppKit','WebKit','Carbon','AVFoundation','CoreAudio','Accelerate'].flatMap(name=>['-framework',name])]);
   assert.match((await run(binary)).stdout,/native-function-observation-passed checks=\d+/);
 });

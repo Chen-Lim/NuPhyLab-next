@@ -1,4 +1,5 @@
 import AppKit
+SelectionPermissionProbe.runIfRequested()
 PermissionProbe.runIfRequested()
 PendingAppUpdate.finishRelaunchIfNeeded()
 let instanceDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Air Studio")

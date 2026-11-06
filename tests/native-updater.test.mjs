@@ -31,7 +31,7 @@ if !CommandLine.arguments.contains("--update-ui-qa") {print("{\\"checks\\":13,\\
  const main=path.join(directory,'main.swift'),binary=path.join(directory,'check'),framework=fileURLToPath(new URL('../vendor/sparkle',import.meta.url));
  const presentationChecks=await readFile(new URL('./fixtures/native-update-ui-checks.swift',import.meta.url),'utf8');
  await writeFile(main,source+'\n'+checks+'\n'+presentationChecks);
- const run=promisify(execFile);await run('swiftc',[main,...['AppInstance.swift','UpdateUserDriver.swift','AudioCapture.swift','KeyGestureGate.swift'].map(name=>fileURLToPath(new URL('../native/'+name,import.meta.url))),'-o',binary,'-F',framework,'-framework','Sparkle','-Xlinker','-rpath','-Xlinker',framework,...['AppKit','WebKit','Carbon','AVFoundation','CoreAudio','Accelerate'].flatMap(name=>['-framework',name])]);
+ const run=promisify(execFile);await run('swiftc',[main,...['../tests/fixtures/selection-host-boundary.swift','AppInstance.swift','UpdateUserDriver.swift','AudioCapture.swift','KeyGestureGate.swift'].map(name=>fileURLToPath(new URL('../native/'+name,import.meta.url))),'-o',binary,'-F',framework,'-framework','Sparkle','-Xlinker','-rpath','-Xlinker',framework,...['AppKit','WebKit','Carbon','AVFoundation','CoreAudio','Accelerate'].flatMap(name=>['-framework',name])]);
  assert.deepEqual(JSON.parse((await run(binary)).stdout.trim()),{checks:13,network:false,hardware:false});
  // An argument-domain locale only affects this temporary child process. No
  // defaults command or persisted AppleLanguages preference is ever written.

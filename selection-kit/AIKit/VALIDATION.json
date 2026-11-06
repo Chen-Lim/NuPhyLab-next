@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-04",
+  "swiftBuild": {
+    "status": "passed",
+    "command": "xcrun swift build --package-path AIKit --scratch-path /tmp/lab-ai-build"
+  },
+  "standaloneValidation": {
+    "status": "passed",
+    "caseCount": 25,
+    "command": "bash AIKit/Validation/run.sh",
+    "log": "Validation/last-run.txt",
+    "logSHA256": "ef375b03b9566ca77dd0a23e9c677464a335cb713aa1182c9db5fc1289911b76",
+    "implementation": "Actual Sources compiled directly; standalone assertions; not XCTest"
+  },
+  "xctest": {
+    "status": "not_executed",
+    "reason": "Current Command Line Tools lack XCTest module (no such module XCTest); test files parsed successfully only.",
+    "testSourceFiles": 3
+  },
+  "realProviderRequests": false,
+  "apiKeysRead": false,
+  "keychainAccess": false,
+  "physicalInputOrSpeechTested": false,
+  "signatureOrNotarizationPerformed": false,
+  "moduleSourceSHA256": {
+    "AIClient.swift": "9b4285c67c5241762e3135762364d87b21567e724263f6eb5fe9a70a649b00e8",
+    "AIConfiguration.swift": "824ecb69a5ca4fd948101a8676c73f1eaf8b2421517370a7ecf8817e509ca3fa",
+    "AIModelListRequest.swift": "f1d79db0fe90ba23d18264f789418b19c729116c1f79a6f137614cecf63d98ba",
+    "AIRequestBuilder.swift": "13c2af81aabea307f1d668af1b956fc9645d256be9d8c4b5fa782ed8e9e1e7ba",
+    "AIRequestPrompt.swift": "ecf7e1c1b1d054fc22e0aac2c195c6f62cd4edc7cc723842d0e057d1c3e0110b",
+    "AIStreamingParser.swift": "3752d11a9318b5010581504c0f9159f1388dab262bc5df848837bc832105885e",
+    "AIStreamingTransport.swift": "9f9d49ee2f7b9bb71769bd58ca5d9261d93067064bc8e8189e95dcfeb3b1cf3c"
+  },
+  "singleSelectionMaximumImageCount": 1
+}

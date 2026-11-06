@@ -7,6 +7,10 @@ export function setLanguage(value:Language) {
   if (value === currentLanguage) return;
   currentLanguage = value;
   document.documentElement.lang = value;
+  // Update the native HUD immediately as well as React. The host's regular
+  // settings polling remains a fallback if the bridge is still starting.
+  const bridge=(window as unknown as {webkit?:{messageHandlers?:{selectionLab?:{postMessage:(body:unknown)=>Promise<unknown>}}}}).webkit?.messageHandlers?.selectionLab;
+  if(bridge)void bridge.postMessage({op:'language',language:value}).catch(()=>{});
   for (const notify of listeners) notify();
 }
 export function language() {return currentLanguage;}

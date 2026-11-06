@@ -822,17 +822,23 @@ struct BoardSleepBackup: Codable, Equatable {
 struct BoardSleepJournal {
     let url: URL
     var exists: Bool { FileManager.default.fileExists(atPath: url.path) }
-    func read(serial: String, firmware: [UInt8]) throws -> BoardSleepBackup {
+    // A retained journal can be validated while no keyboard is attached. Device
+    // matching is a separate prerequisite for every actual read/write lease.
+    func readRetained() throws -> BoardSleepBackup {
         let saved: BoardSleepBackup
         do { saved = try JSONDecoder().decode(BoardSleepBackup.self, from: Data(contentsOf: url)) }
         catch { throw failure("SLEEP_BACKUP_INVALID", "The original board sleep record cannot be read; it has been retained.") }
         guard saved.schema == 1, !saved.createdAt.isEmpty, saved.vendorID == 0x19f5, saved.productID == 0x1028,
               saved.firmware.count == 8, Array(saved.firmware.prefix(6)) == [23,0,1,170,6,0],
               saved.original.count == 4, saved.original[0] <= 1, saved.installedEnable == 0,
-              !saved.serial.isEmpty, !serial.isEmpty else {
+              !saved.serial.isEmpty else {
             throw failure("SLEEP_BACKUP_INVALID", "The original board sleep record has an invalid identity or schema; it has been retained.")
         }
-        guard saved.serial == serial else {
+        return saved
+    }
+    func read(serial: String, firmware: [UInt8]) throws -> BoardSleepBackup {
+        let saved = try readRetained()
+        guard !serial.isEmpty, saved.serial == serial else {
             throw failure("SLEEP_BACKUP_DEVICE_MISMATCH", "The board sleep record belongs to a different keyboard. No sleep setting was written.")
         }
         guard firmware.count == 8, Array(saved.firmware.prefix(6)) == Array(firmware.prefix(6)) else {
@@ -2384,10 +2390,18 @@ final class Air75Device {
         if boardSleepLeasePending {
             do {
                 if !connected {
-                    // Retain a strictly identified original; never open a new
-                    // device merely because the old USB attachment vanished.
-                    _ = try boardSleepJournal.read(serial:serial,firmware:firmware)
-                    emit(["event":"boardSleepRestoreDeferred","reason":"disconnected","backupPath":boardSleepJournal.url.path])
+                    // A fresh offline helper has no live serial/firmware. That
+                    // is not corruption of a valid original from a prior run.
+                    // An owned/previously identified session still has to match
+                    // its original, and neither branch opens or writes a device.
+                    let neverIdentified = serial.isEmpty && firmware.isEmpty &&
+                        !sleepMutationAttempted && sleepLeaseOriginal == nil
+                    let saved = try neverIdentified ? boardSleepJournal.readRetained() :
+                        boardSleepJournal.read(serial:serial,firmware:firmware)
+                    if let owned = sleepLeaseOriginal, owned != saved {
+                        throw failure("SLEEP_BACKUP_CHANGED", "The owned board sleep original changed; it has been retained.")
+                    }
+                    emit(["event":"boardSleepRestoreDeferred","reason":"disconnected","deviceIdentityVerified":!neverIdentified,"backupPath":boardSleepJournal.url.path])
                 } else {
                     emit(["event":"boardSleepRestoredOnExit","result":try releaseBoardSleepLease()])
                 }
@@ -4853,6 +4867,16 @@ func testBoardSleepLifecycle(_ check: (Bool, String) throws -> Void) throws {
     let pendingOriginal = try Data(contentsOf:pendingDevice.boardSleepJournal.url)
     pendingDevice.didRemove()
     try check(pendingDevice.shutdown() && pendingBoard.writes == [0] && pendingDevice.boardSleepJournal.exists,"unplugged shutdown retains the original without reopening or sending F5")
+    let offlineBase=pendingDevice.boardSleepJournal.url.deletingLastPathComponent().appendingPathComponent("lighting-backup.json")
+    for attempt in 1...2 {
+        var offlineExchangeCount=0
+        let offline=Air75Device(backupURL:offlineBase,testSerial:{pendingBoard.serial},testExchange:{frame in
+            offlineExchangeCount+=1;return try pendingBoard.exchange(frame)
+        })
+        try check(offline.shutdown(),"fresh offline launch \(attempt) defers a valid prior sleep original without a false quit error")
+        try check(offlineExchangeCount==0 && (try Data(contentsOf:offline.boardSleepJournal.url))==pendingOriginal,
+            "fresh offline quit \(attempt) neither opens a keyboard nor alters its original")
+    }
     _ = try pendingDevice.connect();_ = try pendingDevice.acquireBoardSleepLease()
     try check(pendingBoard.writes == [0] && (try Data(contentsOf:pendingDevice.boardSleepJournal.url)) == pendingOriginal,"same-board reconnect resumes the original instead of capturing disabled zero")
     _ = try pendingDevice.releaseBoardSleepLease()
@@ -4914,6 +4938,33 @@ func testBoardSleepLifecycle(_ check: (Bool, String) throws -> Void) throws {
         try rejected("\(mismatch) sleep original fails closed before F5") {_ = try mismatchedDevice.acquireBoardSleepLease()}
         try check(mismatched.writes.isEmpty && (try Data(contentsOf:mismatchedDevice.boardSleepJournal.url)) == exact,"\(mismatch) rejection preserves the exact original bytes")
     }
+    for invalid in ["schema","emptySerial","firmware","flag","short","json"] {
+        sequence+=1
+        var exchanges=0
+        let offline=Air75Device(backupURL:directory.appendingPathComponent("case-\(sequence)/lighting-backup.json"),testExchange:{_ in
+            exchanges+=1;throw failure("SELF_TEST","offline validation must not open a device")
+        })
+        var saved=BoardSleepBackup(createdAt:"fixture",serial:"prior-board",firmware:[23,0,1,170,6,0,0,0],original:[1,6,24,4])
+        if invalid=="schema" {saved.schema=2}
+        if invalid=="emptySerial" {saved.serial=""}
+        if invalid=="firmware" {saved.firmware[0]=22}
+        if invalid=="flag" {saved.original[0]=2}
+        if invalid=="short" {saved.original=[1]}
+        try offline.boardSleepJournal.save(saved)
+        if invalid=="json" {try Data("invalid original".utf8).write(to:offline.boardSleepJournal.url)}
+        let bytes=try Data(contentsOf:offline.boardSleepJournal.url)
+        try check(!offline.shutdown(),"offline \(invalid) original remains an actual recovery error")
+        try check(exchanges==0 && (try Data(contentsOf:offline.boardSleepJournal.url))==bytes,
+            "offline \(invalid) validation preserves exact bytes without hardware IO")
+    }
+    let changedBoard=Board(),changedDevice=try make(changedBoard)
+    _ = try changedDevice.acquireBoardSleepLease();changedDevice.didRemove()
+    var changedOriginal=try changedDevice.boardSleepJournal.readRetained();changedOriginal.original[1] &+= 1
+    try JSONEncoder().encode(changedOriginal).write(to:changedDevice.boardSleepJournal.url)
+    let changedBytes=try Data(contentsOf:changedDevice.boardSleepJournal.url)
+    try check(!changedDevice.shutdown(),"owned offline original replacement remains a recovery error")
+    try check(changedBoard.writes==[0] && (try Data(contentsOf:changedDevice.boardSleepJournal.url))==changedBytes,
+        "owned offline mismatch neither writes nor deletes the replacement")
     let replacement = Board(), replacementDevice = try make(replacement)
     _ = try replacementDevice.acquireBoardSleepLease();replacementDevice.didRemove();replacement.serial = "replacement-board"
     _ = try replacementDevice.connect()

@@ -106,8 +106,10 @@ await writeFile(
 <key>SUVerifyUpdateBeforeExtraction</key><true/>
 <key>SURequireSignedFeed</key><true/>
 <key>LSMinimumSystemVersion</key><string>13.5</string><key>NSHighResolutionCapable</key><true/>
-<key>NSMicrophoneUsageDescription</key><string>将麦克风声音转换为键盘律动灯效。声音仅在本机分析，不保存或上传。</string>
+<key>NSMicrophoneUsageDescription</key><string>用于麦克风律动，以及主动启用“按住说话”后的本机语音转写；录音不保存或上传。</string>
 <key>NSAudioCaptureUsageDescription</key><string>将电脑播放的声音转换为键盘律动灯效。声音仅在本机分析，不保存或上传。</string>
+<key>NSSpeechRecognitionUsageDescription</key><string>将你按住时说出的问题在本机转成文字，文字仅在提交框选问题后发送至你配置的模型服务。</string>
+<key>NSScreenCaptureUsageDescription</key><string>仅在主动框选时截取选定区域，供本机文字识别；提交后按你的设置发送文字或图片至模型服务。</string>
 <key>NSPrincipalClass</key><string>NSApplication</string>
 <key>NSInputMonitoringUsageDescription</key><string>仅在启用按键触发或全局快捷键后监听所选按键，保留正常输入。</string>
 </dict></plist>`,

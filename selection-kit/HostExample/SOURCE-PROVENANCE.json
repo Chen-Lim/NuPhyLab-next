@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-04",
+  "module": "HostExample",
+  "scope": "One transient selection; no persistence, batch questions, UI or Lab app changes.",
+  "note": "New host-facing implementation based on existing Chord policies; not byte-identical production AppModel/InteractionSession. Full originals are intentionally not shipped because they contain excluded workflows.",
+  "policyReferences": [
+    {
+      "path": "apps/macos/Sources/ChordCore/InteractionSession.swift",
+      "sha256": "5f8e3c7a4974c77ab402afa24e19bf36e61e8dc47e75e36f15dff45474b9eef5"
+    },
+    {
+      "path": "apps/macos/Sources/ChordCore/InteractionSubmissionSafety.swift",
+      "sha256": "782d24e683e5705c626a4c699f466d9b4fecf3cc39b6280910e925400087a92d"
+    },
+    {
+      "path": "apps/macos/Sources/ChordCore/IntentSuggestedAction.swift",
+      "sha256": "5430f85009d2be1387a4b325546dc704627a74906cd1b2288664207792950c91"
+    },
+    {
+      "path": "apps/macos/Sources/ChordCore/IntentRequestDraft.swift",
+      "sha256": "7e740cbe05c5bde9ffc3a1221573c9ac01b3c55fbd56d06414135cb1c3116896"
+    },
+    {
+      "path": "apps/macos/Sources/Chord/AppModel+Intent.swift",
+      "sha256": "b84c1612af56147799ff7058bbfb299ba2c9eb4c8e2e02c40c9eaeeb31a60d6d"
+    },
+    {
+      "path": "apps/macos/Sources/Chord/AppModel+Workflows.swift",
+      "sha256": "2224a906317f0ac1ca8a1fc135767498f8f2cd0f8a026c9defd040d255e262c9"
+    }
+  ],
+  "files": [
+    {
+      "path": "Package.swift",
+      "sha256": "ec72952eaf0f696ef1b04347605d5f9f9db3356f00f762b6145af87d0453a3a5",
+      "bytes": 659,
+      "classification": "new_for_single_selection_handoff"
+    },
+    {
+      "path": "Sources/LabSelectionHostExample/SingleSelectionFeature.swift",
+      "sha256": "24d8f42268049977ea40940fcd0c93a0a3e91b4bba80c73c0c52feee7b8fa247",
+      "bytes": 9314,
+      "classification": "new_for_single_selection_handoff"
+    }
+  ]
+}

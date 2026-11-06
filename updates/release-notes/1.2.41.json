@@ -1,0 +1,17 @@
+{
+  "version": "1.2.41",
+  "zh-CN": [
+    "新增“实验室 → 框选提问”，支持翻译、总结、提问和可选的本机语音转写。框选功能需要 macOS 14 或更新版本。",
+    "扩展模型服务的可选型号，支持读取可用模型列表、手动填写模型 ID 和兼容端点；实际可用性取决于服务与账户。",
+    "新增 16 种可保存的翻译目标语言，可在框选设置和翻译回答中切换，独立于界面语言。",
+    "补齐内置作品名、实验室与框选操作的英文显示，统一灰色界面；将“发送图片”放到“按住说话”下方，图片输入需模型支持。",
+    "完善权限与实际监听状态检查；修复未连接键盘时正常备份导致的退出误提示，并避免启动时恢复为过大的窗口。"
+  ],
+  "en": [
+    "Add Labs → Ask about a selection with translation, summaries, questions and optional local speech transcription. Selection requires macOS 14 or later.",
+    "Expand model choices with supported account catalogs, manual model IDs and compatible endpoints. Availability depends on the provider and account.",
+    "Add 16 saved translation-language choices in selection settings and translation answers, independent of the interface language.",
+    "Complete English labels for built-in artwork, Labs and selection controls, unify the gray interface, and place the image switch below Hold to speak. Image input requires model support.",
+    "Improve permission and listener-readiness checks, fix an unnecessary quit warning for valid backups while the keyboard is disconnected, and prevent oversized restored launch windows."
+  ]
+}

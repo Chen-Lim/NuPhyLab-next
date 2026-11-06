@@ -11,7 +11,7 @@ const stub=name=>Object.defineProperty(()=>null,'name',{value:name});
 async function fixture(language='zh-CN'){
  const commands=[],Button=stub('Button');
  const ui=createVMEnvironment({
-  'lucide-react':{},'./primitives':{Button,Modal:stub('Modal'),Switch:stub('Switch'),run:value=>value},
+  'lucide-react':{},'./SelectionLab':{SelectionAPISettings:stub('SelectionAPISettings'),SelectionPermissionSettings:stub('SelectionPermissionSettings')},'./primitives':{Button,Modal:stub('Modal'),Switch:stub('Switch'),run:value=>value},
   './DurationField':{DurationField:stub('DurationField')},'../../shared/lighting-power.mjs':power,
   './StartupGuide':{useStartupCopy:()=> (zh,en)=>language==='en'?en:zh,OFFICIAL_DRIVER_URL:'https://drive.nuphyio.com/#/setting'},'./codexKeys':{nativeCodexKeys:async()=>false},
   './i18n':{useLanguage:()=>language,t:value=>value},'../../package.json':{version:'fixture'},'./api':{readAppState:async()=>null},

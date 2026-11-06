@@ -398,6 +398,51 @@ struct NativeFunctionKeyObservations {
     }
 }
 
+enum NativeWindowStartupGeometry {
+    static func savedFrame(_ value:String?) -> NSRect? {
+        guard let value else{return nil}
+        // AppKit appends system tiling state to the eight frame/screen numbers.
+        // Restore only ordinary geometry, never replay that asynchronous state.
+        let numbers=value.split(whereSeparator:{$0.isWhitespace}).prefix(8).compactMap{Double($0)}
+        guard numbers.count==8,numbers.allSatisfy({$0.isFinite}),numbers[2]>0,numbers[3]>0 else{return nil}
+        let rect=NSRect(x:numbers[0],y:numbers[1],width:numbers[2],height:numbers[3])
+        return valid(rect) ? rect : nil
+    }
+    static func targetScreen(saved:NSRect?,screens:[NSRect],fallback:NSRect)->NSRect {
+        guard let saved,valid(saved) else{return visibleFrame(fallback)}
+        let matches=screens.filter(valid).map { screen -> (NSRect,CGFloat) in
+            let overlap=saved.intersection(screen)
+            return (screen,overlap.isEmpty ? 0 : overlap.width*overlap.height)
+        }
+        if let best=matches.max(by:{$0.1<$1.1}),best.1>0{return best.0}
+        return visibleFrame(fallback)
+    }
+    static func visibleFrame(_ proposed:NSRect) -> NSRect {
+        valid(proposed) ? proposed : NSRect(x:0,y:0,width:1440,height:900)
+    }
+    static func defaultContentSize(visible:NSSize) -> NSSize {
+        let bounds=visibleFrame(NSRect(origin:.zero,size:visible)).size
+        return NSSize(width:min(max(1,bounds.width-32),max(720,min(1080,bounds.width*0.85))),
+            height:min(max(1,bounds.height-32),max(520,min(720,bounds.height*0.82-28))))
+    }
+    static func frame(restored:NSRect?,visible:NSRect,defaultSize:NSSize) -> NSRect {
+        let screen=visibleFrame(visible)
+        let preferred=valid(NSRect(origin:.zero,size:defaultSize)) ? defaultSize : defaultContentSize(visible:screen.size)
+        let size=NSSize(width:min(preferred.width,screen.width),height:min(preferred.height,screen.height))
+        let centered=NSRect(x:screen.midX-size.width/2,y:screen.midY-size.height/2,width:size.width,height:size.height)
+        guard let saved=restored,valid(saved),saved.width>=min(720,size.width),saved.height>=min(520,size.height),
+              saved.width<=size.width+1,saved.height<=size.height+1,
+              !saved.intersection(screen).isEmpty else{return centered}
+        // Ordinary user sizing is retained, but a maximized/tiled/old-display
+        // frame must not make the next launch occupy the entire screen.
+        return NSRect(x:min(max(saved.minX,screen.minX),screen.maxX-saved.width),
+            y:min(max(saved.minY,screen.minY),screen.maxY-saved.height),width:saved.width,height:saved.height)
+    }
+    private static func valid(_ rect:NSRect)->Bool {
+        [rect.origin.x,rect.origin.y,rect.size.width,rect.size.height].allSatisfy{$0.isFinite} && rect.size.width>0 && rect.size.height>0
+    }
+}
+
 enum NativeWindowDragRegion {
     // Window coordinates, in points. Full-size content can report no titlebar
     // layout gap; the actual frame converted from screen is the drag boundary.
@@ -552,6 +597,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     var pendingUpdateVersion: String?
     var preparingUpdate = false
     var workerRestartPolicy = WorkerRestartPolicy()
+    var selectionShortcutRecording=false
+    lazy var selectionLab: any SelectionFeature = SelectionFeatureFactory.make(directory: dataDirectory)
     let windowFrameName = "AirStudio.CompactWindow.v1"
     let dataDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Air Studio")
     var workerLogURL: URL { dataDirectory.appendingPathComponent("Logs/worker.log") }
@@ -580,17 +627,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         window.isMovable=true
         window.titlebarAppearsTransparent=true;window.titleVisibility = .hidden
         window.title="NuPhy Lab";window.contentMinSize=NSSize(width:720,height:520);window.delegate=self;window.isReleasedWhenClosed=false
-        if !window.setFrameUsingName(windowFrameName) {window.center()}
+        window.isRestorable=false
+        let restored=NativeWindowStartupGeometry.savedFrame(UserDefaults.standard.string(forKey:"NSWindow Frame \(windowFrameName)"))
+        let visible=NativeWindowStartupGeometry.targetScreen(saved:restored,screens:NSScreen.screens.map{$0.visibleFrame},
+            fallback:NSScreen.main?.visibleFrame ?? .zero)
+        let contentSize=NativeWindowStartupGeometry.defaultContentSize(visible:visible.size)
+        window.contentMinSize=NSSize(width:min(720,contentSize.width),height:min(520,contentSize.height))
+        let defaultFrame=window.frameRect(forContentRect:NSRect(origin:.zero,size:contentSize))
+        window.setFrame(NativeWindowStartupGeometry.frame(restored:restored,
+            visible:visible,defaultSize:defaultFrame.size),display:false)
+        // Replace the old tiling payload before registering autosave; letting
+        // AppKit restore it can resize the window again after this method ends.
+        window.saveFrame(usingName:windowFrameName)
         window.setFrameAutosaveName(windowFrameName)
         let config=WKWebViewConfiguration();config.preferences.javaScriptCanOpenWindowsAutomatically=false
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"codexKeys")
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"audioControl")
+        config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"selectionLab")
+        selectionLab.updateLanguage(english ? .en:.zh)
+        selectionLab.showSettings = { [weak self] in self?.show(); self?.web.evaluateJavaScript("window.dispatchEvent(new CustomEvent('nuphylab:navigate',{detail:'ai'}))", completionHandler:nil) }
+        selectionLab.recordingChanged = { [weak self] active in self?.selectionShortcutRecording=active;self?.refreshHotkeys() }
+        selectionLab.requestRelaunch = { [weak self] in
+            guard let self, !self.terminating, !self.preparingUpdate, !self.driverOpenInFlight,
+                  !self.capturingKey, self.keyGestureGate.activeCount == 0, !self.selectionLab.isBusy else { return false }
+            self.permissionRelaunchPending = true
+            self.appendWorkerLog(Data("Completing selection permission setup by a clean app relaunch.\n".utf8))
+            NSApp.terminate(nil); return true
+        }
         web=WKWebView(frame:.zero,configuration:config);web.navigationDelegate=self;web.uiDelegate=self
         window.contentView=web;show();startWorker()
         // Targeted events delivered to this window do not always become Carbon
         // global-hotkey events. Share the same held-key gate and action path.
-        localKeyMonitor=NSEvent.addLocalMonitorForEvents(matching:[.keyDown,.keyUp]){[weak self] event in
+        localKeyMonitor=NSEvent.addLocalMonitorForEvents(matching:[.keyDown,.keyUp,.flagsChanged]){[weak self] event in
             guard let self=self else{return event}
+            if self.selectionLab.consumeLocal(event){return nil}
+            guard event.type == .keyDown || event.type == .keyUp else{return event}
             return self.handleLocalKey(event)
         }
         NSWorkspace.shared.notificationCenter.addObserver(self,selector:#selector(willSleep),name:NSWorkspace.willSleepNotification,object:nil)
@@ -799,7 +870,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     @objc func show(){window?.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)}
     func defaultWindowSize() -> NSSize {
         let visible=(window?.screen ?? NSScreen.main)?.visibleFrame.size ?? NSSize(width:1440,height:900)
-        return NSSize(width:max(720,min(1080,visible.width * 0.85)),height:max(520,min(720,visible.height * 0.82 - 28)))
+        return NativeWindowStartupGeometry.defaultContentSize(visible:visible)
     }
     @objc func resetWindowSize(){
         window.setContentSize(defaultWindowSize());window.center()
@@ -845,7 +916,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             }
         }.resume()
     }
-    @objc func willSleep(){ keySessionSuspended=true;setHotkeysEnabled(false);audioCapture.stop();pendingAudio=nil }
+    @objc func willSleep(){ selectionLab.cancel(); keySessionSuspended=true;setHotkeysEnabled(false);audioCapture.stop();pendingAudio=nil }
     @objc func didWake(){ keySessionSuspended=false;if !terminating && !preparingUpdate {post(["op":"resumeConnection"]);refreshHotkeys()} }
     func post(_ data:[String:Any]){guard let base=baseURL else{return};var request=URLRequest(url:base.appendingPathComponent("api/command"));request.httpMethod="POST";request.setValue(apiToken,forHTTPHeaderField:"X-Air-Token");request.setValue("application/json",forHTTPHeaderField:"Content-Type");request.httpBody=try? JSONSerialization.data(withJSONObject:data);URLSession.shared.dataTask(with:request).resume()}
     func activateSlot(_ index:Int,phase:String="down",gesture:NativeKeyGesture?=nil,
@@ -954,6 +1025,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         guard message.frameInfo.isMainFrame,let url=message.frameInfo.request.url,
               url.host==baseURL?.host,url.port==baseURL?.port,
               let body=message.body as? [String:Any] else{replyHandler(nil,"Invalid origin");return}
+        if message.name == "selectionLab" { selectionLab.handle(body, reply: replyHandler); return }
         if message.name == "audioControl" {
             guard let permission=body["permission"] as? String,["microphone","system"].contains(permission) else{replyHandler(nil,"Invalid permission");return}
             let pane=permission == "microphone" ? "Privacy_Microphone" : "Privacy_AudioCapture"
@@ -1043,7 +1115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         permissionRecovery.observe(granted:granted,
             captureReady:localGranted && permissionHelperReady && (!hotkeysEnabled || functionKeyTapIsActive()),now:now,
             freshGrantNeedsRelaunch:fresh != nil && granted && stale)
-        let canRecover = !capturingKey && keyGestureGate.activeCount==0 && !driverOpenInFlight && !preparingUpdate && !permissionRelaunchPending
+        let canRecover = !selectionLab.isBusy && !capturingKey && keyGestureGate.activeCount==0 && !driverOpenInFlight && !preparingUpdate && !permissionRelaunchPending
             && !CommandLine.arguments.contains(PermissionAppRelaunch.argument)
         if permissionRecovery.shouldRecover(now:now,idle:canRecover) {
             permissionRelaunchPending=true
@@ -1087,9 +1159,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         return ["opened":opened,"permission":permission,"permissions":nativePermissionSnapshot()]
     }
     func applicationDidBecomeActive(_ notification:Notification){
+        selectionLab.refreshAuthorization()
         reportNativePermissions(force:true);refreshHotkeys();resumeAfterOfficialDriverIfNeeded()
     }
     func applicationDidResignActive(_ notification:Notification){
+        selectionLab.cancelShortcutRecording()
         if driverOpenInFlight || driverReturnPending {driverReturnSawInactive=true}
         refreshHotkeys()
     }
@@ -1314,7 +1388,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         refreshHotkeys()
     }
     func refreshHotkeys(){
-        setHotkeysEnabled(configuredKeysEnabled && !keySessionSuspended && !capturingKey && !(editingField && NSApp.isActive) && !terminating && hotkeyPollTimer != nil)
+        setHotkeysEnabled(configuredKeysEnabled && !selectionShortcutRecording && !keySessionSuspended && !capturingKey && !(editingField && NSApp.isActive) && !terminating && hotkeyPollTimer != nil)
         if hotkeysEnabled { refreshReservedKeyCapture() }
         if capturingKey && NSApp.isActive && !terminating { _ = startReservedKeyCapture() }
         else if !hotkeysEnabled { stopReservedKeyCapture() }
@@ -1323,7 +1397,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func reportHotkeys(){
         guard baseURL != nil,!terminating else{return}
         _ = reconcileFunctionKeyTap()
-        let suspended=capturingKey || (editingField && NSApp.isActive)
+        let suspended=selectionShortcutRecording || capturingKey || (editingField && NSApp.isActive)
         let signature="\(registeredCodes)|\(failedCodes)|\(suspended)"
         guard signature != lastKeyReportSignature || Date().timeIntervalSince(lastKeyReport)>5 else{return}
         lastKeyReportSignature=signature;lastKeyReport=Date()
@@ -1363,7 +1437,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                 let helper=native?["helper"] as? [String:Any] ?? native
                 self.permissionHelperReady=["inputMonitoring","accessibility","canPostEvents"].allSatisfy{helper?[$0] as? Bool==true}
                 if let value=settings?["language"] as? String, ["en","zh-CN"].contains(value), self.english != (value == "en") {
-                    self.english = value == "en"; self.buildMenus()
+                    self.english = value == "en"; self.buildMenus(); self.selectionLab.updateLanguage(self.english ? .en:.zh)
                     #if canImport(Sparkle)
                     self.updateUserDriver?.refreshLanguage()
                     #endif
@@ -1375,6 +1449,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         hotkeyStateTask?.resume()
     }
     func setHotkeysEnabled(_ enabled:Bool){
+        selectionLab.updateReservedKeys((enabled || selectionShortcutRecording && configuredKeysEnabled) ? Set(keyConfiguration.map{$0.keyCode}) : (capturingKey ? Set(functionKeyCodes.keys):[]))
         if !enabled {cancelPhysicalHold()}
         if enabled {
             guard !hotkeysEnabled else{return}
@@ -1567,6 +1642,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool{show();return true}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply{
         if terminating{return .terminateLater}
+        selectionLab.shutdown()
         resetOfficialDriverReturn()
         stopHotkeyMonitoring()
         guard let worker=worker else{return .terminateNow}

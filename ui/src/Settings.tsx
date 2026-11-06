@@ -1,9 +1,10 @@
+import {SelectionAPISettings, SelectionPermissionSettings} from "./SelectionLab";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ChevronRight, CircleHelp, RotateCcw, Sun } from "lucide-react";
 import { Button, Modal, run, Switch } from "./primitives";
 import { DurationField } from "./DurationField";
 import { DEFAULT_LIGHT_TIME_MS, lightingTimerDeadline } from "../../shared/lighting-power.mjs";
-import { requestAppPermission, refreshAppPermissions, useStartupCopy, OFFICIAL_DRIVER_URL } from "./StartupGuide";
+import { useStartupCopy, OFFICIAL_DRIVER_URL } from "./StartupGuide";
 import { useLanguage, t } from "./i18n";
 import type { AppState, Command } from "./types";
 import packageInfo from "../../package.json";
@@ -17,11 +18,8 @@ import "./device-settings-v5.css";
 import "./settings-overlays-v6.css";
 import "./action-reasons-v7.css";
 
-type SettingsTab = "general" | "lighting" | "permissions" | "updates" | "about";
-type Permission = "inputMonitoring" | "accessibility";
+type SettingsTab = "ai" | "general" | "lighting" | "permissions" | "updates" | "about";
 const timeOptions = [0, 60000, 300000, 900000, 1800000, 3600000, 7200000];
-function granted(value: unknown) { return value === true || value === "granted" || value === "authorized"; }
-function denied(value: unknown) { return value === false || value === "denied" || value === "restricted"; }
 
 function LightingPreferences({ state, command, display, onNavigateStudio }: {state: AppState | null; command: Command; display?: ConnectionDisplay; onNavigateStudio?: () => void}) {
   const copy = useStartupCopy();
@@ -123,43 +121,7 @@ function OutputColorPreferences({state, command, serviceUnknown}: {state: AppSta
   </section>;
 }
 
-function PermissionPreferences({ state, command }: {state: AppState | null; command: Command}) {
-  const copy = useStartupCopy();
-  const [busy, setBusy] = useState<Permission | "refresh" | "">("");
-  const [error,setError] = useState("");
-  const inFlight=useRef(false);
-  const native = state?.native || {};
-  const permissions = native.permissions && typeof native.permissions === "object" ? native.permissions as Record<string,unknown> : native;
-  useEffect(() => {
-    let active=true;
-    const refresh = () => { if (document.hidden || inFlight.current) return; inFlight.current=true;setBusy("refresh");void refreshAppPermissions(command,{silent:true}).catch(()=>{}).finally(()=>{inFlight.current=false;if(active)setBusy("");}); };
-    refresh(); window.addEventListener("focus", refresh); document.addEventListener("visibilitychange", refresh);
-    return () => { active=false;window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
-  }, [command]);
-  const perform = async (permission:Permission|"refresh") => {
-    if(inFlight.current)return;inFlight.current=true;setBusy(permission);setError("");
-    try { if(permission === "refresh")await refreshAppPermissions(command,{silent:true});else await requestAppPermission(command,permission,{silent:true}); }
-    catch(error) { setError(error instanceof Error ? error.message : copy("暂时无法检查权限，请稍后重试。","Could not check permissions. Try again shortly.")); }
-    finally {inFlight.current=false;setBusy("");}
-  };
-  const entries: {id:Permission; title:string; detail:string}[] = [
-    {id: "inputMonitoring", title: copy("输入监控", "Input Monitoring"), detail: copy("用于读取选定按键，响应快捷键与按键灯效。", "Reads selected keys for shortcuts and key-triggered lighting.")},
-    {id: "accessibility", title: copy("辅助功能", "Accessibility"), detail: copy("用于执行系统快捷操作。", "Runs system shortcuts.")},
-  ];
-  return <div className="lab-permission-preferences">
-    <div className="lab-settings-intro"><h2>{copy("Mac 权限", "Mac permissions")}</h2><p>{copy("在使用相关功能时按需授权。", "Grant access when you need a feature.")}</p></div>
-    <div className="lab-setting-panel lab-permissions-panel">{entries.map(({id,title,detail}) => {
-      const allowed = granted(permissions[id]);
-      return <div className="lab-setting-row lab-permission-row" key={id}><div><h3>{title}</h3><p>{detail}</p></div><div className="lab-permission-action">{allowed ? <span className="lab-permission-status ready"><i/>{copy("已允许", "Allowed")}</span> : <><span className="lab-permission-status">{copy(denied(permissions[id]) ? "尚未允许" : "状态未知", denied(permissions[id]) ? "Not allowed" : "Unknown")}</span><Button icon={<ArrowUpRight size={16}/>} busy={busy === id} disabled={Boolean(busy)} onClick={() => run(perform(id))}>{copy("前往授权", "Allow access")}</Button></>}</div></div>;
-    })}
-      <div className="lab-setting-row lab-permission-row"><div><h3>{copy("系统声音", "System audio")}</h3><p>{copy("开始系统声音律动时请求。", "Requested when you start system audio lighting.")}</p></div><span className={`lab-permission-status ${state?.audio?.active && state?.settings.audio && (state.settings.audio as {source?:string}).source === "system" ? "ready" : ""}`}><i/>{state?.audio?.active && (state.settings.audio as {source?:string}|undefined)?.source === "system" ? copy("已允许", "Allowed") : copy("使用时请求", "Requested when used")}</span></div>
-      <div className="lab-setting-row lab-permission-row"><div><h3>{copy("麦克风", "Microphone")}</h3><p>{copy("选择麦克风作为声音来源时请求。", "Requested when microphone input is used.")}</p></div><span className={`lab-permission-status ${state?.audio?.active && (state.settings.audio as {source?:string}|undefined)?.source === "microphone" ? "ready" : ""}`}><i/>{state?.audio?.active && (state.settings.audio as {source?:string}|undefined)?.source === "microphone" ? copy("已允许", "Allowed") : copy("使用时请求", "Requested when used")}</span></div>
-    </div>
-    <div className="lab-permission-footer"><details className="lab-settings-help"><summary><CircleHelp size={15}/>{copy("授权帮助", "Permission help")}</summary><p>{copy("点击「前往授权」直达对应设置，在系统中开启 NuPhy Lab。列表中没有 NuPhy Lab 时，用「＋」添加。返回后会自动检查权限；如系统提示重新打开应用，请按提示操作。", "Choose Allow access and enable NuPhy Lab in System Settings. If it is missing, add it with +. Permissions refresh when you return. Reopen the app if macOS asks you to.")}</p></details><Button kind="ghost" icon={<RotateCcw size={15}/>} busy={busy === "refresh"} disabled={Boolean(busy)} onClick={() => run(perform("refresh"))}>{copy(busy === "refresh" ? "正在检查…" : "重新检查",busy === "refresh" ? "Checking…" : "Check again")}</Button></div>
-    {error && <p className="settings-v6-note is-error" role="alert">{t(error)}</p>}
-    {Boolean(native.error) && <p className="lab-settings-note">{t(String(native.error))}</p>}
-  </div>;
-}
+
 
 function AboutPreferences({ state, command }: {state: AppState | null; command: Command}) {
   const copy = useStartupCopy();
@@ -215,13 +177,14 @@ export function Settings({ state, command, initialTab = "general", display, onNa
   const normalizeTab = (value: SettingsTab): SettingsTab => value === "updates" ? "about" : value;
   const [tab, setTab] = useState<SettingsTab>(normalizeTab(initialTab));
   useEffect(() => { setTab(normalizeTab(initialTab)); }, [initialTab]);
-  const tabs: [SettingsTab,string][] = [["general",copy("通用", "General")],["lighting",copy("灯光与休眠", "Lighting and sleep")],["permissions",copy("权限", "Permissions")],["about",copy("关于与更新", "About & updates")]];
+  const tabs: [SettingsTab,string][] = [["general",copy("通用", "General")],["ai",copy("模型与 API","Models & API")],["lighting",copy("灯光与休眠", "Lighting and sleep")],["permissions",copy("权限", "Permissions")],["about",copy("关于与更新", "About & updates")]];
   return <section className="lab-settings-page">
     <div className="lab-settings-tabs" role="tablist" aria-label={copy("设置分类", "Settings categories")}>{tabs.map(([id,label]) => <button key={id} id={`settings-tab-${id}`} role="tab" aria-selected={tab === id} aria-controls={`settings-panel-${id}`} onClick={() => setTab(id)}>{label}{id==='about'&&availableFirmwareUpdate(state)&&<i className="settings-update-dot" aria-label={copy('键盘固件有可用更新','Keyboard firmware update available')}/>}</button>)}</div>
     <div className="lab-settings-content" id={`settings-panel-${tab}`} role="tabpanel" aria-labelledby={`settings-tab-${tab}`}>
+      {tab === "ai" && <SelectionAPISettings/>}
       {tab === "general" && <div className="lab-setting-panel lab-general-panel"><div className="lab-setting-row"><h3>{copy("语言 / Language", "Language")}</h3><select aria-label={copy("Language / 语言", "Language")} disabled={!state} value={language} onChange={event => run(command({op: "settings", settings: {language:event.target.value}}))}><option value="zh-CN">{copy("简体中文", "Simplified Chinese")}</option><option value="en">English</option></select></div><div className="lab-setting-row"><Switch label={copy("插线后自动连接", "Connect automatically when plugged in")} disabled={!state} checked={Boolean(state?.settings.autoConnect)} onChange={autoConnect => run(command({op:"settings",settings:{autoConnect}}))}/></div></div>}
       {tab === "lighting" && <LightingPreferences state={state} command={command} display={display} onNavigateStudio={onNavigateStudio}/>}
-      {tab === "permissions" && <PermissionPreferences state={state} command={command}/>}
+      {tab === "permissions" && <SelectionPermissionSettings/>}
       {tab === "about" && <AboutPreferences state={state} command={command}/>}
     </div>
   </section>;

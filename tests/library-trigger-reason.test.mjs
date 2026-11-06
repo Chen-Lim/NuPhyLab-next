@@ -1,6 +1,7 @@
 import * as modelLayouts from '../shared/layout.mjs';
 import * as keyboardModels from '../shared/keyboard-models.mjs';
 import test from 'node:test';
+import * as presetNames from '../shared/preset-names.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
@@ -21,6 +22,7 @@ function fixture(scenes,{connected=true,serviceError='',display,otherState={},ca
   const jsx=(type,props,key)=>({type,props:props??{},key}),exports={};
   const props={layout:Array.from({length:84},(_,index)=>({index})),state:{device:{connected,capabilities:{perKey:true}},firmware:{compatible:true},settings:{brightness:100},scenes,...otherState},display,serviceError,onLoad:(...args)=>loads.push(args),onPlay:value=>plays.push(value),onNew(){},command(){throw Error('Unexpected real/API action');},notify(){}};
   const require=name=>{
+    if(name==='../../shared/preset-names.mjs')return presetNames;
     if(name==='../../shared/layout.mjs')return modelLayouts;
     if(name==='../../shared/keyboard-models.mjs')return keyboardModels;
     if(name==='react')return react;

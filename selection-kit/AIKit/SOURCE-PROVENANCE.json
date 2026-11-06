@@ -1,0 +1,121 @@
+{
+  "date": "2026-11-04",
+  "module": "LabSelectionAI",
+  "minimumOS": "macOS14",
+  "originalProjectBusinessSourceModified": false,
+  "files": [
+    {
+      "path": "Package.swift",
+      "sha256": "6264db3c9e5ff1ce8ecbddb4d73e4825d7cf57a72d248341d265dcc077dd8022",
+      "bytes": 397,
+      "classification": "new_for_lab_handoff"
+    },
+    {
+      "path": "README.md",
+      "sha256": "6c11bf433b9903296e49e520e182f944342912ed01c05bd34fec13bcafed4601",
+      "bytes": 7066,
+      "classification": "new_for_lab_handoff"
+    },
+    {
+      "path": "Sources/LabSelectionAI/AIClient.swift",
+      "sha256": "9b4285c67c5241762e3135762364d87b21567e724263f6eb5fe9a70a649b00e8",
+      "bytes": 10662,
+      "classification": "adapted",
+      "originalPath": "apps/macos/Sources/ChordCore/AIClient.swift",
+      "originalSHA256": "2899f1310baa2f8f2e7346cce5d6127adc3187b161f6761d1f659b4dc7bf9ac4",
+      "notes": "Retains bounded stream transport, cancellation and same-response JSON handling; removes app-specific/structured-output parameters; model-list page support."
+    },
+    {
+      "path": "Sources/LabSelectionAI/AIConfiguration.swift",
+      "sha256": "824ecb69a5ca4fd948101a8676c73f1eaf8b2421517370a7ecf8817e509ca3fa",
+      "bytes": 7796,
+      "classification": "adapted",
+      "originalPath": "apps/macos/Sources/ChordCore/AIConfiguration.swift",
+      "originalSHA256": "512a060c205e1c8465042ef4b02cd758ff64cb45585cb8294b1f2d58419ee3b2",
+      "notes": "New independent configuration, regional/overseas endpoint presets, empty model default, explicit image capability, optional workspace and same-origin model-list URL; endpoint and credential isolation design adapted."
+    },
+    {
+      "path": "Sources/LabSelectionAI/AIModelListRequest.swift",
+      "sha256": "f1d79db0fe90ba23d18264f789418b19c729116c1f79a6f137614cecf63d98ba",
+      "bytes": 5363,
+      "classification": "adapted",
+      "originalPath": "apps/macos/Sources/ChordCore/AIModelListRequest.swift",
+      "originalSHA256": "e557c2726aa75301843e2f98044b1dc8bb9aa6b92347bd68eaa493a0e170d31c",
+      "notes": "Retains validation/dedup and safe same-origin route derivation; Anthropic cursor and headers added; Qwen proprietary list rejected explicitly."
+    },
+    {
+      "path": "Sources/LabSelectionAI/AIRequestBuilder.swift",
+      "sha256": "13c2af81aabea307f1d668af1b956fc9645d256be9d8c4b5fa782ed8e9e1e7ba",
+      "bytes": 12094,
+      "classification": "adapted",
+      "originalPath": "apps/macos/Sources/ChordCore/AIRequestBuilder.swift",
+      "originalSHA256": "a1cc0c361460ff2a9e37fc94be12f037c5fd55f2fbd5e76e1d0b169d83946d89",
+      "notes": "Independent builder retains validation and Responses/Chat encoding; removes app dependencies and model-ID heuristics; adds native Anthropic schema/auth/version/refusal; at most one image from the current single selection. Mistral documented text/thinking content arrays parsed with thinking excluded."
+    },
+    {
+      "path": "Sources/LabSelectionAI/AIRequestPrompt.swift",
+      "sha256": "ecf7e1c1b1d054fc22e0aac2c195c6f62cd4edc7cc723842d0e057d1c3e0110b",
+      "bytes": 1619,
+      "classification": "adapted",
+      "originalPath": "apps/macos/Sources/ChordCore/AIRequestPrompt.swift",
+      "originalSHA256": "4bb4f34e38744e221c83252e5625da6ca877aa28ad89a6653b635f560c41f337",
+      "notes": "Interaction safety/output guidance adapted; single selection JSON envelope separates explicit instruction and untrusted content; no structured actions."
+    },
+    {
+      "path": "Sources/LabSelectionAI/AIStreamingParser.swift",
+      "sha256": "3752d11a9318b5010581504c0f9159f1388dab262bc5df848837bc832105885e",
+      "bytes": 15555,
+      "classification": "adapted",
+      "originalPath": "apps/macos/Sources/ChordCore/AIStreamingParser.swift",
+      "originalSHA256": "9e78ca8d1211b17cbaa14b212618f75c5f854dc4cfec7527c76fe07fb44bd6c2",
+      "notes": "Retains SSE framing and Responses/Chat parsing; adds Anthropic native content block lifecycle, latest and legacy refusal checks. Mistral mixed content arrays use shared visible-text parser."
+    },
+    {
+      "path": "Sources/LabSelectionAI/AIStreamingTransport.swift",
+      "sha256": "9f9d49ee2f7b9bb71769bd58ca5d9261d93067064bc8e8189e95dcfeb3b1cf3c",
+      "bytes": 7378,
+      "classification": "adapted",
+      "originalPath": "apps/macos/Sources/ChordCore/AIStreamingTransport.swift",
+      "originalSHA256": "e189721bfd885eecc1886d162548e6d6d1710d1925356e12ba06f4be88ef448f",
+      "notes": "Original implementation body preserved; only provenance header added.",
+      "originalBodyUnchanged": true
+    },
+    {
+      "path": "Tests/LabSelectionAITests/ParserTests.swift",
+      "sha256": "e1b9e9fea459a81aee839a29511d79f87bb82d41e4b2ec2d90504e0c26942d8f",
+      "bytes": 9087,
+      "classification": "new_for_lab_handoff"
+    },
+    {
+      "path": "Tests/LabSelectionAITests/RequestTests.swift",
+      "sha256": "4ed676b9d1324381b17d9e35bb0807c97b010b05f170b6607139008619755d85",
+      "bytes": 8996,
+      "classification": "new_for_lab_handoff"
+    },
+    {
+      "path": "Tests/LabSelectionAITests/TransportTests.swift",
+      "sha256": "0e082dcb9c5a758923bf1537afa431739489ecf08d1e2a76db5648ed1f6a742e",
+      "bytes": 6774,
+      "classification": "new_for_lab_handoff"
+    },
+    {
+      "path": "Validation/Validation.swift",
+      "sha256": "75226a8f1c7293acd9d7130ab16928b31ef6819c8006095c291b7a71a8c9c6c0",
+      "bytes": 20507,
+      "classification": "new_for_lab_handoff"
+    },
+    {
+      "path": "Validation/last-run.txt",
+      "sha256": "ef375b03b9566ca77dd0a23e9c677464a335cb713aa1182c9db5fc1289911b76",
+      "bytes": 1683,
+      "classification": "new_for_lab_handoff"
+    },
+    {
+      "path": "Validation/run.sh",
+      "sha256": "926dc70e1bee0477e67c6385483ce75912099e80361b5493a20e7364ca8c7a06",
+      "bytes": 540,
+      "classification": "new_for_lab_handoff"
+    }
+  ],
+  "claims": "An extracted/adapted module, not byte-identical full Chord app. No secrets, settings, UI, stored-selection feature or third-party package dependency."
+}

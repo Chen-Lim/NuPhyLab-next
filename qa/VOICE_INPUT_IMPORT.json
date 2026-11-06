@@ -1,0 +1,24 @@
+{
+  "source": "selection-kit/NativeKit",
+  "imported": [
+    "IntentTapRunLoop.swift",
+    "SpeechRecognitionPolicy.swift",
+    "VoiceAudioWorker.swift",
+    "VoiceInputLifecycle.swift",
+    "LocalVoiceCapture.swift",
+    "ModernSpeechRecognition.swift",
+    "InputBindingRuntimeState.swift",
+    "InputModifiers.swift",
+    "SelectionHoldMonitor.swift",
+    "VoiceCaptureService.swift",
+    "InputBinding.swift",
+    "VoiceAudioExecutor.swift",
+    "VoiceSession.swift",
+    "IntentInputBridge.swift",
+    "ModifierEventState.swift",
+    "IntentInputSource.swift",
+    "InputBindingPolicy.swift"
+  ],
+  "change": "Flatten module; remove ChordAudioBoundary import and use bridging header. Existing package provenance remains.",
+  "audioBoundary": "native/selection-audio"
+}

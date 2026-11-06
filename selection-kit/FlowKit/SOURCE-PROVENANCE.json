@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-04",
+  "module": "FlowKit",
+  "scope": "One transient selection; no persistence, batch questions, UI or Lab app changes.",
+  "note": "New host-facing implementation based on existing Chord policies; not byte-identical production AppModel/InteractionSession. Full originals are intentionally not shipped because they contain excluded workflows.",
+  "policyReferences": [
+    {
+      "path": "apps/macos/Sources/ChordCore/InteractionSession.swift",
+      "sha256": "5f8e3c7a4974c77ab402afa24e19bf36e61e8dc47e75e36f15dff45474b9eef5"
+    },
+    {
+      "path": "apps/macos/Sources/ChordCore/InteractionSubmissionSafety.swift",
+      "sha256": "782d24e683e5705c626a4c699f466d9b4fecf3cc39b6280910e925400087a92d"
+    },
+    {
+      "path": "apps/macos/Sources/ChordCore/IntentSuggestedAction.swift",
+      "sha256": "5430f85009d2be1387a4b325546dc704627a74906cd1b2288664207792950c91"
+    },
+    {
+      "path": "apps/macos/Sources/ChordCore/IntentRequestDraft.swift",
+      "sha256": "7e740cbe05c5bde9ffc3a1221573c9ac01b3c55fbd56d06414135cb1c3116896"
+    },
+    {
+      "path": "apps/macos/Sources/Chord/AppModel+Intent.swift",
+      "sha256": "b84c1612af56147799ff7058bbfb299ba2c9eb4c8e2e02c40c9eaeeb31a60d6d"
+    },
+    {
+      "path": "apps/macos/Sources/Chord/AppModel+Workflows.swift",
+      "sha256": "2224a906317f0ac1ca8a1fc135767498f8f2cd0f8a026c9defd040d255e262c9"
+    }
+  ],
+  "files": [
+    {
+      "path": "Checks/main.swift",
+      "sha256": "915167ebdc0bd738285d26dc2b535595e57ddcfd5858cd671bee9d4b40e32b7a",
+      "bytes": 11166,
+      "classification": "new_for_single_selection_handoff"
+    },
+    {
+      "path": "Package.swift",
+      "sha256": "b99336fd2425381feb100873174951f842e01e7785f21fb36db09acdcb3eb17d",
+      "bytes": 697,
+      "classification": "new_for_single_selection_handoff"
+    },
+    {
+      "path": "Sources/LabSelectionFlow/SelectionCoordinator.swift",
+      "sha256": "e496aa29a755d28e56cd232c7a73df0b97d5e5ba8c38a84878233a1945c798c3",
+      "bytes": 6205,
+      "classification": "new_for_single_selection_handoff"
+    },
+    {
+      "path": "Sources/LabSelectionFlow/SelectionSession.swift",
+      "sha256": "6b6614a49908bbf60008964775c145affc9758f478e17ea7b06494682b9f8b71",
+      "bytes": 10230,
+      "classification": "new_for_single_selection_handoff"
+    },
+    {
+      "path": "Tests/LabSelectionFlowTests/SelectionCoordinatorTests.swift",
+      "sha256": "7ab34882dbe7c145ea8217aff9bc082b42d83f6378a1a58e8371cb14cc9b4b7f",
+      "bytes": 5835,
+      "classification": "new_for_single_selection_handoff"
+    },
+    {
+      "path": "Tests/LabSelectionFlowTests/SelectionSessionTests.swift",
+      "sha256": "d49f1aa7be18de3c176bbf70a3617174d2f658dfb5b5865340a914c367b1cdca",
+      "bytes": 6969,
+      "classification": "new_for_single_selection_handoff"
+    }
+  ]
+}

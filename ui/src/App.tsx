@@ -1,3 +1,4 @@
+import {displayPresetName} from '../../shared/preset-names.mjs';
 import {getKeyboardProfile,isKeyboardModel} from '../../shared/keyboard-models.mjs';
 import {getLayoutModel} from '../../shared/layout.mjs';
 import {nativeLightingOnly} from '../../shared/device-status.mjs';
@@ -12,6 +13,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {useCodexKeys} from './codexKeys';
 import {
   CircleAlert,
+  FlaskConical,
+  ChevronDown,
+  ScanLine,
   SquareTerminal,
   Folder,
   Keyboard,
@@ -30,6 +34,7 @@ import { Codex } from "./Codex";
 import { ClaudeCode } from "./ClaudeCode";
 import { agentSource } from "./AgentSourceSwitch";
 import { Device } from "./Device";
+import {SelectionLab} from "./SelectionLab";
 import { Settings } from "./Settings";
 import {availableFirmwareUpdate} from '../../shared/firmware-onboarding.mjs';
 import './update-notices.css';
@@ -43,7 +48,7 @@ import { triggerPlaybackConfig } from "../../shared/trigger.mjs";
 import { blankColors, DEFAULT_ANIMATION } from "./types";
 import type { Scene, StudioMode } from "./types";
 import {useLanguage, setLanguage} from "./i18n";
-type Page = "studio" | "library" | "codex" | "device" | "settings" | "game" | "audio" | "offline";
+type Page = "selection-question" | "studio" | "library" | "codex" | "device" | "settings" | "game" | "audio" | "offline";
 const cloneScene = (scene: Scene): Scene => JSON.parse(JSON.stringify(scene));
 const modeForScene = (scene: Scene): StudioMode =>
   scene.trigger ? "trigger" : scene.animation.effect === "static" ? "paint" : "animation";
@@ -58,11 +63,11 @@ type LibraryPlayRequest = { id: string; scene: Scene; action: 'open' | 'new'; co
 export default function App() {
   const language=useLanguage();
   const [draftSession, setDraftSession] = useState(0);
-  const [settingsTab, setSettingsTab] = useState<"general"|"lighting"|"permissions"|"updates"|"about">("general");
+  const [settingsTab, setSettingsTab] = useState<"general"|"lighting"|"permissions"|"updates"|"about"|"ai">("general");
   useEffect(()=>{
     const navigate=(event:Event)=>{
       const target=(event as CustomEvent<string>).detail;
-      if(target === "lighting" || target === "permissions" || target === "updates" || target === "about" || target === "general") {setSettingsTab(target);setPage("settings");}
+      if(target === "ai" || target === "lighting" || target === "permissions" || target === "updates" || target === "about" || target === "general") {setSettingsTab(target);setPage("settings");}
       else if(target === "device" || target === "library")setPage(target);
     };
     window.addEventListener("nuphylab:navigate",navigate);
@@ -70,6 +75,7 @@ export default function App() {
   },[]);
   const [studioMode, setStudioMode] = useState<StudioMode>("paint");
   const [focusCodexColors,setFocusCodexColors] = useState(false);
+  const [labExpanded,setLabExpanded] = useState(false);
   const [page, setPage] = useState<Page>("studio"),
     [draft, setDraft] = useState<Scene>({
       name: "一颗小心意",
@@ -176,7 +182,7 @@ export default function App() {
   useEffect(()=>{saveAttemptId.current=null;},[draftSession,modelId]);
   const openSave = () => {
     setSaveError("");
-    setSaveName(draft.name);
+    setSaveName(displayPresetName(draft.name,tr));
     setSaveCopy(false);
     setSaveOpen(true);
   };
@@ -289,7 +295,8 @@ export default function App() {
     } catch {notify('暂时无法读取本机草稿。原记录已保留，请重试读取。');}
   };
   const creative = ["studio", "audio", "offline"].includes(page);
-  const pageTitle = creative ? "灯光创作" : page === "library" ? "作品库" : page === "codex" ? "AI 助手" : page === "game" ? "灯光游戏" : page === "settings" ? "设置" : "设备";
+  useEffect(()=>{window.scrollTo(0,0);},[page]);
+  const pageTitle = page === "selection-question" ? "框选提问" : creative ? "灯光创作" : page === "library" ? "作品库" : page === "codex" ? "AI 助手" : page === "game" ? "灯光游戏" : page === "settings" ? "设置" : "设备";
   return (
     <KeyboardModuleContext.Provider value={state?.settings.airTopRightModule === "keycap" ? "keycap" : "rotary"}>
     <div className="app-shell lab-v5" data-page={page} data-native={Boolean((window as Window & {webkit?:unknown}).webkit)}>
@@ -303,6 +310,10 @@ export default function App() {
             ["codex", "AI 助手", SquareTerminal],
             ["game", "灯光游戏", Gamepad2],
           ] as const).map(([id, label, Icon]) => <button key={id} aria-label={tr(label)} title={tr(label)} className={(id === "studio" ? creative : page === id) ? "active" : ""} aria-current={(id === "studio" ? creative : page === id) ? "page" : undefined} onClick={()=>setPage(id)}><Icon size={18} strokeWidth={1.5}/><span>{tr(label)}</span></button>)}
+          <button className={'lab-nav-parent '+(page==='selection-question'?'contains-active':'')} aria-label={tr('实验室')} aria-expanded={labExpanded} aria-controls="lab-feature-navigation" onClick={()=>setLabExpanded(value=>!value)}><FlaskConical size={18} strokeWidth={1.5}/><span>{tr('实验室')}</span><ChevronDown className="lab-nav-chevron" size={13}/></button>
+          <div id="lab-feature-navigation" className="lab-subnav" hidden={!labExpanded}>
+            <button className={page==='selection-question'?'active':''} aria-current={page==='selection-question'?'page':undefined} aria-label={tr("框选提问")} title={tr("框选提问")} onClick={()=>setPage('selection-question')}><ScanLine size={16} strokeWidth={1.5}/><span>{tr("框选提问")}</span></button>
+          </div>
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-output sidebar-output-v7" role="status" data-connection-state={connectionDisplay.stateId}><span>{connectionCopy({zh:'键盘输出',en:'Keyboard output'})}</span><strong title={connectionSidebar(connectionDisplay)}>{connectionSidebar(connectionDisplay)}</strong></div>
@@ -380,6 +391,7 @@ export default function App() {
               onOffline={()=>setPage(nativeOnly ? "offline" : "studio")}
             />
           ))}
+          {page === "selection-question" && <SelectionLab/>}
           {page === "settings" && <Settings state={state} command={command} display={connectionDisplay} onNavigateStudio={()=>setPage("studio")} initialTab={settingsTab}/>}
         </div>
       </main>
@@ -389,7 +401,7 @@ export default function App() {
         <Button busy={draftTransitionBusy} disabled={saveBusy} onClick={()=>run(adoptLibraryPlay(pendingLibraryPlay))}>{tr(pendingLibraryPlay.action==='new'?'放弃修改并新建':'放弃修改并打开')}</Button>
         <Button kind="primary" data-modal-retry busy={saveBusy||draftTransitionBusy} disabled={!pendingLibraryPlay.saved&&!(draft.name.trim()||guardSaveName.trim())} onClick={()=>run(saveThenLibraryPlay())}>{tr(saveBusy?'保存中…':pendingLibraryPlay.saved?(pendingLibraryPlay.action==='new'?'重试新建':'重试打开'):pendingLibraryPlay.action==='new'?(saveError?'重试保存后新建':'保存后新建'):(saveError?'重试保存后打开':'保存后打开'))}</Button>
       </>}>
-        <p>{tr('先处理「')}<span translate="no">{draft.name||tr('未命名作品')}</span>{pendingLibraryPlay.action==='new'?tr('」的修改，再新建作品。'):<>{tr('」的修改，再打开「')}<span translate="no">{pendingLibraryPlay.scene.name}</span>{language==='en'?'”.':'」。'}</>}</p>
+        <p>{tr('先处理「')}<span translate="no">{displayPresetName(draft.name,tr)||tr('未命名作品')}</span>{pendingLibraryPlay.action==='new'?tr('」的修改，再新建作品。'):<>{tr('」的修改，再打开「')}<span translate="no">{displayPresetName(pendingLibraryPlay.scene.name,tr)}</span>{language==='en'?'”.':'」。'}</>}</p>
         {!draft.name.trim()&&<label className="form-field">{tr('作品名称')}<input aria-label={tr('保存当前草稿名称')} value={guardSaveName} disabled={saveBusy} maxLength={80} onChange={event=>{setGuardSaveName(event.target.value);setSaveError('');}}/></label>}
         <p className="muted">{tr('取消会保留当前草稿和键盘输出。')}</p>
         {saveError&&<div className="overlay-error" role="alert"><CircleAlert size={14}/><span>{tr(saveError)}</span></div>}

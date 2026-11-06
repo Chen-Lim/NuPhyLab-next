@@ -10,7 +10,9 @@ A macOS lighting studio for **NuPhy AIR65 / AIR75 / AIR100 V3, NODE75 / NODE100 
 
 ### [直接下载最新版安装包 · Download the latest macOS installer](https://github.com/bohu8264/NuPhyLab-next/releases/latest/download/NuPhyLab-macOS-AppleSilicon.dmg)
 
-**Apple Silicon · macOS 13.5 或以上 / macOS 13.5 or later**
+**Apple Silicon · 键盘功能 macOS 13.5+ · 框选提问 macOS 14+**
+
+**Apple Silicon · macOS 13.5+ for keyboard features · macOS 14+ for selection**
 
 - [最新版本与更新说明 / Latest release and notes](https://github.com/bohu8264/NuPhyLab-next/releases/latest)
 - [项目源码 / Source code](https://github.com/bohu8264/NuPhyLab-next/tree/main)
@@ -63,6 +65,8 @@ Approval commands require a current request. Sending requires the chat composer 
 - 按键触发、键盘游戏和声音律动。/ Key-triggered effects, keyboard games and audio-reactive lighting.
 - Codex / Claude Code 任务快捷键和状态灯。/ Codex / Claude Code task shortcuts and status lights.
 - USB 自动识别键盘型号，各型号的作品分别保存。/ Automatic USB model detection, with separate artwork for each keyboard model.
+- 框选翻译、总结与提问，可选本机语音转写，并连接自己的模型服务。/ Selection translation, summaries and questions, with optional local speech transcription and your own model service.
+- 中英文界面与 16 种可保存的翻译目标语言。/ Chinese and English interfaces, with 16 saved translation-language choices.
 
 ## 文档与源码 / Documentation and source
 
@@ -71,3 +75,19 @@ Approval commands require a current request. Sending requires the chat composer 
 - [发布流程（中文）](docs/RELEASING.md) · [Release workflow (English)](docs/RELEASING.en.md)
 - [第三方声明 / Third-party notices](THIRD_PARTY_NOTICES.md)
 - [问题反馈 / Report an issue](https://github.com/bohu8264/NuPhyLab-next/issues)
+
+## 框选提问 / Ask about a selection
+
+打开 **实验室 → 框选提问**，在 **设置 → 模型与 API** 选择服务和模型并保存自己的 API Key，按提示完成授权。按住快捷键拖动框选，松开后获得翻译或总结，也可输入或口述问题。
+
+Open **Labs → Ask about a selection**, choose a service and model in **Settings → Models & API**, and save your own API key. Complete the permission prompts, hold the shortcut, drag over a region and release for a translation or summary. You can also type or dictate a question.
+
+“翻译为”支持中文、英语、日语、韩语等 16 种语言，选择会保存。界面语言与翻译目标独立设置。“发送图片”位于“按住说话”下方，仅在你开启且所选模型支持图片输入时使用；语音在本机转写。
+
+**Translate to** offers 16 languages, including Chinese, English, Japanese and Korean, and remembers your choice independently of the interface language. The image switch sits below **Hold to speak** and requires a model that supports image input. Speech is transcribed locally.
+
+选区文字与问题会发送到你配置的模型服务；图片仅在启用后按操作需要发送，API Key 保存在本机钥匙串中。
+
+Selected text and questions are sent to your configured model service. Images are included only when enabled and needed for the selected action. API keys are stored in the local Keychain.
+
+[设置与使用 / Setup and usage](docs/SELECTION.md) · [界面与翻译语言 / Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [1.2.41 更新说明 / What's new in 1.2.41](docs/RELEASE_1.2.41.md)

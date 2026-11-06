@@ -1,0 +1,26 @@
+Standalone fixture validation: 25 cases passed; no real provider traffic, no XCTest execution.
+1. 10 provider/region presets: HTTPS, explicit model required
+2. Reject insecure endpoint, URL credentials, queries, fragments and whitespace
+3. Credential identity separates origin, protocol and workspace
+4. Image opt-in, image count/signature, text size and header limits
+5. Responses request text/image schema and store=false
+6. All Chat-compatible presets use documented basic schema
+7. Anthropic native image/system/version/workspace/auth schema
+8. Explicit instruction separate from untrusted selected text
+9. Model-list pagination, de-duplication, unsupported Qwen catalog rejection
+10. SSE BOM, CRLF, comments, multiline data and split UTF-8
+11. Chat terminal stop, repeated stop and empty usage chunks
+12. Chat missing stop, truncation and tool calls are not successful answers
+13. Mistral thinking/text chunk transition and JSON; no reasoning exposure
+14. Responses canonical final value avoids replaying deltas
+15. Anthropic stream requires closed blocks, valid stop reason and message_stop
+16. Anthropic new/legacy refusal, output limit and tool handoff rejection
+17. Anthropic JSON text and latest refusal detail
+18. Anthropic initial text and deltas across multiple content blocks
+19. Production transport processes byte-fragmented UTF-8 SSE once
+20. Compatible JSON on same streaming request; no extra request
+21. HTTP failure sanitized; no automatic retry
+22. Cancellation stops outstanding URLSession task
+23. Deadline timer ends stalled connection without retries
+24. Transport enforces actual received byte cap
+25. Redirect delegate returns nil and rejects the request

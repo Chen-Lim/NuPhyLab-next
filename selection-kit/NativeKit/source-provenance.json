@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "snapshotDate": "2026-11-04",
+  "sourceRoot": "Chord repository root (relative source paths, current working-tree content, not an older Git commit)",
+  "module": "LabSelectionNative",
+  "scope": "Single explicitly selected item; no saved multi-selection or later grouped-question workflow.",
+  "classification": {
+    "copied": "Byte-identical to the listed source hash.",
+    "adapted": "Explicitly modified/subset or host adapter based on listed production source(s).",
+    "new": "New handoff scaffolding, docs or verification."
+  },
+  "notes": [
+    "All Sources files are in compiled SwiftPM targets.",
+    "No original Chord source files were changed by this extraction.",
+    "Manifest excludes its own hash to avoid circularity.",
+    "Original files may contain out-of-scope functionality; only classified output files are delivered."
+  ],
+  "records": [
+    {
+      "output": "Package.swift",
+      "mode": "new",
+      "sources": [],
+      "outputSHA256": "a409eafcf9f5a257bd1f1d90fe6cab357b2c81c85f8db41b9930102bf42be082",
+      "adaptation": "New standalone package, documentation or synthetic verification code for this handoff."
+    },
+    {
+      "output": "README.md",
+      "mode": "new",
+      "sources": [],
+      "outputSHA256": "9aaef7cfa7c5fe37f18e11c4b50679d8c4b81c1526237346ab0a23a30a442797",
+      "adaptation": "New standalone package, documentation or synthetic verification code for this handoff."
+    },
+    {
+      "output": "Sources/ChordAudioBoundary/ChordAudioBoundary.m",
+      "mode": "copied",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordAudioBoundary/ChordAudioBoundary.m",
+          "sha256": "b33a260c35fcb1c3eb7b5dcc4b62317024583b68c142a76dbe969c0faba913bb"
+        }
+      ],
+      "outputSHA256": "b33a260c35fcb1c3eb7b5dcc4b62317024583b68c142a76dbe969c0faba913bb",
+      "adaptation": "Byte-for-byte production source copy."
+    },
+    {
+      "output": "Sources/ChordAudioBoundary/include/ChordAudioBoundary.h",
+      "mode": "copied",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordAudioBoundary/include/ChordAudioBoundary.h",
+          "sha256": "17251a20f423c7a571a279e35ecc447bf14141d002286d3cf116451a2c58ace0"
+        }
+      ],
+      "outputSHA256": "17251a20f423c7a571a279e35ecc447bf14141d002286d3cf116451a2c58ace0",
+      "adaptation": "Byte-for-byte production source copy."
+    },
+    {
+      "output": "Sources/LabSelectionNative/InputBinding.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/InputBinding.swift",
+          "sha256": "c94905843802e19d578a04459979dbcc8b2c36f234546434fa9618d08b0e01da"
+        }
+      ],
+      "outputSHA256": "846d5ca39220c69c2570823d54c2754e8234ec3d4fbcca5528b9d5e59855c59c",
+      "adaptation": "Single binding and physical-pair reducers only; removed stored configuration, workflow/purpose and shortcut integrations; neutral host-facing labels."
+    },
+    {
+      "output": "Sources/LabSelectionNative/InputBindingPolicy.swift",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/InputBinding.swift",
+          "sha256": "c94905843802e19d578a04459979dbcc8b2c36f234546434fa9618d08b0e01da"
+        }
+      ],
+      "mode": "adapted",
+      "outputSHA256": "335b8055ace466dc6446c248588ed56eb8d7ff13a07713de6b874af441ded5a0",
+      "adaptation": "Single-selection validator extracted from the policy; no other workflow bindings or recorder/settings dependencies."
+    },
+    {
+      "output": "Sources/LabSelectionNative/InputBindingRuntimeState.swift",
+      "mode": "copied",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/InputBindingRuntimeState.swift",
+          "sha256": "15a17d6a0a8af66d96fd529a0b3e78e20ad362ec84b65c058d48d61bbcd4a48e"
+        }
+      ],
+      "outputSHA256": "15a17d6a0a8af66d96fd529a0b3e78e20ad362ec84b65c058d48d61bbcd4a48e",
+      "adaptation": "Byte-for-byte production source copy."
+    },
+    {
+      "output": "Sources/LabSelectionNative/InputModifiers.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/InputMatching.swift",
+          "sha256": "8a420560f39814147e85839b9995020839196f977452633df610148ed6d3c877"
+        }
+      ],
+      "outputSHA256": "0e3c233e8f829753a122ca768c6c60bc80846e6f7c22f4f51f458b9196f6360c",
+      "adaptation": "Only InputModifiers OptionSet retained from InputMatching."
+    },
+    {
+      "output": "Sources/LabSelectionNative/IntentInputBridge.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/IntentInputBridge.swift",
+          "sha256": "995c26805218878338eb0f6f7f8a155b99e87e2c45677982fb0578395cd34c08"
+        }
+      ],
+      "outputSHA256": "76c0805df9aad01b72330ff2b96047f1120f6ad3b63a2453274b59d3096d6a2a",
+      "adaptation": "Production bridge/side geometry retained; removed one obsolete multi-selection comment."
+    },
+    {
+      "output": "Sources/LabSelectionNative/IntentInputSource.swift",
+      "mode": "copied",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/IntentInputSource.swift",
+          "sha256": "f453703a3f5ab622f198a459519c7265ef7e78b9cba17b4f9d8d7a31cb7dd566"
+        }
+      ],
+      "outputSHA256": "f453703a3f5ab622f198a459519c7265ef7e78b9cba17b4f9d8d7a31cb7dd566",
+      "adaptation": "Byte-for-byte production source copy."
+    },
+    {
+      "output": "Sources/LabSelectionNative/IntentTapRunLoop.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/Input/IntentTapRunLoop.swift",
+          "sha256": "5039f230873b6394bc8153396b024e7bc167a0cb424cb9d2d5ab33414b9bf4a0"
+        }
+      ],
+      "outputSHA256": "0420e3698a1fb01ce810475b960f297fea57c7d764cfc663050bc79ced178e32",
+      "adaptation": "Thread label adapted; production lifetime gate, dedicated CFRunLoop and callback machinery retained."
+    },
+    {
+      "output": "Sources/LabSelectionNative/LocalVoiceCapture.swift",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/AI/VoiceCaptureService.swift",
+          "sha256": "1d395d4a3153c1d082645b63b668bd3b29cbcbb841cd6655926e206bc411027b"
+        },
+        {
+          "path": "apps/macos/Sources/ChordCore/InteractionSession.swift",
+          "sha256": "5f8e3c7a4974c77ab402afa24e19bf36e61e8dc47e75e36f15dff45474b9eef5"
+        },
+        {
+          "path": "apps/macos/Sources/ChordCore/InteractionDiagnostics.swift",
+          "sha256": "5c6d10e2bcdd2a4860168a93473c3d305f3d96f20128f20d441e9dd54cf37e1b"
+        }
+      ],
+      "mode": "adapted",
+      "outputSHA256": "18476890837f89554a543a5fb077b8770b863800dc68307d636a75217d21c6bf",
+      "adaptation": "New no-UI facade around adapted production service; single transcript result enum and bounded diagnostics only; no full InteractionSession or library code."
+    },
+    {
+      "output": "Sources/LabSelectionNative/ModernSpeechRecognition.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/AI/ModernSpeechRecognition.swift",
+          "sha256": "fe8359978553fda545c8ccdd17b296fae57eb7c46bd47ed3ff39c04d581a039e"
+        }
+      ],
+      "outputSHA256": "c7225691ac3ce2e9f14a65b9db27fc070d69a088593c15944dc8e0d5a3337cc4",
+      "adaptation": "ChordCore import removed; installed-model-only macOS 26 branch retained."
+    },
+    {
+      "output": "Sources/LabSelectionNative/ModifierEventState.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/ModifierEventState.swift",
+          "sha256": "0fb54e2fa7dddd1922275983795c8f517866b6db00a2d6e28c20b1cfe826d1c2"
+        }
+      ],
+      "outputSHA256": "214f96380e79e04f6d868753667b9ea75009cb14387b1102d4f0b293d9e6ae0c",
+      "adaptation": "Only modifier edge normalization retained; recording-step representation removed."
+    },
+    {
+      "output": "Sources/LabSelectionNative/NativeCapture.swift",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/Input/SelectionCapture.swift",
+          "sha256": "97e0ac0d644f3f69c97b5665364222b04be1deaf3cee90977fb518204e14d159"
+        },
+        {
+          "path": "apps/macos/Sources/Chord/Input/PermissionService.swift",
+          "sha256": "c5c32351f8fc4c7a0adc40c0019a97a9e9299b386cf0738a34b116c3e43f08b4"
+        },
+        {
+          "path": "apps/macos/Sources/Chord/Input/ScreenAwarenessService.swift",
+          "sha256": "e8d44a36a3667b75412c002cba0efd86325292d255037b8b733d7b37d1bd6ff5"
+        }
+      ],
+      "mode": "adapted",
+      "outputSHA256": "5243b49228576334be4d49491ef420193a09430f61a53ac3788d204189e835ba",
+      "adaptation": "Public read-only permission snapshot and AX selected-text adapter; screenshot picker, permission request UI and general actions excluded; bounded text and ancestor protection included."
+    },
+    {
+      "output": "Sources/LabSelectionNative/RegionCaptureService.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/Input/RegionCaptureService.swift",
+          "sha256": "19fa844812a73472a61992333aa2afbb3daa0bd51fa4cb639aa84ce0f393996a"
+        }
+      ],
+      "outputSHA256": "34d30dcf5c00798eef03d3ef89e91f577376540b01e106d3134937f2f1224f02",
+      "adaptation": "Public single-region capture; caller/system OCR languages filtered against installed Vision support; protected-focus/center guard included for direct callers."
+    },
+    {
+      "output": "Sources/LabSelectionNative/ScreenAwarenessService.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/Input/ScreenAwarenessService.swift",
+          "sha256": "e8d44a36a3667b75412c002cba0efd86325292d255037b8b733d7b37d1bd6ff5"
+        }
+      ],
+      "outputSHA256": "b905ad550bf91c4d25090c006807049b1280fe4ecc08fe002fd8ac7c465f7fc5",
+      "adaptation": "Public single-object actor and DTO; A/B label, two-object limit and brand-specific message removed; protected metadata checks retained."
+    },
+    {
+      "output": "Sources/LabSelectionNative/ScreenshotNetworkImage.swift",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/ScreenshotAIImagePreparation.swift",
+          "sha256": "a19bb59aeea9f778169e282211aac707cd4f9da3b06613593d9ca0c4e90ebfe5"
+        }
+      ],
+      "mode": "adapted",
+      "outputSHA256": "ef0351082328710f35262739f43b30cbc517ca99bb8477b791632eea809f300a",
+      "adaptation": "Single PNG only; same 2048/1600/1200/800 and 3 MiB network limits, ImageIO thumbnail replaces artifact renderer; no arrays, editor or saved multi-selection policy."
+    },
+    {
+      "output": "Sources/LabSelectionNative/SelectionHoldMonitor.swift",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/Input/IntentModifierMonitor.swift",
+          "sha256": "7f422eb749ce4a8a2944bd40f53b6787d8d63d73f287cd81b043b2eac1176f00"
+        }
+      ],
+      "mode": "adapted",
+      "outputSHA256": "c6cb698980c859aa5f0a214c5a50cc83e87be8a484e0fc862200dfdde62d92af",
+      "adaptation": "Single binding host adapter based on production monitor: independent runloop, precise standard/NX side-pair ownership, move coalescing, generation cancellation, physical-up drain, safety/session/display cancellation; no multi-workflow routing, shortcut handoffs or full AppModel."
+    },
+    {
+      "output": "Sources/LabSelectionNative/SelectionModels.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/IntentModels.swift",
+          "sha256": "55c7dfe2f416847f4e085a8b9c6fe11e23b2847ec77997df25267d0353f7f7f3"
+        },
+        {
+          "path": "apps/macos/Sources/ChordCore/Models.swift",
+          "sha256": "b0eef5e361011a3490e1e0eb0d1c3c3a7ea0aece1d9208cffa5480700fa31f1d"
+        }
+      ],
+      "outputSHA256": "4cc6aa4350da46434560cc288673ae94de3527e7de33d61d2dc87104cdb95dac",
+      "adaptation": "Single-selection bounds, DTO and protected-text policy only; no A/B, object reference roles, carry, action planner or persistence; reduced AppLanguage added."
+    },
+    {
+      "output": "Sources/LabSelectionNative/SpeechRecognitionPolicy.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/AI/SpeechRecognitionPolicy.swift",
+          "sha256": "f77155bd26fdb2d8bd7c88ba10b35d8004c077540beedc01345f150529b3d77f"
+        }
+      ],
+      "outputSHA256": "fd0e092836b0abc24ca0cd112714701eb8fa2fb94395af9480246b8cfce7f5e3",
+      "adaptation": "ChordCore import and dictation purpose removed; single spoken-instruction purpose and compact command vocabulary retained."
+    },
+    {
+      "output": "Sources/LabSelectionNative/VoiceAudioExecutor.swift",
+      "mode": "copied",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/VoiceAudioExecutor.swift",
+          "sha256": "9f215f86a48dd14d0b89ddcbd38edb18d66a7a22679d7c026301b6f037da2ea1"
+        }
+      ],
+      "outputSHA256": "9f215f86a48dd14d0b89ddcbd38edb18d66a7a22679d7c026301b6f037da2ea1",
+      "adaptation": "Byte-for-byte production source copy."
+    },
+    {
+      "output": "Sources/LabSelectionNative/VoiceAudioWorker.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/AI/VoiceAudioWorker.swift",
+          "sha256": "14d1b619e53b6f071588b30522f2c5d878fcc740b7247b9aa79fc43d45ba6091"
+        }
+      ],
+      "outputSHA256": "01a1831ba59110ec52b62188bfba08ec13c2e146c741de02cd842bf2887644bf",
+      "adaptation": "ChordCore import removed; worker queue, lease checks, local-only speech and cleanup retained."
+    },
+    {
+      "output": "Sources/LabSelectionNative/VoiceCaptureService.swift",
+      "mode": "adapted",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/Chord/AI/VoiceCaptureService.swift",
+          "sha256": "1d395d4a3153c1d082645b63b668bd3b29cbcbb841cd6655926e206bc411027b"
+        }
+      ],
+      "outputSHA256": "27791ca3f52cd0300bdcd74762abd3a5f0d221e136952ca75886f969ebf9b1a1",
+      "adaptation": "ChordCore import removed; caller-supplied locale override and host permission wording added; production recording worker lifecycle retained."
+    },
+    {
+      "output": "Sources/LabSelectionNative/VoiceInputLifecycle.swift",
+      "mode": "copied",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/VoiceInputLifecycle.swift",
+          "sha256": "f7f6acac9f953c2978c70fd52d54a142a2474e5d09dc93244dec733c7fceffcb"
+        }
+      ],
+      "outputSHA256": "f7f6acac9f953c2978c70fd52d54a142a2474e5d09dc93244dec733c7fceffcb",
+      "adaptation": "Byte-for-byte production source copy."
+    },
+    {
+      "output": "Sources/LabSelectionNative/VoiceSession.swift",
+      "mode": "copied",
+      "sources": [
+        {
+          "path": "apps/macos/Sources/ChordCore/VoiceSession.swift",
+          "sha256": "e1dc4317c76c1c6a8b133ebb1044d9de34bbb74bc3e66c79e1cb7f1f7fb953cd"
+        }
+      ],
+      "outputSHA256": "e1dc4317c76c1c6a8b133ebb1044d9de34bbb74bc3e66c79e1cb7f1f7fb953cd",
+      "adaptation": "Byte-for-byte production source copy."
+    },
+    {
+      "output": "Tests/LabSelectionNativeTests/NativeCoreTests.swift",
+      "mode": "new",
+      "sources": [],
+      "outputSHA256": "876ca34de2a444f115547e064a5588ec4b724025642c0d7cbed1772da7ac2764",
+      "adaptation": "New standalone package, documentation or synthetic verification code for this handoff."
+    },
+    {
+      "output": "Validation/main.swift",
+      "mode": "new",
+      "sources": [],
+      "outputSHA256": "8e6449cd01d6e38b7ba9c477e399dadeb3df6613e3cefa929c4084d24ca1e1ec",
+      "adaptation": "New standalone package, documentation or synthetic verification code for this handoff."
+    }
+  ]
+}

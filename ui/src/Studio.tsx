@@ -1,3 +1,4 @@
+import {displayPresetName} from '../../shared/preset-names.mjs';
 import {keyboardGeometry} from './keyboard-geometry';
 import {getLayoutModel} from '../../shared/layout.mjs';
 import { rangeStyle } from "./rangeStyle";
@@ -520,7 +521,7 @@ export function Studio({
     <header ref={workspace.headerRef} className={`v5-work-row ${frameEditor ? "v5-frame-edit-heading" : ""}`}>
       <div className="v5-work-identity">
         {frameEditor ? <><button className="text-button" onClick={() => finishFrame(false)}><ArrowLeft size={16} />{tr("返回动画")}</button><h2>{tr(`正在编辑第 ${frameEditor.index + 1} 帧`)}</h2></> : <>
-          <label className="v5-work-name"><input aria-label={tr("当前作品名称")} title={tr("点击修改作品名称")} value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })} maxLength={80} /><Pencil size={12} /></label>
+          <label className="v5-work-name"><input aria-label={tr("当前作品名称")} title={tr("点击修改作品名称")} value={displayPresetName(draft.name,tr)} onChange={event => setDraft({ ...draft, name: event.target.value })} maxLength={80} /><Pencil size={12} /></label>
           <span>{tr(draftSaved ? "已保存到本机" : draft.id ? "有未保存修改" : "新作品 · 未保存")}</span>
         </>}
       </div>

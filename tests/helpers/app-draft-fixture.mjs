@@ -9,6 +9,7 @@ import * as layouts from '../../shared/layout.mjs';
 import * as keyboardModels from '../../shared/keyboard-models.mjs';
 import {applyArtworkAppearance} from '../../shared/render-animation.mjs';
 import * as firmwareOnboarding from '../../shared/firmware-onboarding.mjs';
+import * as presetNames from '../../shared/preset-names.mjs';
 const {validateTrigger}=triggers;
 
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -36,7 +37,7 @@ export async function appDraftFixture(options={}){
   const command=async body=>{commands.push(clone(body));if(options.onCommand)return options.onCommand(body,{state,commands});if(body.op==='saveScene'){const saved={...clone(body.scene),updatedAt:'fixture-saved'};const index=state.scenes.findIndex(s=>s.id===saved.id);if(index<0)state.scenes.push(saved);else state.scenes[index]=saved;return{savedScene:clone(saved)};}return{ok:true};};
   const readState=async()=>{if(options.onReadState)return options.onReadState({state,commands});return clone(state);};
   const api={state,layout,serviceError:'',command,readState,refresh:async()=>{},exiting:false};
-  const host={addEventListener(type,fn){if(!events.has(type))events.set(type,new Set());events.get(type).add(fn);},removeEventListener(type,fn){events.get(type)?.delete(fn);},dispatchEvent(e){events.get(e.type)?.forEach(fn=>fn(e));}};
+  const host={scrollTo(){},addEventListener(type,fn){if(!events.has(type))events.set(type,new Set());events.get(type).add(fn);},removeEventListener(type,fn){events.get(type)?.delete(fn);},dispatchEvent(e){events.get(e.type)?.forEach(fn=>fn(e));}};
   const jsx=(type,props,key)=>({type,props:props??{},key});
   const sandbox={console:{log(){},warn(){},error(...x){errors.push(x);}},Error,DOMException,Date,JSON,Array,Set,Map,Promise,Number,String,Boolean,Math,Object,crypto:{randomUUID:()=>`fixture-uuid-${++uuid}`},window:host,localStorage,performance:{now:()=>0},requestAnimationFrame:fn=>{fn();return 1;},cancelAnimationFrame(){},CustomEvent:class{constructor(type,options={}){this.type=type;Object.assign(this,options);}}};
   const compile=(text,requireFn)=>{const exports={};vm.runInNewContext(ts.transpileModule(text,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText,{...sandbox,exports,require:requireFn});return exports;};
@@ -44,6 +45,7 @@ export async function appDraftFixture(options={}){
   const types=compile(typesSource,name=>sharedImport(name)??(()=>{throw Error('Unexpected types import '+name);})());
   const persistence=compile(helperSource,name=>name==='./types'?types:name==='../../shared/trigger.mjs'?{validateTrigger}:sharedImport(name)??(()=>{throw Error('Unexpected persistence import '+name);})());
   const requireApp=name=>{
+    if(name==='../../shared/preset-names.mjs')return presetNames;
     if(sharedImport(name))return sharedImport(name);
     if(name==='react')return react;
     if(name==='react/jsx-runtime')return{jsx,jsxs:jsx,Fragment:Symbol.for('fixture.Fragment')};
@@ -66,7 +68,7 @@ export async function appDraftFixture(options={}){
     if(name==='../../shared/connection-display.mjs')return{deriveConnectionDisplay:()=>({stateId:'connected'})};
     if(name==='./connection-copy-v7')return{presentConnectionDisplay:v=>v,connectionCopy:v=>v.zh,connectionHeader:()=>'',connectionSidebar:()=>''};
     if(name==='./primitives')return{Button:component('Button'),Modal:component('Modal'),run:promise=>{void promise.catch(()=>{});}};
-    const child=name.match(/^\.\/(FeedbackToast|AudioPanel|AudioPendingNotice|NativeLighting|Studio|Library|Codex|ClaudeCode|Device|Settings|StartupGuide)$/)?.[1];
+    const child=name.match(/^\.\/(FeedbackToast|AudioPanel|AudioPendingNotice|NativeLighting|Studio|Library|Codex|ClaudeCode|Device|Settings|SelectionLab|StartupGuide)$/)?.[1];
     if(child)return{[child]:component(child)};
     throw Error('Unexpected App import '+name);
   };

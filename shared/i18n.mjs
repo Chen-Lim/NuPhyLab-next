@@ -1,5 +1,8 @@
+import selectionMessages from "./selection-messages.json" with {type:"json"};
 import {overlayMessages} from "./ui-overlays-i18n.mjs";
 export const messages = {
+  "实验室":"Labs",
+  "框选提问":"Ask about a selection",
   "请允许辅助功能，授权后会自动连接。": "Allow Accessibility; NuPhy Lab will connect automatically after permission is granted.",
   "请打开 Codex。": "Open Codex to use AI commands.",
   "请保留一个 Codex 应用实例。": "Keep one Codex application instance open.",
@@ -1443,6 +1446,7 @@ export const messages = {
   "按键仍会正常输入。": "The key still types normally.",
   "启用后可试闪": "Enable to test a flash",
   ...overlayMessages,
+  ...selectionMessages,
 };
 
 const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
