@@ -6,35 +6,37 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>NuPhy Lab</title>
         <item>
-            <title>1.2.40</title>
-            <pubDate>Thu, 05 Nov 2026 17:00:13 +0800</pubDate>
+            <title>1.2.41</title>
+            <pubDate>Fri, 06 Nov 2026 13:59:47 +0800</pubDate>
             <link>https://github.com/bohu8264/NuPhyLab-next</link>
-            <sparkle:version>1.2.40</sparkle:version>
-            <sparkle:shortVersionString>1.2.40</sparkle:shortVersionString>
+            <sparkle:version>1.2.41</sparkle:version>
+            <sparkle:shortVersionString>1.2.41</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.5</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
             <description sparkle:format="plain-text"><![CDATA[NUPHY-RELEASE-NOTES 1
-version:1.2.40
+version:1.2.41
 [zh-CN]
-NuPhy Lab 1.2.40
+NuPhy Lab 1.2.41
 
-• 新增 NODE75、NODE100 的 LP / HP 布局，以及 AIR65 V3、AIR100 V3 的 USB 适配和独立作品画布。
-• 为兼容固件上的支持型号加入连接动画，按型号检查官方固件版本。
-• NODE 触摸条保留原手势，AI 模式按需隔离与功能键共用的媒体输入，退出后恢复原键位。
-• AIR65 V3 没有实体 F 区，不提供 F1–F12 自动接管。新增型号中，实体检查目前仅覆盖 NODE75 LP；其余型号仍需实机验证。
+• 新增“实验室 → 框选提问”，支持翻译、总结、提问和可选的本机语音转写。框选功能需要 macOS 14 或更新版本。
+• 扩展模型服务的可选型号，支持读取可用模型列表、手动填写模型 ID 和兼容端点；实际可用性取决于服务与账户。
+• 新增 16 种可保存的翻译目标语言，可在框选设置和翻译回答中切换，独立于界面语言。
+• 补齐内置作品名、实验室与框选操作的英文显示，统一灰色界面；将“发送图片”放到“按住说话”下方，图片输入需模型支持。
+• 完善权限与实际监听状态检查；修复未连接键盘时正常备份导致的退出误提示，并避免启动时恢复为过大的窗口。
 [en]
-NuPhy Lab 1.2.40
+NuPhy Lab 1.2.41
 
-• Add USB profiles and separate artwork canvases for NODE75 and NODE100 LP / HP, AIR65 V3 and AIR100 V3.
-• Add the connection animation to supported models with compatible firmware, with model-specific official firmware checks.
-• Preserve NODE touch gestures while separating shared media inputs from AI function keys as needed; restore the original keymap when leaving AI mode.
-• AIR65 V3 has no physical function row and does not support automatic F1–F12 takeover. Among newly added models, physical checks currently cover NODE75 LP only; the other models still need hardware validation.
+• Add Labs → Ask about a selection with translation, summaries, questions and optional local speech transcription. Selection requires macOS 14 or later.
+• Expand model choices with supported account catalogs, manual model IDs and compatible endpoints. Availability depends on the provider and account.
+• Add 16 saved translation-language choices in selection settings and translation answers, independent of the interface language.
+• Complete English labels for built-in artwork, Labs and selection controls, unify the gray interface, and place the image switch below Hold to speak. Image input requires model support.
+• Improve permission and listener-readiness checks, fix an unnecessary quit warning for valid backups while the keyboard is disconnected, and prevent oversized restored launch windows.
 ]]></description>
-            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.40/NuPhyLab-1.2.40-macOS-AppleSilicon.dmg" length="43324549" type="application/octet-stream" sparkle:edSignature="bu+me4C0SwAqBL9yTi7BXqIraKr8pA6iWjjiUq4F0o6/jTK3kWhDiTfazzbt6PcUQzS9DubhPq9YWtsYR56oBw=="/>
+            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.41/NuPhyLab-1.2.41-macOS-AppleSilicon.dmg" length="43849944" type="application/octet-stream" sparkle:edSignature="r2TJ5iArLRLxqRkhsjGlxaVgrT+91ChZxonH8AN2FWUfatoGZWnfpn/aZTqr9grp6cuerd4jieQ5sR9dmGIBAg=="/>
         </item>
     </channel>
 </rss>
 <!-- sparkle-signatures:
-edSignature: 4wUmJ1Uk2IDPAz7XDvMTFTbMQmZwV3vjBRm3aji0y3IIV3kzF/8IITXGbRzcOTuOA7iwiUH6vOeINz1xgSZqCA==
-length: 2472
+edSignature: Vk1I4zP13sLSTw3Ysh5pCSx8gyHErx+MERv+aOWZ0to03yyzhQ1/9nkygEVzKIqyJUTo4VzR9++6q0u3GL/xBw==
+length: 2958
 -->
