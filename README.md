@@ -42,6 +42,16 @@ Lighting requires USB. AIR75 V3 also supports Bluetooth shortcut control. Follow
 
 各型号固件与兼容范围 / Model-specific firmware and compatibility: [键盘兼容性 / Keyboard compatibility](docs/KEYBOARD_COMPATIBILITY.md)。AIR65 V3 无实体 F 区，不提供 F1–F12 自动接管。/ AIR65 V3 has no physical function row and does not offer automatic F1–F12 takeover.
 
+## 模拟声浪 / Typing Sounds
+
+在侧栏“灯光游戏”下方打开 **模拟声浪**。麻将、奶油、木质、轻柔、段落、复古六类各三款，共 18 款；可试听、收藏，并调节总音量、回弹和空格等大键的声音。首次默认关闭，开启后在其他应用中打字也会播放。
+
+Open **Typing Sounds** below **Lighting Games** in the sidebar. Choose from 18 sounds: three each in Marbly, Creamy, Woody, Soft, Tactile and Retro. Preview, save favorites, and adjust master volume, releases and large keys such as Space. It starts off; enable it to play sounds while typing in other apps.
+
+声音随应用提供，无需下载或 API。试听不需要输入监控；打字播放需要这项权限。声浪只使用按键代码，不记录文字或上传输入。[完整说明与声音来源 / Full guide and sound credits](docs/TYPING_SOUNDS.md)
+
+Sounds are bundled and need no download or API. Previews need no Input Monitoring permission; typing playback does. Typing Sounds uses key codes without recording text or uploading input.
+
 ## Codex 默认命令键 / Default Codex command keys
 
 在 AI 助手中开启 Codex 模式后使用。/ Enable Codex mode in AI Assistant to use these defaults.
@@ -63,6 +73,7 @@ Approval commands require a current request. Sending requires the chat composer 
 
 - 逐键 RGB 绘图、动画与本地作品库。/ Per-key RGB painting, animation and a local artwork library.
 - 按键触发、键盘游戏和声音律动。/ Key-triggered effects, keyboard games and audio-reactive lighting.
+- 18 款本地打字音效，可分别调节大键声音。/ 18 local typing sounds with separate large-key levels.
 - Codex / Claude Code 任务快捷键和状态灯。/ Codex / Claude Code task shortcuts and status lights.
 - USB 自动识别键盘型号，各型号的作品分别保存。/ Automatic USB model detection, with separate artwork for each keyboard model.
 - 框选翻译、总结与提问，可选本机语音转写，并连接自己的模型服务。/ Selection translation, summaries and questions, with optional local speech transcription and your own model service.
@@ -90,4 +101,4 @@ Open **Labs → Ask about a selection**, choose a service and model in **Setting
 
 Selected text and questions are sent to your configured model service. Images are included only when enabled and needed for the selected action. API keys are stored in the local Keychain.
 
-[设置与使用 / Setup and usage](docs/SELECTION.md) · [界面与翻译语言 / Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [1.2.42 更新说明 / What's new in 1.2.42](docs/RELEASE_1.2.42.md)
+[设置与使用 / Setup and usage](docs/SELECTION.md) · [界面与翻译语言 / Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [1.2.43 更新说明 / What's new in 1.2.43](docs/RELEASE_1.2.43.md)

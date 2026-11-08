@@ -1,0 +1,15 @@
+Custom keyboard timbre WAV assets — CC0 1.0 Universal
+Sources, all CC0 1.0:
+Typing on a rainy 75 — Techrul
+https://freesound.org/people/Techrul/sounds/815614/
+Keyboard typing sounds: Unidentified Technics keyboard — zrrion
+https://freesound.org/people/zrrion/sounds/665075/
+Keyboard Typing 2 (HHKB, Topre) — grcekh
+https://freesound.org/people/grcekh/sounds/546033/
+License: https://creativecommons.org/publicdomain/zero/1.0/
+
+NuPhy Lab tuning: slicing, contact/body shaping, modeled large keys and releases.
+The recordings do not identify individual keys or key-up events.
+The 12 profiles are designed timbres, not recordings of 12 new switch models.
+Woody/felted labels describe tuning, not physical materials in the recording.
+The derivative WAV assets are also dedicated under CC0 1.0.

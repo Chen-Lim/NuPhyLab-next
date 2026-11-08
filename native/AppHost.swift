@@ -532,6 +532,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     private var gestureBindingEpochs = [String:Int]()
     private var keyBindingEpoch:Int?
     private var dictationKeyCodes = Set<UInt32>()
+    private var typingDictationGestures = Set<String>()
     var physicalCommandCodes:Set<String> = ["F7","F8","F9","F11","F12"]
     var capturePermissionSignature:String?
     var permissionRecovery=PermissionCaptureRecovery()
@@ -598,6 +599,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     var preparingUpdate = false
     var workerRestartPolicy = WorkerRestartPolicy()
     var selectionShortcutRecording=false
+    lazy var typingSounds = TypingSoundController(directory: dataDirectory)
     lazy var selectionLab: any SelectionFeature = SelectionFeatureFactory.make(directory: dataDirectory)
     let windowFrameName = "AirStudio.CompactWindow.v1"
     let dataDirectory = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Air Studio")
@@ -644,9 +646,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"codexKeys")
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"audioControl")
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"selectionLab")
+        config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"typingSounds")
+        _ = typingSounds
+        selectionLab.voiceActivityChanged = { [weak self] active in self?.typingSounds.setPaused("selectionVoice", active:active) }
         selectionLab.updateLanguage(english ? .en:.zh)
         selectionLab.showSettings = { [weak self] in self?.show(); self?.web.evaluateJavaScript("window.dispatchEvent(new CustomEvent('nuphylab:navigate',{detail:'ai'}))", completionHandler:nil) }
-        selectionLab.recordingChanged = { [weak self] active in self?.selectionShortcutRecording=active;self?.refreshHotkeys() }
+        selectionLab.recordingChanged = { [weak self] active in self?.selectionShortcutRecording=active;self?.typingSounds.setPaused("shortcut",active:active);self?.refreshHotkeys() }
         selectionLab.requestRelaunch = { [weak self] in
             guard let self, !self.terminating, !self.preparingUpdate, !self.driverOpenInFlight,
                   !self.capturingKey, self.keyGestureGate.activeCount == 0, !self.selectionLab.isBusy else { return false }
@@ -825,7 +830,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             }
             // A recovery may not bypass failed keyboard restoration. Keep the
             // host open; the ordinary failure alert below retains diagnostics.
-            terminating=false;NSApp.reply(toApplicationShouldTerminate:false);setExitPresentation(false)
+            terminating=false;typingSounds.setPaused("quitting",active:false);NSApp.reply(toApplicationShouldTerminate:false);setExitPresentation(false)
             if status==0 && !signaled {startWorker();return}
             permissionRecovery.attempted=true
         }
@@ -953,6 +958,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     private func beginPhysicalHold(_ gesture:NativeKeyGesture,epoch:Int) {
         cancelPhysicalHold()
         physicalHoldGesture=gesture;physicalHoldEpoch=epoch
+        typingDictationGestures.insert(gesture.id)
+        typingSounds.setPaused("dictation:"+gesture.id, active:true)
         guard refreshPhysicalHold() else{return}
         let timer=Timer(timeInterval:0.5,repeats:true){[weak self] _ in _ = self?.refreshPhysicalHold()}
         physicalHoldHeartbeat=timer;RunLoop.main.add(timer,forMode:.common)
@@ -975,6 +982,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     }
     private func cancelPhysicalHold() {
         physicalHoldHeartbeat?.invalidate();physicalHoldHeartbeat=nil
+        if let id=physicalHoldGesture?.id,typingDictationGestures.contains(id) {
+            // A cancelled/failed delivery keeps sound paused, never assumes the
+            // remote microphone stopped. The UI offers deliberate recovery.
+            DispatchQueue.main.asyncAfter(deadline:.now()+8) { [weak self] in
+                guard let self,self.typingDictationGestures.remove(id) != nil else { return }
+                self.typingSounds.setPaused("dictationUnconfirmed",active:true)
+                self.typingSounds.setPaused("dictation:"+id,active:false)
+            }
+        }
         physicalHoldGesture=nil;physicalHoldEpoch=nil
         _ = nativePhysicalHold?.invalidate(nowMs:physicalHoldNowMs())
     }
@@ -997,9 +1013,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         var request=URLRequest(url:base.appendingPathComponent("api/command"),timeoutInterval:5)
         request.httpMethod="POST";request.setValue(apiToken,forHTTPHeaderField:"X-Air-Token")
         request.setValue("application/json",forHTTPHeaderField:"Content-Type")
-        request.httpBody=try? JSONSerialization.data(withJSONObject:keyEventQueue.removeFirst())
-        URLSession.shared.dataTask(with:request){[weak self] _,_,_ in
-            DispatchQueue.main.async {self?.keyEventSending=false;self?.sendNextKey()}
+        let packet=keyEventQueue.removeFirst()
+        request.httpBody=try? JSONSerialization.data(withJSONObject:packet)
+        URLSession.shared.dataTask(with:request){[weak self] data,response,error in
+            let payload=data.flatMap { try? JSONSerialization.jsonObject(with:$0) } as? [String:Any]
+            let result=payload?["result"] as? [String:Any]
+            let ok=error == nil && (response as? HTTPURLResponse)?.statusCode==200 && payload?["ok"] as? Bool==true
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if let id=packet["gestureId"] as? String,self.typingDictationGestures.contains(id) {
+                    let up=packet["phase"] as? String=="up"
+                    let stopped=ok && TypingDictationCompletion.confirmed(result)
+                    let neverStarted=ok && !up && result?["performed"] as? Bool==false
+                    if up || neverStarted {
+                        self.typingDictationGestures.remove(id)
+                        if up && !stopped { self.typingSounds.setPaused("dictationUnconfirmed",active:true) }
+                        self.typingSounds.setPaused("dictation:"+id,active:false)
+                    }
+                }
+                self.keyEventSending=false;self.sendNextKey()
+            }
         }.resume()
     }
     func sendAudio(_ packet:[String:Any]) {
@@ -1025,6 +1058,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         guard message.frameInfo.isMainFrame,let url=message.frameInfo.request.url,
               url.host==baseURL?.host,url.port==baseURL?.port,
               let body=message.body as? [String:Any] else{replyHandler(nil,"Invalid origin");return}
+        if message.name == "typingSounds" { typingSounds.handle(body, reply: replyHandler); return }
         if message.name == "selectionLab" { selectionLab.handle(body, reply: replyHandler); return }
         if message.name == "audioControl" {
             guard let permission=body["permission"] as? String,["microphone","system"].contains(permission) else{replyHandler(nil,"Invalid permission");return}
@@ -1372,7 +1406,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         }
         let nextEpoch=NativeKeySigner.bindingEpoch(value?["bindingEpoch"])
         if keyBindingEpoch != nextEpoch {setHotkeysEnabled(false);keyBindingEpoch=nextEpoch}
-        let dictationCodes=Set(value?["dictationCodes"] as? [String] ?? [])
+        let dictationCodes=Set((value?["source"] as? String ?? "codex") == "codex" ? (value?["dictationCodes"] as? [String] ?? []) : [])
         physicalCommandCodes=Set(value?["physicalCodes"] as? [String] ?? ["F7","F8","F9","F11","F12"])
         let raw=value?["bindings"] as? [[String:Any]] ?? []
         let next=raw.compactMap { item -> (code:String,keyCode:UInt32)? in
@@ -1388,6 +1422,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         refreshHotkeys()
     }
     func refreshHotkeys(){
+        typingSounds.setPaused("commandShortcut",active:capturingKey)
         setHotkeysEnabled(configuredKeysEnabled && !selectionShortcutRecording && !keySessionSuspended && !capturingKey && !(editingField && NSApp.isActive) && !terminating && hotkeyPollTimer != nil)
         if hotkeysEnabled { refreshReservedKeyCapture() }
         if capturingKey && NSApp.isActive && !terminating { _ = startReservedKeyCapture() }
@@ -1443,7 +1478,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                     #endif
                 }
                 self.applyKeyConfiguration(keys)
-                self.audioCapture.sync((state?["audio"] as? [String:Any])?["capture"] as? [String:Any])
+                let capture=(state?["audio"] as? [String:Any])?["capture"] as? [String:Any]
+                self.typingSounds.setPaused("microphone", active:capture?["enabled"] as? Bool == true && capture?["source"] as? String == "microphone")
+                self.audioCapture.sync(capture)
             }
         }
         hotkeyStateTask?.resume()
@@ -1638,11 +1675,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func sendCapturedFunctionKey(_ code:String,phase:String) {
         web.evaluateJavaScript("window.dispatchEvent(new CustomEvent('nuphylab:function-key',{detail:{code:'\(code)',phase:'\(phase)'}}));",completionHandler:nil)
     }
+    func applicationWillTerminate(_ notification:Notification) { typingSounds.shutdown() }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{return false}
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool{show();return true}
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply{
         if terminating{return .terminateLater}
         selectionLab.shutdown()
+        typingSounds.setPaused("quitting",active:true)
         resetOfficialDriverReturn()
         stopHotkeyMonitoring()
         guard let worker=worker else{return .terminateNow}
@@ -1659,6 +1698,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         if signalResult != 0 && signalError != ESRCH {
             permissionRelaunchPending=false
             terminating=false
+            typingSounds.setPaused("quitting",active:false)
             setExitPresentation(false)
             appendWorkerLog(Data("Worker shutdown signal failed: pid=\(workerPID), errno=\(signalError)\n".utf8))
             startHotkeyMonitoring()

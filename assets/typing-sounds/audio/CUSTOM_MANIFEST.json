@@ -1,0 +1,4832 @@
+{
+  "schema": 3,
+  "sources": {
+    "rainy75": {
+      "url": "https://freesound.org/people/Techrul/sounds/815614/",
+      "author": "Techrul",
+      "license": "CC0 1.0",
+      "label": "Rainy 75",
+      "press": [
+        2786,
+        5840,
+        9316,
+        11109,
+        25463,
+        34290,
+        44134,
+        5446
+      ],
+      "light": [
+        1062,
+        1692,
+        18485,
+        28098
+      ]
+    },
+    "technics": {
+      "url": "https://freesound.org/people/zrrion/sounds/665075/",
+      "author": "zrrion",
+      "license": "CC0 1.0",
+      "label": "Modified Technics / Gateron Yellow",
+      "press": [
+        511,
+        9577,
+        12552,
+        16858,
+        22656,
+        24195,
+        31103,
+        38307
+      ],
+      "light": [
+        669,
+        22284,
+        24056,
+        25763
+      ]
+    },
+    "hhkb": {
+      "url": "https://freesound.org/people/grcekh/sounds/546033/",
+      "author": "grcekh",
+      "license": "CC0 1.0",
+      "label": "HHKB Professional Hybrid / Topre",
+      "tailSeconds": 0.055,
+      "press": [
+        5493,
+        9020,
+        10014,
+        13717,
+        24379,
+        36456,
+        38424,
+        46299
+      ],
+      "light": [
+        5393,
+        7150,
+        18933,
+        30778
+      ]
+    }
+  },
+  "familySources": {
+    "marble": "rainy75",
+    "creamy": "rainy75",
+    "woody": "technics",
+    "soft": "hhkb"
+  },
+  "downloadKind": "public HQ previews",
+  "keyIdentitiesKnown": false,
+  "styles": [
+    {
+      "id": "mahjong-crisp",
+      "zh": "清脆麻将",
+      "en": "Marble Clack",
+      "category": "marble",
+      "rate": 1.1,
+      "cutoff": 6500,
+      "bodyHz": 1450,
+      "bodyDb": 4.0,
+      "attack": 1.24,
+      "decay": 0.045,
+      "contact": 0.11,
+      "drive": 1.1
+    },
+    {
+      "id": "mahjong-porcelain",
+      "zh": "白瓷麻将",
+      "en": "Porcelain Marble",
+      "category": "marble",
+      "rate": 1.2,
+      "cutoff": 7200,
+      "bodyHz": 1850,
+      "bodyDb": 4.5,
+      "attack": 1.18,
+      "decay": 0.034,
+      "contact": 0.17,
+      "drive": 0.95
+    },
+    {
+      "id": "thock-deep",
+      "zh": "厚润麻将",
+      "en": "Deep Marble",
+      "category": "marble",
+      "rate": 0.85,
+      "cutoff": 3900,
+      "bodyHz": 700,
+      "bodyDb": 6.0,
+      "attack": 1.0,
+      "decay": 0.068,
+      "contact": 0.1,
+      "drive": 1.45
+    },
+    {
+      "id": "cream-milk",
+      "zh": "奶油绵密",
+      "en": "Velvet Cream",
+      "category": "creamy",
+      "rate": 1.01,
+      "cutoff": 3400,
+      "bodyHz": 1170,
+      "bodyDb": 3.6,
+      "attack": 0.98,
+      "decay": 0.048,
+      "contact": 0.04,
+      "drive": 1.55
+    },
+    {
+      "id": "cream-butter",
+      "zh": "黄油柔润",
+      "en": "Butter Cream",
+      "category": "creamy",
+      "rate": 0.9,
+      "cutoff": 2700,
+      "bodyHz": 880,
+      "bodyDb": 4.2,
+      "attack": 0.86,
+      "decay": 0.061,
+      "contact": 0.03,
+      "drive": 1.7
+    },
+    {
+      "id": "cream-pudding",
+      "zh": "布丁弹润",
+      "en": "Pudding Pop",
+      "category": "creamy",
+      "rate": 1.07,
+      "cutoff": 4950,
+      "bodyHz": 1550,
+      "bodyDb": 4.8,
+      "attack": 1.29,
+      "decay": 0.036,
+      "contact": 0.09,
+      "drive": 1.25
+    },
+    {
+      "id": "wood-bamboo",
+      "zh": "竹节轻叩",
+      "en": "Bamboo Knock",
+      "category": "woody",
+      "rate": 1.11,
+      "cutoff": 5600,
+      "bodyHz": 1750,
+      "bodyDb": 5.5,
+      "attack": 1.15,
+      "decay": 0.026,
+      "contact": 0.24,
+      "drive": 1.05
+    },
+    {
+      "id": "wood-walnut",
+      "zh": "胡桃木响",
+      "en": "Walnut Knock",
+      "category": "woody",
+      "rate": 0.9,
+      "cutoff": 3900,
+      "bodyHz": 950,
+      "bodyDb": 6.0,
+      "attack": 1.05,
+      "decay": 0.043,
+      "contact": 0.2,
+      "drive": 1.3
+    },
+    {
+      "id": "wood-ebony",
+      "zh": "乌木低叩",
+      "en": "Ebony Knock",
+      "category": "woody",
+      "rate": 0.8,
+      "cutoff": 2850,
+      "bodyHz": 610,
+      "bodyDb": 6.0,
+      "attack": 0.96,
+      "decay": 0.057,
+      "contact": 0.22,
+      "drive": 1.4
+    },
+    {
+      "id": "soft-velvet",
+      "zh": "绒面轻敲",
+      "en": "Felted Tap",
+      "category": "soft",
+      "rate": 0.94,
+      "cutoff": 2300,
+      "bodyHz": 950,
+      "bodyDb": 2.5,
+      "attack": 0.78,
+      "decay": 0.027,
+      "contact": 0.015,
+      "drive": 1.4
+    },
+    {
+      "id": "soft-cushion",
+      "zh": "软垫轻触",
+      "en": "Cushioned Tap",
+      "category": "soft",
+      "rate": 0.84,
+      "cutoff": 1950,
+      "bodyHz": 650,
+      "bodyDb": 3.0,
+      "attack": 0.85,
+      "decay": 0.045,
+      "contact": 0.025,
+      "drive": 1.6
+    },
+    {
+      "id": "soft-light",
+      "zh": "轻柔落底",
+      "en": "Soft Landing",
+      "category": "soft",
+      "rate": 1.06,
+      "cutoff": 3200,
+      "bodyHz": 1250,
+      "bodyDb": 1.8,
+      "attack": 0.92,
+      "decay": 0.024,
+      "contact": 0.01,
+      "drive": 1.2
+    }
+  ],
+  "groupParameters": {
+    "regular": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    "space": [
+      0.86,
+      0.72,
+      1.55,
+      4.0,
+      1.18,
+      0.11
+    ],
+    "enter": [
+      0.96,
+      0.91,
+      1.22,
+      2.3,
+      1.08,
+      0.065
+    ],
+    "backspace": [
+      1.05,
+      1.04,
+      0.86,
+      1.0,
+      0.94,
+      0.025
+    ],
+    "shiftLeft": [
+      0.94,
+      0.82,
+      1.3,
+      2.4,
+      1.01,
+      0.06
+    ],
+    "shiftRight": [
+      0.98,
+      0.9,
+      1.18,
+      1.8,
+      0.98,
+      0.045
+    ],
+    "tab": [
+      1.08,
+      1.08,
+      0.82,
+      0.8,
+      0.88,
+      0.015
+    ],
+    "caps": [
+      1.02,
+      0.98,
+      0.98,
+      1.4,
+      0.94,
+      0.025
+    ]
+  },
+  "sampleRate": 48000,
+  "format": "mono PCM16 WAV",
+  "assets": [
+    {
+      "path": "audio/mahjong-crisp/press/regular_0.wav",
+      "sha256": "84076559d0da2841c0b3c7d4e43edc96479ceab68c56bdbfa6a794d5c474120e",
+      "frames": 6240,
+      "peak": 0.48500783076778564,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2532.5249059104653
+    },
+    {
+      "path": "audio/mahjong-crisp/press/regular_1.wav",
+      "sha256": "e6c33746a082848eca3fb57b6a86dddcf0947a27ba62c0da527aa0696c116c37",
+      "frames": 6240,
+      "peak": 0.5000939341896992,
+      "energy": 5.045999999999999,
+      "centroidHz": 2533.530759951744
+    },
+    {
+      "path": "audio/mahjong-crisp/press/regular_2.wav",
+      "sha256": "68ac7cb6d010a8d4788c804235dc3dc29ab9908d942d96d5868f7eb888535159",
+      "frames": 6240,
+      "peak": 0.5228267846587457,
+      "energy": 5.045999999999997,
+      "centroidHz": 2721.437810648424
+    },
+    {
+      "path": "audio/mahjong-crisp/press/regular_3.wav",
+      "sha256": "b7b78dc83e10c7637d5672b4b076e828b3d17fc63f6998e867cabf2381bfe1c2",
+      "frames": 6240,
+      "peak": 0.3847142878919246,
+      "energy": 5.045999999999999,
+      "centroidHz": 2789.3562274558562
+    },
+    {
+      "path": "audio/mahjong-crisp/press/regular_4.wav",
+      "sha256": "04ca36d80479f6d61570c4f5349052dbcffab95a0ff1a1cf85c3659686850187",
+      "frames": 6240,
+      "peak": 0.5366913327716009,
+      "energy": 5.046,
+      "centroidHz": 3343.5150756484322
+    },
+    {
+      "path": "audio/mahjong-crisp/press/regular_5.wav",
+      "sha256": "6f3315d62438c8c10beb806271e4cb6ab7740eeb466cabe96dc78325a23897f1",
+      "frames": 6240,
+      "peak": 0.5551563271298126,
+      "energy": 5.045999999999997,
+      "centroidHz": 3229.900000832373
+    },
+    {
+      "path": "audio/mahjong-crisp/press/regular_6.wav",
+      "sha256": "0441b6f3c49505b34be9b14a42c9b8cfae9ec23c684822f201643f7e27019385",
+      "frames": 6240,
+      "peak": 0.5230387634438468,
+      "energy": 5.045999999999999,
+      "centroidHz": 3373.694176466406
+    },
+    {
+      "path": "audio/mahjong-crisp/press/regular_7.wav",
+      "sha256": "d8d2f98a41298b400441a5cf9dfc09bac8151a2ce87cf41440816a74fdb7cf18",
+      "frames": 6240,
+      "peak": 0.5927423511194311,
+      "energy": 5.045999999999999,
+      "centroidHz": 3196.9001914266787
+    },
+    {
+      "path": "audio/mahjong-crisp/release/regular_0.wav",
+      "sha256": "3ab49ad84774a43f67c88604bcdd9dbd3d629075abffc1d58784fff0fab97dad",
+      "frames": 2692,
+      "peak": 0.06279446336280485,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1265.6860406636545
+    },
+    {
+      "path": "audio/mahjong-crisp/release/regular_1.wav",
+      "sha256": "e25db988debd372628bf8991886abeb6e94929c7969648d6189955bcb054fc38",
+      "frames": 2692,
+      "peak": 0.08478723826141149,
+      "energy": 0.48492059999999987,
+      "centroidHz": 1221.841799660446
+    },
+    {
+      "path": "audio/mahjong-crisp/release/regular_2.wav",
+      "sha256": "c7793807454f1e4542a7f6444086d2ec0f009b9ead261448bb6e241af3462e77",
+      "frames": 2692,
+      "peak": 0.16791057320462882,
+      "energy": 0.48492059999999987,
+      "centroidHz": 3266.7136683487843
+    },
+    {
+      "path": "audio/mahjong-crisp/release/regular_3.wav",
+      "sha256": "45291c1965c140b7dc404db8879a1870eda060b7ee7b3f6f764a456c91f92f52",
+      "frames": 2692,
+      "peak": 0.19040598032392883,
+      "energy": 0.48492059999999987,
+      "centroidHz": 2746.604637121972
+    },
+    {
+      "path": "audio/mahjong-crisp/press/space_0.wav",
+      "sha256": "0958eb880762e86b99311942637acdd1fb31ba34da671fc4c6c58c5cd21026ee",
+      "frames": 9672,
+      "peak": 0.5431321550262315,
+      "energy": 7.026050399999999,
+      "centroidHz": 2099.3904939498184
+    },
+    {
+      "path": "audio/mahjong-crisp/press/space_1.wav",
+      "sha256": "a30133a0b54f0dd55413cc2d9772d9d2a28f2796d5114b1f20ec960b91b09989",
+      "frames": 9672,
+      "peak": 0.559883356949913,
+      "energy": 7.026050399999999,
+      "centroidHz": 2358.3791403885093
+    },
+    {
+      "path": "audio/mahjong-crisp/press/space_2.wav",
+      "sha256": "f2e8d55a3029a09ec5c99ebc6cddf2686aff94c323b361064e1e47799f2aa0f0",
+      "frames": 9672,
+      "peak": 0.44538382021915823,
+      "energy": 7.026050399999998,
+      "centroidHz": 2399.8207953126334
+    },
+    {
+      "path": "audio/mahjong-crisp/release/space_0.wav",
+      "sha256": "1882640a339fece111518c45434f525afbb5d085284326fe04f9fd12e39e8b2a",
+      "frames": 4173,
+      "peak": 0.1050270834884242,
+      "energy": 0.6752034434399997,
+      "centroidHz": 1083.3849998524174
+    },
+    {
+      "path": "audio/mahjong-crisp/release/space_1.wav",
+      "sha256": "b2643c6b37f9933a5a284df3bbfa6236ee15ad683d0921feb7e67e7d5fbeb699",
+      "frames": 4173,
+      "peak": 0.1821158678946813,
+      "energy": 0.6752034434399996,
+      "centroidHz": 2823.1356671550025
+    },
+    {
+      "path": "audio/mahjong-crisp/press/enter_0.wav",
+      "sha256": "adfafa9fc1129c42c04168dbb8533f7bb4fee3fd6bfd90089f6a16d42aadbc5f",
+      "frames": 7612,
+      "peak": 0.5466984176632591,
+      "energy": 5.885654400000002,
+      "centroidHz": 2644.332336912618
+    },
+    {
+      "path": "audio/mahjong-crisp/press/enter_1.wav",
+      "sha256": "06bc1f9817dadb24abe1505d895e6009b3116c36b4f74918db3addb3c3e55709",
+      "frames": 7612,
+      "peak": 0.41231199623482995,
+      "energy": 5.885654399999998,
+      "centroidHz": 2661.961596738574
+    },
+    {
+      "path": "audio/mahjong-crisp/press/enter_2.wav",
+      "sha256": "51c558cff23ce31603435cd74c5689dd62542a79d67d587101d6e3c37317d5b9",
+      "frames": 7612,
+      "peak": 0.5460298510470781,
+      "energy": 5.8856544,
+      "centroidHz": 3196.635604021392
+    },
+    {
+      "path": "audio/mahjong-crisp/release/enter_0.wav",
+      "sha256": "099ddadf22af2bb0f84ca91ed1904a4932417b26f44837245ef13c76863c155d",
+      "frames": 3285,
+      "peak": 0.17662786747788325,
+      "energy": 0.5656113878400001,
+      "centroidHz": 3109.5486026966887
+    },
+    {
+      "path": "audio/mahjong-crisp/release/enter_1.wav",
+      "sha256": "467e8fb6cdbcbbb7f4b0498cb9b5b0ff0db10e5eb8b7b35b30adea7144b84144",
+      "frames": 3285,
+      "peak": 0.19817901138613514,
+      "energy": 0.5656113878400002,
+      "centroidHz": 2662.5329310888646
+    },
+    {
+      "path": "audio/mahjong-crisp/press/backspace_0.wav",
+      "sha256": "01205360e186d128e7aa95ac5b53e63ebc1eccd20499c8cc35e0601991f20308",
+      "frames": 5366,
+      "peak": 0.37083440486780345,
+      "energy": 4.458645599999998,
+      "centroidHz": 2859.319262430625
+    },
+    {
+      "path": "audio/mahjong-crisp/press/backspace_1.wav",
+      "sha256": "5b76cc1409a269863352d0a99e798f679beea66b9b691dde1834f2794e0bab12",
+      "frames": 5366,
+      "peak": 0.5072655131071075,
+      "energy": 4.4586456000000005,
+      "centroidHz": 3424.4023711793848
+    },
+    {
+      "path": "audio/mahjong-crisp/press/backspace_2.wav",
+      "sha256": "6711632a442e715535cf4a65684c0ada03db6a4c87993d017d81533c7b124023",
+      "frames": 5366,
+      "peak": 0.5286578240262567,
+      "energy": 4.4586456000000005,
+      "centroidHz": 3269.589543899594
+    },
+    {
+      "path": "audio/mahjong-crisp/release/backspace_0.wav",
+      "sha256": "e8c289a1c8b56d35bc91a63575134639d31f8d1e1278c137264a77ef05037c30",
+      "frames": 2315,
+      "peak": 0.1796469624990743,
+      "energy": 0.42847584215999984,
+      "centroidHz": 2852.8197364953826
+    },
+    {
+      "path": "audio/mahjong-crisp/release/backspace_1.wav",
+      "sha256": "ff527e268843954df5d7eba7c10beb1f6f6b14e521a3f4028c797e669b5e1435",
+      "frames": 2315,
+      "peak": 0.06358505819450316,
+      "energy": 0.42847584215999984,
+      "centroidHz": 1291.487096088001
+    },
+    {
+      "path": "audio/mahjong-crisp/press/shiftLeft_0.wav",
+      "sha256": "73f8dd992e98b6af8af647e5b9d9c4eebc3cdd3124f9c6ac2f96ee77ff8a66de",
+      "frames": 8112,
+      "peak": 0.5059989511707711,
+      "energy": 5.1474246,
+      "centroidHz": 3093.775449561423
+    },
+    {
+      "path": "audio/mahjong-crisp/press/shiftLeft_1.wav",
+      "sha256": "e24c686df0324f5460a489b8e7d1c7e8074f91ce032595f73065b8f1637d5680",
+      "frames": 8112,
+      "peak": 0.5290869358353821,
+      "energy": 5.147424599999999,
+      "centroidHz": 2978.731188976699
+    },
+    {
+      "path": "audio/mahjong-crisp/press/shiftLeft_2.wav",
+      "sha256": "4f882c39cc0a7d5b19cdccb48b7e1c5e0822d69790a6d9b6c850dccaf4617107",
+      "frames": 8112,
+      "peak": 0.4989244227305241,
+      "energy": 5.1474246,
+      "centroidHz": 3120.9320573562486
+    },
+    {
+      "path": "audio/mahjong-crisp/release/shiftLeft_0.wav",
+      "sha256": "5f3d1c5f1e1a146fc2d191e9fd258deec8dfa38bc40dc339d2362112b988ed74",
+      "frames": 3500,
+      "peak": 0.06714169013691329,
+      "energy": 0.4946675040599998,
+      "centroidHz": 1195.3359570841653
+    },
+    {
+      "path": "audio/mahjong-crisp/release/shiftLeft_1.wav",
+      "sha256": "e54c9473cefb86ad44dd74f289163ab2f7d55d64bc99408a9c4d77b3399a4190",
+      "frames": 3500,
+      "peak": 0.0893130143085586,
+      "energy": 0.4946675040599999,
+      "centroidHz": 1162.035718495284
+    },
+    {
+      "path": "audio/mahjong-crisp/press/shiftRight_0.wav",
+      "sha256": "50f9ee0ed224f329380c1e60410715e6a1cf368b958c318727e42aaeacbf0638",
+      "frames": 7363,
+      "peak": 0.5253760244560868,
+      "energy": 4.8461783999999986,
+      "centroidHz": 3079.1627895859438
+    },
+    {
+      "path": "audio/mahjong-crisp/press/shiftRight_1.wav",
+      "sha256": "9ed6116918c212aa22c14ff406d09229dc68e0da5e98fb24b4cd74f090f7cda5",
+      "frames": 7363,
+      "peak": 0.49093416654783545,
+      "energy": 4.8461784,
+      "centroidHz": 3219.080991925733
+    },
+    {
+      "path": "audio/mahjong-crisp/press/shiftRight_2.wav",
+      "sha256": "7736e3c2d2eec4d1868a3ca443426ca93079d2d5f8c9b6a1e5ffcdc9953b7069",
+      "frames": 7363,
+      "peak": 0.5558433601446001,
+      "energy": 4.846178399999999,
+      "centroidHz": 3015.282734177178
+    },
+    {
+      "path": "audio/mahjong-crisp/release/shiftRight_0.wav",
+      "sha256": "e33d6736f83d7888625f7c814e4b2348a40ec6539e74702de53b4e40ed4b23f9",
+      "frames": 3177,
+      "peak": 0.08773875483052836,
+      "energy": 0.46571774424,
+      "centroidHz": 1204.410285947627
+    },
+    {
+      "path": "audio/mahjong-crisp/release/shiftRight_1.wav",
+      "sha256": "e8880eb8328e48cbe22c9b621abc0a7baec139ead2a1da230eafe487651ebd7f",
+      "frames": 3177,
+      "peak": 0.16313553089085844,
+      "energy": 0.46571774423999995,
+      "centroidHz": 3152.2851544009905
+    },
+    {
+      "path": "audio/mahjong-crisp/press/tab_0.wav",
+      "sha256": "ed10de82943b7297489ab20d1da1bfcee64cf3aa45a3044bdc4490ec8ff8dbed",
+      "frames": 5116,
+      "peak": 0.47206230505278396,
+      "energy": 3.9076223999999993,
+      "centroidHz": 3469.603975243132
+    },
+    {
+      "path": "audio/mahjong-crisp/press/tab_1.wav",
+      "sha256": "1a0e37ad244d271641f4ed2e70d9ac561904b0531ba6d08e05d2e7d71b016ac4",
+      "frames": 5116,
+      "peak": 0.5378747793931545,
+      "energy": 3.907622399999999,
+      "centroidHz": 3272.788724771738
+    },
+    {
+      "path": "audio/mahjong-crisp/press/tab_2.wav",
+      "sha256": "31e2424a6fef6692fb58830303deaa4a0af739164207db6c280fa31b132c681e",
+      "frames": 5116,
+      "peak": 0.43212506777775195,
+      "energy": 3.9076223999999993,
+      "centroidHz": 2589.9477166644324
+    },
+    {
+      "path": "audio/mahjong-crisp/release/tab_0.wav",
+      "sha256": "9ac64df8d9ddb794655db083132653d998f490dbe2b252cd352aa7f1eff99050",
+      "frames": 2208,
+      "peak": 0.1518769844031117,
+      "energy": 0.37552251264,
+      "centroidHz": 3387.1323336021364
+    },
+    {
+      "path": "audio/mahjong-crisp/release/tab_1.wav",
+      "sha256": "08d8659316db20905f42fa0dfdaed3923b779f48cee515e386f1013989b74bcb",
+      "frames": 2208,
+      "peak": 0.170238797737713,
+      "energy": 0.37552251263999986,
+      "centroidHz": 2928.287973545252
+    },
+    {
+      "path": "audio/mahjong-crisp/press/caps_0.wav",
+      "sha256": "064a3c8bb3c6be99bc0e209634ac80353dc6d5c25750f95549e7db63248f107b",
+      "frames": 6115,
+      "peak": 0.5526054168391223,
+      "energy": 4.458645599999998,
+      "centroidHz": 3149.197142935867
+    },
+    {
+      "path": "audio/mahjong-crisp/press/caps_1.wav",
+      "sha256": "b93774e73c00af29ca91d63614c156ea395fdb41b2ed2d138eb947b6f6e58260",
+      "frames": 6115,
+      "peak": 0.44829684926036295,
+      "energy": 4.458645599999999,
+      "centroidHz": 2482.1998583601207
+    },
+    {
+      "path": "audio/mahjong-crisp/press/caps_2.wav",
+      "sha256": "8660b5de3b41bfec4fd727d01e16861cbec44278aff7a9cddffe1e9f10c6b644",
+      "frames": 6115,
+      "peak": 0.46970605482666505,
+      "energy": 4.4586456,
+      "centroidHz": 2474.1297019245435
+    },
+    {
+      "path": "audio/mahjong-crisp/release/caps_0.wav",
+      "sha256": "99835be8551a12202a7d0419bc58c806121061d966e66a0554af7aee7a952d04",
+      "frames": 2638,
+      "peak": 0.1771464697790152,
+      "energy": 0.4284758421599998,
+      "centroidHz": 2783.320782354909
+    },
+    {
+      "path": "audio/mahjong-crisp/release/caps_1.wav",
+      "sha256": "fa24ad982a31008569e9690255439eae0f15db1005794bed405cdfda95ed2b0c",
+      "frames": 2638,
+      "peak": 0.06372804053202831,
+      "energy": 0.42847584215999984,
+      "centroidHz": 1271.209511986668
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_0.wav",
+      "sha256": "692df4286758380701efadbe5368c176fcfde2fce62158bcd7aabd3be8f5034d",
+      "frames": 6240,
+      "peak": 0.5172107220430728,
+      "energy": 5.046,
+      "centroidHz": 2738.7642849046283
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_1.wav",
+      "sha256": "df3805878fd16217c5c7e5de88d0deae534a5b7ecfb5bd35569a39bac2bdbfdf",
+      "frames": 6240,
+      "peak": 0.5443935425367622,
+      "energy": 5.045999999999999,
+      "centroidHz": 2757.1789984421175
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_2.wav",
+      "sha256": "d704bd4f5be4997e25f5c0097a322a9ceba445e27f8503a9eab85457770249cb",
+      "frames": 6240,
+      "peak": 0.5592431595210653,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2861.1143512513786
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_3.wav",
+      "sha256": "f0421da9a17a463575e2584f5f4e5a792841ab5c28ab3e75137023b0a5bd9749",
+      "frames": 6240,
+      "peak": 0.42055718685320664,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2952.0512256993143
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_4.wav",
+      "sha256": "2e1a2e836cc54bed483cc1de8b2a6e7f5ed2c6aeda28a98b05ea39fb2af5dd5b",
+      "frames": 6240,
+      "peak": 0.5887248751221682,
+      "energy": 5.046,
+      "centroidHz": 3475.517007983892
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_5.wav",
+      "sha256": "ea1d353dc7efcaa8d5ffb4793840813c004cf07e0ec1aff49ad99126fcf07195",
+      "frames": 6240,
+      "peak": 0.6032594419330168,
+      "energy": 5.045999999999999,
+      "centroidHz": 3418.848661117894
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_6.wav",
+      "sha256": "712e0327cd43111b7ec6788a9d1bcfe514b8869d798426be9b26a95dd0fd3888",
+      "frames": 6240,
+      "peak": 0.5684877768646323,
+      "energy": 5.045999999999999,
+      "centroidHz": 3537.476478020755
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/regular_7.wav",
+      "sha256": "ab7cb5ed46060e98c0812c1cbb8bf60cc400488a1370b28b8fb816d907d6e53a",
+      "frames": 6240,
+      "peak": 0.6320773285359862,
+      "energy": 5.0459999999999985,
+      "centroidHz": 3359.0589843958346
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/regular_0.wav",
+      "sha256": "5259298dff9a3547c32fff4439b12a45cc9dad940aba6d85fcdc52047f1c87f9",
+      "frames": 2692,
+      "peak": 0.06729359103821574,
+      "energy": 0.48492059999999987,
+      "centroidHz": 1388.3158528675403
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/regular_1.wav",
+      "sha256": "d29e12854768943556d6907df90f9a306fb19e350211d52b29cad5e9d470a54e",
+      "frames": 2692,
+      "peak": 0.09060098848184069,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1354.078085845273
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/regular_2.wav",
+      "sha256": "6160d7b18b55ef59bd9c4e70b87f302d4cc964dd0dd25db1c9f7458db69ebe68",
+      "frames": 2692,
+      "peak": 0.18340734758138005,
+      "energy": 0.4849205999999998,
+      "centroidHz": 3445.165851374483
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/regular_3.wav",
+      "sha256": "767e8c6eb13c6e9f4c5d857f03e4b5a302fb0736ec5e5950927bd545b64c75de",
+      "frames": 2692,
+      "peak": 0.2036413054797212,
+      "energy": 0.4849205999999999,
+      "centroidHz": 2925.297314391247
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/space_0.wav",
+      "sha256": "4ba30d87c7b930704d4c8cbb49e91f664a19e57a7c7988de0595cd05c3cb7a57",
+      "frames": 9672,
+      "peak": 0.5701699541410883,
+      "energy": 7.026050399999999,
+      "centroidHz": 2276.0720774247006
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/space_1.wav",
+      "sha256": "2d2748d84922d2df4d1c285e9512c8e3dc06168315253db92f169af4df860727",
+      "frames": 9672,
+      "peak": 0.6093462010848858,
+      "energy": 7.026050399999997,
+      "centroidHz": 2488.262658190152
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/space_2.wav",
+      "sha256": "af8b8378e99e58d3c15e18d2f571d799118367919f2015569eb5fc02f68adc3b",
+      "frames": 9672,
+      "peak": 0.45282980066667555,
+      "energy": 7.026050399999996,
+      "centroidHz": 2546.031161288253
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/space_0.wav",
+      "sha256": "5cb5a5e4d33b67a6c527a0fe094be2f8fcae9011faf02d6fd752449bc59dfe84",
+      "frames": 4173,
+      "peak": 0.11691590862112262,
+      "energy": 0.6752034434399997,
+      "centroidHz": 1225.1414705892103
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/space_1.wav",
+      "sha256": "308e3f327bb3cba1dff58cd61c84275964fff5f8cfe3e3ae843cc2ca1d1c3c97",
+      "frames": 4173,
+      "peak": 0.19586458709548513,
+      "energy": 0.6752034434399997,
+      "centroidHz": 2971.6340643383146
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/enter_0.wav",
+      "sha256": "2fcda8d0ca91a913cbd2e609ab9f9a832bafe82d13b84aa88fd3191350ce4357",
+      "frames": 7612,
+      "peak": 0.5840551696507184,
+      "energy": 5.885654400000001,
+      "centroidHz": 2793.7335160356038
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/enter_1.wav",
+      "sha256": "402056dbf85fe07f0d64515987419aa38f8dc68ad584c047ca7f86bb2a7de914",
+      "frames": 7612,
+      "peak": 0.4417011582008802,
+      "energy": 5.885654400000002,
+      "centroidHz": 2806.1807992383597
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/enter_2.wav",
+      "sha256": "7d25af188a1c29cdff2664e21237f2a25dd74bd9aa720889924d83476089bf4d",
+      "frames": 7612,
+      "peak": 0.5846811993861458,
+      "energy": 5.885654400000002,
+      "centroidHz": 3314.2646137519146
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/enter_0.wav",
+      "sha256": "2957cfff30c82c456534bbb7c37cd94e189079a6a154fd2856c189ea46d7fe9f",
+      "frames": 3285,
+      "peak": 0.19218236254745247,
+      "energy": 0.5656113878399999,
+      "centroidHz": 3300.0636644674873
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/enter_1.wav",
+      "sha256": "0369103712f8cc46f61ed1d4b71ea9aed1db401c571a9a971ea179e100b4234e",
+      "frames": 3285,
+      "peak": 0.20867041978436357,
+      "energy": 0.56561138784,
+      "centroidHz": 2840.7255800367334
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/backspace_0.wav",
+      "sha256": "bde83b69cddeaf1dfd1104f1b54ce8f309cce9f72c211925e01810aa4e2b60d6",
+      "frames": 5366,
+      "peak": 0.4045955302182174,
+      "energy": 4.4586456,
+      "centroidHz": 3028.043369121444
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/backspace_1.wav",
+      "sha256": "0d48d02300b6867063b653399520daaff218e50b2be76fd1feaa1307c1110fa8",
+      "frames": 5366,
+      "peak": 0.5578428457229574,
+      "energy": 4.4586456000000005,
+      "centroidHz": 3571.8718508523016
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/backspace_2.wav",
+      "sha256": "e0008e145a991a36d4359ecb93bceea18949e521e148d96789d57327c556a534",
+      "frames": 5366,
+      "peak": 0.5763258622215661,
+      "energy": 4.458645599999998,
+      "centroidHz": 3476.4783270033618
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/backspace_0.wav",
+      "sha256": "01693af0ee819324721775e602cd673705759ba6e81e85e6d14abb25978ab0a4",
+      "frames": 2315,
+      "peak": 0.19343683425907565,
+      "energy": 0.42847584215999995,
+      "centroidHz": 3055.7534189079706
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/backspace_1.wav",
+      "sha256": "08c43d4575cb4f5f562aa093408e85122ac825d2c925ff4d644b017c2ea01caf",
+      "frames": 2315,
+      "peak": 0.06904217166628274,
+      "energy": 0.42847584215999984,
+      "centroidHz": 1432.1736986509359
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/shiftLeft_0.wav",
+      "sha256": "6e01f49b5606db9037ca393ee0a334fd39a89e1d76b8d5953f6a3a3504fecc4f",
+      "frames": 8112,
+      "peak": 0.5432442782684667,
+      "energy": 5.147424600000001,
+      "centroidHz": 3192.9835922112766
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/shiftLeft_1.wav",
+      "sha256": "4b5c97c82b1b274ab898fd16d1d1f8ea744f390bc851757faca5b3d6e498a88d",
+      "frames": 8112,
+      "peak": 0.5719092178197567,
+      "energy": 5.1474246,
+      "centroidHz": 3145.4915567920693
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/shiftLeft_2.wav",
+      "sha256": "0202409bda21e480c4bd33fb3936b9e2aed1c80ebd209f3f8d4b42a3bd7f95fc",
+      "frames": 8112,
+      "peak": 0.541343451657703,
+      "energy": 5.147424599999997,
+      "centroidHz": 3249.333237511018
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/shiftLeft_0.wav",
+      "sha256": "60c395b9f17912bc124fd77eb3004ba3df9153055451fbeea78955188d7efc36",
+      "frames": 3500,
+      "peak": 0.0746657299593222,
+      "energy": 0.4946675040599999,
+      "centroidHz": 1327.235028741706
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/shiftLeft_1.wav",
+      "sha256": "6443db232fcd04e43a370c906b2c7329d69f29aab56da69ea34737f2a960fd98",
+      "frames": 3500,
+      "peak": 0.09801748568430686,
+      "energy": 0.49466750405999976,
+      "centroidHz": 1305.0446876364585
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/shiftRight_0.wav",
+      "sha256": "c1cf28b7804da33405b25889da5c5202eaa588b389ab34eeb9ea95f87d085869",
+      "frames": 7363,
+      "peak": 0.5741646181588985,
+      "energy": 4.846178399999999,
+      "centroidHz": 3262.7333945405167
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/shiftRight_1.wav",
+      "sha256": "3857613c490caca3e88e9a5d9612a1d22ec28fcd43303975322aefc9ef73b7bf",
+      "frames": 7363,
+      "peak": 0.5378356542461121,
+      "energy": 4.846178400000001,
+      "centroidHz": 3370.366430909795
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/shiftRight_2.wav",
+      "sha256": "a91f6bc53c78ab655a711d580072d3a5d71762ec09cc2b8bacb82fca6a0fe12f",
+      "frames": 7363,
+      "peak": 0.6095843277791283,
+      "energy": 4.846178399999999,
+      "centroidHz": 3202.828485028636
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/shiftRight_0.wav",
+      "sha256": "038e48634399fec588ebcf72fd8673dcc2e195685e1c7bd9281b86d7a06c411f",
+      "frames": 3177,
+      "peak": 0.09529203274442194,
+      "energy": 0.46571774424,
+      "centroidHz": 1349.823483946041
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/shiftRight_1.wav",
+      "sha256": "93155296cedb75ac68b18814aff8b4670d47060d2c962aefe0324491d45878b8",
+      "frames": 3177,
+      "peak": 0.17693817790824423,
+      "energy": 0.46571774424,
+      "centroidHz": 3328.028275549488
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/tab_0.wav",
+      "sha256": "af95eac757b07a299d5d3f999f64af974c70c1e120382d9078fcde673ef4ce25",
+      "frames": 5116,
+      "peak": 0.5095193501382894,
+      "energy": 3.9076223999999997,
+      "centroidHz": 3648.6120535151395
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/tab_1.wav",
+      "sha256": "a6ca69fad422ea958d0eb008a61495a64f3cdccf957406aa7a828441c2367990",
+      "frames": 5116,
+      "peak": 0.5738778417391203,
+      "energy": 3.9076223999999993,
+      "centroidHz": 3471.5719573137308
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/tab_2.wav",
+      "sha256": "30ee6f9d916d0e75199aabd5406a5613ab7745dc555b0502837867a887f3a427",
+      "frames": 5116,
+      "peak": 0.4606252754954217,
+      "energy": 3.907622399999999,
+      "centroidHz": 2819.28527760646
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/tab_0.wav",
+      "sha256": "1cb46163e6af3cde3da866fd4e6da73930037744ce32904581fc3486d0167365",
+      "frames": 2208,
+      "peak": 0.16638087236226717,
+      "energy": 0.37552251263999986,
+      "centroidHz": 3586.559341212245
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/tab_1.wav",
+      "sha256": "2887120ca8b9d74b7882341239227edd1d900f76d071f697345c03d9e6a12083",
+      "frames": 2208,
+      "peak": 0.18292207831366517,
+      "energy": 0.3755225126399999,
+      "centroidHz": 3133.7852848766265
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/caps_0.wav",
+      "sha256": "1f6b599a46fa05038eb3602001ed3bf3ff6a7246d267f5fd9295ad3294a484f7",
+      "frames": 6115,
+      "peak": 0.5877985044056145,
+      "energy": 4.458645599999998,
+      "centroidHz": 3306.0156703810635
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/caps_1.wav",
+      "sha256": "57d2c84f50eed3aac65b5f202df3679cfc9d7b466d5cd5499afa9cc48dfb52d7",
+      "frames": 6115,
+      "peak": 0.4913412223633958,
+      "energy": 4.4586456,
+      "centroidHz": 2692.4262576325077
+    },
+    {
+      "path": "audio/mahjong-porcelain/press/caps_2.wav",
+      "sha256": "1b7fc8d0a8ab58e0ae7a770ed9d7977c4e58c28d385d690e850c3cb9ad8e3a7c",
+      "frames": 6115,
+      "peak": 0.5188759275400445,
+      "energy": 4.4586456,
+      "centroidHz": 2722.849865855347
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/caps_0.wav",
+      "sha256": "288e5fe0a34b8e02fd0a024ef20cf2fe4f56b1405b3a77a29b4bc391fd7522cd",
+      "frames": 2638,
+      "peak": 0.1897584774309686,
+      "energy": 0.42847584216000006,
+      "centroidHz": 2964.475153152316
+    },
+    {
+      "path": "audio/mahjong-porcelain/release/caps_1.wav",
+      "sha256": "6f7d81a850a4dbaa048ec25e365fcbb178719f6ca1c98edebaf7b3647d4bb366",
+      "frames": 2638,
+      "peak": 0.06992948170528901,
+      "energy": 0.4284758421599996,
+      "centroidHz": 1411.875197214827
+    },
+    {
+      "path": "audio/thock-deep/press/regular_0.wav",
+      "sha256": "bde57058b39cf835f8feae392a17522bf4b5d90647576ee2595d5c46b8cd7d6c",
+      "frames": 6240,
+      "peak": 0.3807326874255966,
+      "energy": 5.045999999999999,
+      "centroidHz": 1678.89470801538
+    },
+    {
+      "path": "audio/thock-deep/press/regular_1.wav",
+      "sha256": "2f5d9a29c5335eacdff62a6d4520adf933a57821bd5f2a8419ff205f50325c8e",
+      "frames": 6240,
+      "peak": 0.4068565187876066,
+      "energy": 5.045999999999999,
+      "centroidHz": 1741.6276764005481
+    },
+    {
+      "path": "audio/thock-deep/press/regular_2.wav",
+      "sha256": "d7484dd33efb642f8e6fa2431fabc1d224b50200429566c118fcb3a459cfdfe2",
+      "frames": 6240,
+      "peak": 0.43786449864766014,
+      "energy": 5.046,
+      "centroidHz": 1976.6628154208674
+    },
+    {
+      "path": "audio/thock-deep/press/regular_3.wav",
+      "sha256": "137b56806f908738b0259dd4b2650377716103f1a9c6424deee21913d30a4d0e",
+      "frames": 6240,
+      "peak": 0.34706449201233924,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2049.6138056670657
+    },
+    {
+      "path": "audio/thock-deep/press/regular_4.wav",
+      "sha256": "41f6142e6ec5820cdc752632d77fc39aa9d1f9142703f7e4a20d132fbb38061a",
+      "frames": 6240,
+      "peak": 0.47805795544304597,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2411.870905454782
+    },
+    {
+      "path": "audio/thock-deep/press/regular_5.wav",
+      "sha256": "fd2560cc0fd8935436965b9cf4444d385be2a6f0b9d3c353e8bdc94a06abe553",
+      "frames": 6240,
+      "peak": 0.46001312971632563,
+      "energy": 5.045999999999999,
+      "centroidHz": 2350.069755110947
+    },
+    {
+      "path": "audio/thock-deep/press/regular_6.wav",
+      "sha256": "95ac554ea95ddc533b3391e699fcbf8d006447484408d821a3230eb9c8316cbe",
+      "frames": 6240,
+      "peak": 0.4509675356044234,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2399.7959302301374
+    },
+    {
+      "path": "audio/thock-deep/press/regular_7.wav",
+      "sha256": "ec42bc895735fe03914aa3a06ca72daa539c60684437b6f56b93a4c8626d130d",
+      "frames": 6240,
+      "peak": 0.5020546836365075,
+      "energy": 5.046,
+      "centroidHz": 2339.773659018057
+    },
+    {
+      "path": "audio/thock-deep/release/regular_0.wav",
+      "sha256": "dcc5231042f0aa13d239124e0a19248260cd03c388a9e232a6302304e451492b",
+      "frames": 2692,
+      "peak": 0.05942713450334689,
+      "energy": 0.4849205999999998,
+      "centroidHz": 868.9541257641603
+    },
+    {
+      "path": "audio/thock-deep/release/regular_1.wav",
+      "sha256": "c7db5875245c443fd562b8671fef0f97903d4140df27b34a5dcd2ea8725818d4",
+      "frames": 2692,
+      "peak": 0.0682819889233954,
+      "energy": 0.48492060000000003,
+      "centroidHz": 862.9375684894027
+    },
+    {
+      "path": "audio/thock-deep/release/regular_2.wav",
+      "sha256": "b67aaa9907bd89c6ef462d35629eccccee44b712137cbc262e4463e41a4bc522",
+      "frames": 2692,
+      "peak": 0.13824307849819897,
+      "energy": 0.48492060000000003,
+      "centroidHz": 2273.1070927991814
+    },
+    {
+      "path": "audio/thock-deep/release/regular_3.wav",
+      "sha256": "ca2aed3399f2a3179da36faed4571fd2938ad820a4cf8d1e793166b4be8a61cc",
+      "frames": 2692,
+      "peak": 0.1589722448392382,
+      "energy": 0.48492060000000003,
+      "centroidHz": 2059.176186994762
+    },
+    {
+      "path": "audio/thock-deep/press/space_0.wav",
+      "sha256": "e328040158dc31da53aa2afb90732e7e94e713dc2afd35e7490aed2811a1f9e1",
+      "frames": 9672,
+      "peak": 0.41338513895952095,
+      "energy": 7.0260504,
+      "centroidHz": 1426.1441830282834
+    },
+    {
+      "path": "audio/thock-deep/press/space_1.wav",
+      "sha256": "7b5bef7029dc761502f2ebf5be7a83c98bee348462120dcbd15e35b6bb90cc86",
+      "frames": 9672,
+      "peak": 0.4649926654157362,
+      "energy": 7.0260504,
+      "centroidHz": 1686.726826437982
+    },
+    {
+      "path": "audio/thock-deep/press/space_2.wav",
+      "sha256": "5662ccc7b3d62692a2eda1eea23e29a60dfb61c5bbe08f107e787b8d1e7f1bcc",
+      "frames": 9672,
+      "peak": 0.38680425819997366,
+      "energy": 7.0260504,
+      "centroidHz": 1755.3095681209895
+    },
+    {
+      "path": "audio/thock-deep/release/space_0.wav",
+      "sha256": "ce22156fa7ca2c0e97fd3b6e9eb772aa0df48f71d614a154900fb5f7888c8585",
+      "frames": 4173,
+      "peak": 0.07356696756884071,
+      "energy": 0.6752034434399998,
+      "centroidHz": 737.0124823771832
+    },
+    {
+      "path": "audio/thock-deep/release/space_1.wav",
+      "sha256": "16d6e3b1c1a5f15b0203b0e624a75cf45625fddda4520ed099c3a794686b5a27",
+      "frames": 4173,
+      "peak": 0.1503234784026976,
+      "energy": 0.6752034434399996,
+      "centroidHz": 1981.9474780070252
+    },
+    {
+      "path": "audio/thock-deep/press/enter_0.wav",
+      "sha256": "c71e8687766d9cedc378cb4b23acdf17cc09660fe02826ce18320f3d4943b483",
+      "frames": 7612,
+      "peak": 0.4591994684846875,
+      "energy": 5.8856544,
+      "centroidHz": 1880.644510296826
+    },
+    {
+      "path": "audio/thock-deep/press/enter_1.wav",
+      "sha256": "eaf9a719c6dd95d847f2dfbf769083c05449d38f4494b3b578c665748f59c20a",
+      "frames": 7612,
+      "peak": 0.3674435479303779,
+      "energy": 5.885654400000003,
+      "centroidHz": 1945.652528509062
+    },
+    {
+      "path": "audio/thock-deep/press/enter_2.wav",
+      "sha256": "6aa549ab499da52f48418c273e540798c08f58303ce3000717e49f90292fd0c4",
+      "frames": 7612,
+      "peak": 0.49486559171981975,
+      "energy": 5.885654400000002,
+      "centroidHz": 2270.0239318878007
+    },
+    {
+      "path": "audio/thock-deep/release/enter_0.wav",
+      "sha256": "c1c55556ad05437140fec13ef8ecc6ae0d114641906182ea21a9278cf21a6a30",
+      "frames": 3285,
+      "peak": 0.14525051848413376,
+      "energy": 0.5656113878400001,
+      "centroidHz": 2148.969905530405
+    },
+    {
+      "path": "audio/thock-deep/release/enter_1.wav",
+      "sha256": "121664018a69e22b3881c566f8b08f8fe4649c6cf2e0cadbff03bdfc4b6f1bd5",
+      "frames": 3285,
+      "peak": 0.16500566381655932,
+      "energy": 0.5656113878400002,
+      "centroidHz": 1953.0302568594143
+    },
+    {
+      "path": "audio/thock-deep/press/backspace_0.wav",
+      "sha256": "01446259c9796cfb3192b39df44c05c44ec9ed79b06fea2cc64a65223aa7049e",
+      "frames": 5366,
+      "peak": 0.3338787877235663,
+      "energy": 4.4586456,
+      "centroidHz": 2089.72463841953
+    },
+    {
+      "path": "audio/thock-deep/press/backspace_1.wav",
+      "sha256": "b0dc20a45bea0d884055f891830f3478f5eb2e797ba5f4033fede2cbb9b246a7",
+      "frames": 5366,
+      "peak": 0.4546743995062943,
+      "energy": 4.458645599999999,
+      "centroidHz": 2419.327939761994
+    },
+    {
+      "path": "audio/thock-deep/press/backspace_2.wav",
+      "sha256": "a15b1e17c46bca1fac93f94e45f6e6e6e46588dfc6564864ec5d77c56fe663c5",
+      "frames": 5366,
+      "peak": 0.4381797281460663,
+      "energy": 4.458645599999999,
+      "centroidHz": 2332.7365974847407
+    },
+    {
+      "path": "audio/thock-deep/release/backspace_0.wav",
+      "sha256": "fb56474a13bd96eea8152a8846767d332ed93c25c8801cf561ef8b96aa545424",
+      "frames": 2315,
+      "peak": 0.1498591100960986,
+      "energy": 0.42847584215999995,
+      "centroidHz": 2078.9223452533765
+    },
+    {
+      "path": "audio/thock-deep/release/backspace_1.wav",
+      "sha256": "0cccb582a66e5fa5bde0d711269c778c283e163832f9f09df3307f5600383893",
+      "frames": 2315,
+      "peak": 0.059563517387313934,
+      "energy": 0.4284758421599999,
+      "centroidHz": 872.6937203785184
+    },
+    {
+      "path": "audio/thock-deep/press/shiftLeft_0.wav",
+      "sha256": "9a9c0b40e8a84de7f081a6a4fc174d5b8bae3b592612a88ad34798570afb8d2f",
+      "frames": 8112,
+      "peak": 0.4567073798636101,
+      "energy": 5.1474246,
+      "centroidHz": 2216.0336270041716
+    },
+    {
+      "path": "audio/thock-deep/press/shiftLeft_1.wav",
+      "sha256": "70ca227d6d52b4c582523bf247133c21b8fe31c193e7547ac6dc2e18dc5a88cd",
+      "frames": 8112,
+      "peak": 0.43817370480112966,
+      "energy": 5.1474246,
+      "centroidHz": 2163.026849747145
+    },
+    {
+      "path": "audio/thock-deep/press/shiftLeft_2.wav",
+      "sha256": "867d394d211b5bd964e349e09d5b521f5a0f2a12b138100801086c0e9de925a0",
+      "frames": 8112,
+      "peak": 0.4313449371861216,
+      "energy": 5.147424599999999,
+      "centroidHz": 2201.3381017832485
+    },
+    {
+      "path": "audio/thock-deep/release/shiftLeft_0.wav",
+      "sha256": "f793993e9639f3aacb985366d41a6b00207919529e788ba799c4803c8c6d4c20",
+      "frames": 3500,
+      "peak": 0.06616017388285765,
+      "energy": 0.4946675040599997,
+      "centroidHz": 792.6233275766393
+    },
+    {
+      "path": "audio/thock-deep/release/shiftLeft_1.wav",
+      "sha256": "54135be82149819432e29ed4b7ba095ebbb74af8eee10817239cf3971a385559",
+      "frames": 3500,
+      "peak": 0.06496930797256097,
+      "energy": 0.49466750405999976,
+      "centroidHz": 799.4941927279081
+    },
+    {
+      "path": "audio/thock-deep/press/shiftRight_0.wav",
+      "sha256": "9a36a08372bf9a3213e673d2a23c97cb8c5f19ac182232025964267a4f41b0fb",
+      "frames": 7363,
+      "peak": 0.4353655983809935,
+      "energy": 4.846178399999999,
+      "centroidHz": 2220.726905343614
+    },
+    {
+      "path": "audio/thock-deep/press/shiftRight_1.wav",
+      "sha256": "efab2d8db232985b09020cc7dab45fdcf2dea6cced815d68d2b9e7a516bf288a",
+      "frames": 7363,
+      "peak": 0.4286405943046284,
+      "energy": 4.8461784,
+      "centroidHz": 2263.663592879814
+    },
+    {
+      "path": "audio/thock-deep/press/shiftRight_2.wav",
+      "sha256": "af41eac86d6bf85eb703eaa1af911bbda230f113b931c398b621cef26b5dead3",
+      "frames": 7363,
+      "peak": 0.4621652186384343,
+      "energy": 4.8461783999999986,
+      "centroidHz": 2172.621219070901
+    },
+    {
+      "path": "audio/thock-deep/release/shiftRight_0.wav",
+      "sha256": "b6b206dab80a7f5eda0b98d37686c5b49d87108abac26c79570cc303f65e664a",
+      "frames": 3177,
+      "peak": 0.06498057347208037,
+      "energy": 0.46571774424,
+      "centroidHz": 830.5231639842574
+    },
+    {
+      "path": "audio/thock-deep/release/shiftRight_1.wav",
+      "sha256": "1ce7b2d7592e4a12a74e1ee9dd049e3e3481c301ed81d581ae973a6355f7e7fb",
+      "frames": 3177,
+      "peak": 0.1326076267434565,
+      "energy": 0.46571774423999995,
+      "centroidHz": 2173.7693521201245
+    },
+    {
+      "path": "audio/thock-deep/press/tab_0.wav",
+      "sha256": "8f5c7a8d17652c538e650458c35711c61df81409a682cdc7361083cd327250ef",
+      "frames": 5116,
+      "peak": 0.4059068071348661,
+      "energy": 3.9076223999999984,
+      "centroidHz": 2410.9075102855118
+    },
+    {
+      "path": "audio/thock-deep/press/tab_1.wav",
+      "sha256": "23810ad6553bcfee2d4790d83cb6a0cd864a58c07dcaf93e931c1978047eb8a1",
+      "frames": 5116,
+      "peak": 0.44030955810033157,
+      "energy": 3.9076223999999997,
+      "centroidHz": 2331.9162044312943
+    },
+    {
+      "path": "audio/thock-deep/press/tab_2.wav",
+      "sha256": "cfaa2fbf3fd771e264aba82fafb2d7059089afa8cc5f35d5827e451a9bca3104",
+      "frames": 5116,
+      "peak": 0.3386423511292373,
+      "energy": 3.9076223999999997,
+      "centroidHz": 1680.2370540454997
+    },
+    {
+      "path": "audio/thock-deep/release/tab_0.wav",
+      "sha256": "ff55cd3e842df166d6cc920973cf4e2fd1aa472e7404094d7ded92c7f93eaa0d",
+      "frames": 2208,
+      "peak": 0.1225412775981578,
+      "energy": 0.37552251264,
+      "centroidHz": 2303.332325982846
+    },
+    {
+      "path": "audio/thock-deep/release/tab_1.wav",
+      "sha256": "a3555b4f4b0c8a214932fba1c462899c0a3778bdd83dd835d0bac2139c7bb7e9",
+      "frames": 2208,
+      "peak": 0.14170857895856268,
+      "energy": 0.3755225126399999,
+      "centroidHz": 2119.912649176977
+    },
+    {
+      "path": "audio/thock-deep/press/caps_0.wav",
+      "sha256": "b8ab39f4a48f7b3f0587f47e8486ab4545e49776dfae44f710141895bf7461f5",
+      "frames": 6115,
+      "peak": 0.46049449237256296,
+      "energy": 4.4586456,
+      "centroidHz": 2244.365519234866
+    },
+    {
+      "path": "audio/thock-deep/press/caps_1.wav",
+      "sha256": "75d02bc08f16dc5eb954963ffa7f3c3316c9706decca62abdb6d88c1148523ce",
+      "frames": 6115,
+      "peak": 0.3520000834808968,
+      "energy": 4.4586456,
+      "centroidHz": 1616.8394381966773
+    },
+    {
+      "path": "audio/thock-deep/press/caps_2.wav",
+      "sha256": "1ebcb37004f23f56f51c3a68511e76efc40e9faa6646b0d49cf3fcf016679a74",
+      "frames": 6115,
+      "peak": 0.37785314303575485,
+      "energy": 4.4586456,
+      "centroidHz": 1686.8829356541232
+    },
+    {
+      "path": "audio/thock-deep/release/caps_0.wav",
+      "sha256": "72c8ff530a91c3d2f6f6a862c14a1fd7f35d74455f9e9d991f9bf6a65a3e8130",
+      "frames": 2638,
+      "peak": 0.1476687452893204,
+      "energy": 0.4284758421599998,
+      "centroidHz": 2033.697131552629
+    },
+    {
+      "path": "audio/thock-deep/release/caps_1.wav",
+      "sha256": "30d437a5a9ad64fa0ba3c74a67467b21a81df9319e15d977aa3c07345849303b",
+      "frames": 2638,
+      "peak": 0.059983190571050914,
+      "energy": 0.42847584215999995,
+      "centroidHz": 855.2682369932295
+    },
+    {
+      "path": "audio/cream-milk/press/regular_0.wav",
+      "sha256": "62c07839fae5aeb817a9453fa9bafd3914925239d326ceebf044ac01450fa384",
+      "frames": 6240,
+      "peak": 0.3995933161277631,
+      "energy": 5.045999999999998,
+      "centroidHz": 1815.3348952129918
+    },
+    {
+      "path": "audio/cream-milk/press/regular_1.wav",
+      "sha256": "03d57e08def647c6d64191659e3e17fda0c8e884d9c7fea8adbedd49babc63b5",
+      "frames": 6240,
+      "peak": 0.4294668360262339,
+      "energy": 5.045999999999999,
+      "centroidHz": 1925.644408997047
+    },
+    {
+      "path": "audio/cream-milk/press/regular_2.wav",
+      "sha256": "08bba8fd7c9d29ee20f2a14deb02769dbb427069351954a1f2a34b75b369b7ea",
+      "frames": 6240,
+      "peak": 0.45425690228559595,
+      "energy": 5.046000000000001,
+      "centroidHz": 2306.905967628859
+    },
+    {
+      "path": "audio/cream-milk/press/regular_3.wav",
+      "sha256": "d66d94ec9b85eb444c2266f14574d75598504b750b2ad3328d37270a1d721757",
+      "frames": 6240,
+      "peak": 0.3662274084534766,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2392.8465440407304
+    },
+    {
+      "path": "audio/cream-milk/press/regular_4.wav",
+      "sha256": "7c9541514b9ce9cf17a076c84cb1972c682d0aabdb32d275b5b5986a91985d3b",
+      "frames": 6240,
+      "peak": 0.4970974168307727,
+      "energy": 5.045999999999999,
+      "centroidHz": 2723.268154008614
+    },
+    {
+      "path": "audio/cream-milk/press/regular_5.wav",
+      "sha256": "4e5317a45f62a21272127a21788e877804e5f7af1b7deacb4361556d9ea00ec4",
+      "frames": 6240,
+      "peak": 0.4827893019401541,
+      "energy": 5.045999999999999,
+      "centroidHz": 2558.3113490711703
+    },
+    {
+      "path": "audio/cream-milk/press/regular_6.wav",
+      "sha256": "daa5ff4b2ea896612b3d4faf6754bb478de5efe6eecb8ac9a23e2ae92213ad4d",
+      "frames": 6240,
+      "peak": 0.47244077392799827,
+      "energy": 5.045999999999997,
+      "centroidHz": 2630.3734702707916
+    },
+    {
+      "path": "audio/cream-milk/press/regular_7.wav",
+      "sha256": "4727991bf605c8a6fa3c894d05664fd18b1fd96705d26afbd807188fd68c3de4",
+      "frames": 6240,
+      "peak": 0.5265041830509772,
+      "energy": 5.045999999999997,
+      "centroidHz": 2580.0693310449215
+    },
+    {
+      "path": "audio/cream-milk/release/regular_0.wav",
+      "sha256": "fae6277eecbc72afdaac06f21f5289515fcd9c01690addde414b0885c7527f43",
+      "frames": 2692,
+      "peak": 0.055077093571499355,
+      "energy": 0.48492059999999987,
+      "centroidHz": 965.7132791052029
+    },
+    {
+      "path": "audio/cream-milk/release/regular_1.wav",
+      "sha256": "4809f8149862359486d3937374903d9cb1f955ef660b253472bcc792ab42327f",
+      "frames": 2692,
+      "peak": 0.07088409307825848,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1006.1831949427202
+    },
+    {
+      "path": "audio/cream-milk/release/regular_2.wav",
+      "sha256": "301dd0be762b55c0b05fa97e336acdbb63fb310011d4ef01aae6fe12f829ce86",
+      "frames": 2692,
+      "peak": 0.1426682396968268,
+      "energy": 0.4849206,
+      "centroidHz": 2432.5145576779532
+    },
+    {
+      "path": "audio/cream-milk/release/regular_3.wav",
+      "sha256": "50595ff816eda9ad880b47efe4bd6998fd5295ecb0bdf9f4fc334f913ff54796",
+      "frames": 2692,
+      "peak": 0.16482659575633654,
+      "energy": 0.48492059999999987,
+      "centroidHz": 2305.958693256643
+    },
+    {
+      "path": "audio/cream-milk/press/space_0.wav",
+      "sha256": "7461e6f6a08227fe412f9793730672f886acfbdfd885ddea30f848bdab100d71",
+      "frames": 9672,
+      "peak": 0.4551148583190915,
+      "energy": 7.026050399999999,
+      "centroidHz": 1685.4526476255653
+    },
+    {
+      "path": "audio/cream-milk/press/space_1.wav",
+      "sha256": "ed338b2c9f45421bc99ed336f99d7f1f8bb612edfd81a335bb9eefbcc94bb69a",
+      "frames": 9672,
+      "peak": 0.5026118899321095,
+      "energy": 7.026050399999999,
+      "centroidHz": 2085.714594509215
+    },
+    {
+      "path": "audio/cream-milk/press/space_2.wav",
+      "sha256": "e2cd7a1f04a2c27f6ec6d9ccf1c42602abb5d90d71c14ee643a0ff6c946901c4",
+      "frames": 9672,
+      "peak": 0.41083796578025294,
+      "energy": 7.026050399999996,
+      "centroidHz": 2123.366691342564
+    },
+    {
+      "path": "audio/cream-milk/release/space_0.wav",
+      "sha256": "4764709ca2304962a88a1ace997c996f072ac9095b8cea318dd858554c27ed9d",
+      "frames": 4173,
+      "peak": 0.08714577997499982,
+      "energy": 0.6752034434399996,
+      "centroidHz": 902.7994372066096
+    },
+    {
+      "path": "audio/cream-milk/release/space_1.wav",
+      "sha256": "8f0554c5d0002483bce58ca6eb0f18b90744fea3553deee1eb133a4402690079",
+      "frames": 4173,
+      "peak": 0.15775826469752804,
+      "energy": 0.6752034434399997,
+      "centroidHz": 2188.635443303972
+    },
+    {
+      "path": "audio/cream-milk/press/enter_0.wav",
+      "sha256": "ee56d0b5b27cd5b875ff3422dc0c490471b209babd7f6dc81ffa32f43efcb314",
+      "frames": 7612,
+      "peak": 0.4808833823756149,
+      "energy": 5.885654400000003,
+      "centroidHz": 2249.7251451032057
+    },
+    {
+      "path": "audio/cream-milk/press/enter_1.wav",
+      "sha256": "c1965a82d58aaac3f612069343bff890c3e93f66398a2b42e5160b61a07b63d6",
+      "frames": 7612,
+      "peak": 0.3910304320044091,
+      "energy": 5.885654400000001,
+      "centroidHz": 2306.770989915624
+    },
+    {
+      "path": "audio/cream-milk/press/enter_2.wav",
+      "sha256": "a4cb25e9fbad4bb77d0e7549aedf44c76d21edd3e70aa077deda37d9566d240e",
+      "frames": 7612,
+      "peak": 0.51216945607085,
+      "energy": 5.8856544,
+      "centroidHz": 2607.403641854062
+    },
+    {
+      "path": "audio/cream-milk/release/enter_0.wav",
+      "sha256": "9cc6951f638ca7c87594197e0591ce9a1699243dd59f810812ffac0a95bc6eb0",
+      "frames": 3285,
+      "peak": 0.15162627291462863,
+      "energy": 0.56561138784,
+      "centroidHz": 2315.771999604111
+    },
+    {
+      "path": "audio/cream-milk/release/enter_1.wav",
+      "sha256": "318ee189ab280b8a1ce9d7c2bf32ace8f3794945a83db6c0a53e642651d17e6a",
+      "frames": 3285,
+      "peak": 0.17217332029773047,
+      "energy": 0.5656113878399999,
+      "centroidHz": 2216.8976234201355
+    },
+    {
+      "path": "audio/cream-milk/press/backspace_0.wav",
+      "sha256": "b7f7d985a9121c51a55d4185f4e29dc0c0f25ac3612962cfecf59886fd33e533",
+      "frames": 5366,
+      "peak": 0.35290492221318087,
+      "energy": 4.4586456000000005,
+      "centroidHz": 2418.666391283146
+    },
+    {
+      "path": "audio/cream-milk/press/backspace_1.wav",
+      "sha256": "3767deae78c4285869cedea44ad58bc3b9728a99ee531c1c13cbd3faa3c8b9b9",
+      "frames": 5366,
+      "peak": 0.47238357967182276,
+      "energy": 4.458645599999999,
+      "centroidHz": 2711.6306413499997
+    },
+    {
+      "path": "audio/cream-milk/press/backspace_2.wav",
+      "sha256": "069903b8105f6479143a88fc2932d7c656e2aa66d6a135d84e46b3cc8ab76732",
+      "frames": 5366,
+      "peak": 0.4606269693363081,
+      "energy": 4.458645599999998,
+      "centroidHz": 2516.512002424462
+    },
+    {
+      "path": "audio/cream-milk/release/backspace_0.wav",
+      "sha256": "3134e1fa006389748e7c1895281c97138985e788d1c06d0c3c6c8e04d750df59",
+      "frames": 2315,
+      "peak": 0.15627517225677154,
+      "energy": 0.42847584215999984,
+      "centroidHz": 2280.216510553096
+    },
+    {
+      "path": "audio/cream-milk/release/backspace_1.wav",
+      "sha256": "922f4ab9f36c59f2db6003586a8d8e2c8942b11daf47af43034be36957b8f3d6",
+      "frames": 2315,
+      "peak": 0.053605238405378515,
+      "energy": 0.4284758421599998,
+      "centroidHz": 981.5588314608003
+    },
+    {
+      "path": "audio/cream-milk/press/shiftLeft_0.wav",
+      "sha256": "62ffbfcbd6fef35f71283d9058494177367c21ce4b5513a58aaab7c500f95aa6",
+      "frames": 8112,
+      "peak": 0.4804542252857857,
+      "energy": 5.147424600000002,
+      "centroidHz": 2542.0084572403757
+    },
+    {
+      "path": "audio/cream-milk/press/shiftLeft_1.wav",
+      "sha256": "33d5acd53f7be639477f9cdb3e0067dd406dbf22d6631b3439a21a54dc457f0b",
+      "frames": 8112,
+      "peak": 0.4699109820363319,
+      "energy": 5.1474246,
+      "centroidHz": 2384.8278980642885
+    },
+    {
+      "path": "audio/cream-milk/press/shiftLeft_2.wav",
+      "sha256": "af9def4ac149aa2d28778eeca7bca9e91de37c60d4c1a565e36124017e9e2dd5",
+      "frames": 8112,
+      "peak": 0.46002469642523175,
+      "energy": 5.147424599999999,
+      "centroidHz": 2451.3871406766953
+    },
+    {
+      "path": "audio/cream-milk/release/shiftLeft_0.wav",
+      "sha256": "3a6d0651a47420a94988a7495b8238ddc3ec70e10e376ea2365b342df9f45eb4",
+      "frames": 3500,
+      "peak": 0.057534321023911206,
+      "energy": 0.49466750405999993,
+      "centroidHz": 917.3772932456519
+    },
+    {
+      "path": "audio/cream-milk/release/shiftLeft_1.wav",
+      "sha256": "07df85a2199ee26b2d21172ea2f6ab52c48c6cde8fa2f123557ca2914f3f2a2b",
+      "frames": 3500,
+      "peak": 0.07408783744475246,
+      "energy": 0.49466750405999976,
+      "centroidHz": 960.4160125471273
+    },
+    {
+      "path": "audio/cream-milk/press/shiftRight_0.wav",
+      "sha256": "eefdf037891987c6719f2bd5daee4239f304b1c398ca538074f5eb47273cb3a3",
+      "frames": 7363,
+      "peak": 0.4635019186724204,
+      "energy": 4.846178399999999,
+      "centroidHz": 2434.396760252668
+    },
+    {
+      "path": "audio/cream-milk/press/shiftRight_1.wav",
+      "sha256": "9deff4680d9d5e122377f8710001012603be51250b4885c39bff6bfd7f4fd215",
+      "frames": 7363,
+      "peak": 0.45334675562621085,
+      "energy": 4.846178399999998,
+      "centroidHz": 2505.572643533983
+    },
+    {
+      "path": "audio/cream-milk/press/shiftRight_2.wav",
+      "sha256": "7a1d7e27056fef7c8887f1e38289d7254840116c847732cc11dd5aaf49cb754c",
+      "frames": 7363,
+      "peak": 0.49742923007843537,
+      "energy": 4.8461783999999986,
+      "centroidHz": 2436.668223952783
+    },
+    {
+      "path": "audio/cream-milk/release/shiftRight_0.wav",
+      "sha256": "ad768aa8db85242814bca0b535bc8c686b6f19af444a77cfcb77e0a3aa2d437f",
+      "frames": 3177,
+      "peak": 0.07218075885646916,
+      "energy": 0.46571774424000006,
+      "centroidHz": 988.6740020848608
+    },
+    {
+      "path": "audio/cream-milk/release/shiftRight_1.wav",
+      "sha256": "f6436ebe1c10a7d72822eb44c22e74c0156c9a76918f24e497bf3e1008a53383",
+      "frames": 3177,
+      "peak": 0.13782659809874986,
+      "energy": 0.46571774424000006,
+      "centroidHz": 2318.0770485431767
+    },
+    {
+      "path": "audio/cream-milk/press/tab_0.wav",
+      "sha256": "092573816ff5debc6f22de843b38ce80a16814dfa452aeda614c25d49d41771c",
+      "frames": 5116,
+      "peak": 0.42486336891329174,
+      "energy": 3.9076224000000015,
+      "centroidHz": 2614.5352039314107
+    },
+    {
+      "path": "audio/cream-milk/press/tab_1.wav",
+      "sha256": "c436fc3831b3a9428619a56afdebd8c43b9825b56f711cced2e01f68bcf3d07f",
+      "frames": 5116,
+      "peak": 0.4668694914698545,
+      "energy": 3.9076223999999993,
+      "centroidHz": 2540.7627524652994
+    },
+    {
+      "path": "audio/cream-milk/press/tab_2.wav",
+      "sha256": "1180cd5e2e37b30f213f4256c3ffe3c5899f70546c5565c03cb5c6bc3825bfc0",
+      "frames": 5116,
+      "peak": 0.36290931611035543,
+      "energy": 3.907622399999999,
+      "centroidHz": 1825.8230453237638
+    },
+    {
+      "path": "audio/cream-milk/release/tab_0.wav",
+      "sha256": "09b5442f19ffebc378f9f4a9eaa2a00ef3ef88c6eef3d90f288395e8d06dbcfd",
+      "frames": 2208,
+      "peak": 0.12729735145864626,
+      "energy": 0.37552251263999986,
+      "centroidHz": 2383.8809265373966
+    },
+    {
+      "path": "audio/cream-milk/release/tab_1.wav",
+      "sha256": "6473394e6b2708b59dced5dc493ba56ea0ab6fb2dc1b9001c0ccb663296450ca",
+      "frames": 2208,
+      "peak": 0.14760468347820244,
+      "energy": 0.3755225126399999,
+      "centroidHz": 2298.2451656073804
+    },
+    {
+      "path": "audio/cream-milk/press/caps_0.wav",
+      "sha256": "c1ff9dda14c872fde91fe428a8c82afcfba0eb73525337b6c4302519eeeaa501",
+      "frames": 6115,
+      "peak": 0.48622815915348905,
+      "energy": 4.458645599999997,
+      "centroidHz": 2486.106877523105
+    },
+    {
+      "path": "audio/cream-milk/press/caps_1.wav",
+      "sha256": "1cbae797ef89ee50924b3f7f3433766c49e01e093b774f641b1d4d671e0ed158",
+      "frames": 6115,
+      "peak": 0.37850075087827995,
+      "energy": 4.4586456,
+      "centroidHz": 1774.8562980853835
+    },
+    {
+      "path": "audio/cream-milk/press/caps_2.wav",
+      "sha256": "f1a6a21aac08c6665657b2e165c7b44bded735647f6f618b85c6ca6698784b15",
+      "frames": 6115,
+      "peak": 0.4004800183871984,
+      "energy": 4.4586456,
+      "centroidHz": 1900.468728415697
+    },
+    {
+      "path": "audio/cream-milk/release/caps_0.wav",
+      "sha256": "5128ef0eef14e03bfa0e66b77c33e75d141a172fb8865664f93c855fc00eb0be",
+      "frames": 2638,
+      "peak": 0.1539207691117284,
+      "energy": 0.42847584215999995,
+      "centroidHz": 2254.705334013787
+    },
+    {
+      "path": "audio/cream-milk/release/caps_1.wav",
+      "sha256": "6f9d562ea54ea5f3f6e695d28f1b0c349e25195dbc0719fd687fa5557eef69a4",
+      "frames": 2638,
+      "peak": 0.05394273910477664,
+      "energy": 0.42847584215999973,
+      "centroidHz": 966.3782635657974
+    },
+    {
+      "path": "audio/cream-butter/press/regular_0.wav",
+      "sha256": "c404d2713976dfcb4be3da7c77e56f65d100af892f4007f203ed4bff4fcb2d78",
+      "frames": 6240,
+      "peak": 0.3654112495119407,
+      "energy": 5.045999999999999,
+      "centroidHz": 1491.789601562412
+    },
+    {
+      "path": "audio/cream-butter/press/regular_1.wav",
+      "sha256": "4aca7e0fb8d9a949a0ea58d65496e2c7ebc510510d6c52ed6d5cd253be49344b",
+      "frames": 6240,
+      "peak": 0.3956100039347711,
+      "energy": 5.045999999999999,
+      "centroidHz": 1632.6882519839758
+    },
+    {
+      "path": "audio/cream-butter/press/regular_2.wav",
+      "sha256": "1c990ea104015ab7ba9d93d8fa7188f4fe833d77e1d8f5d3511d43dda8c50552",
+      "frames": 6240,
+      "peak": 0.42002391636540193,
+      "energy": 5.045999999999999,
+      "centroidHz": 1919.2730310999032
+    },
+    {
+      "path": "audio/cream-butter/press/regular_3.wav",
+      "sha256": "a181eaed2ea8023d0708d4d1571f75de173c6cc371c371eebdd014c6a98f0c03",
+      "frames": 6240,
+      "peak": 0.3447094181072826,
+      "energy": 5.045999999999999,
+      "centroidHz": 2028.1799262032805
+    },
+    {
+      "path": "audio/cream-butter/press/regular_4.wav",
+      "sha256": "1864c2e70669636e4fe7f5dc7dac584172d2899d5112b5b5d28eed184fccf533",
+      "frames": 6240,
+      "peak": 0.47523388720389126,
+      "energy": 5.045999999999999,
+      "centroidHz": 2260.7200290577425
+    },
+    {
+      "path": "audio/cream-butter/press/regular_5.wav",
+      "sha256": "354674fae65ac2592b1f86db81eca802859d6b5d010fab16c95699e4469efbe9",
+      "frames": 6240,
+      "peak": 0.44537030934000044,
+      "energy": 5.045999999999999,
+      "centroidHz": 2144.818221581185
+    },
+    {
+      "path": "audio/cream-butter/press/regular_6.wav",
+      "sha256": "6bbb91c619285182a16aacd7d7e16989099f4ede1bc5e5c831b021a9cf16efec",
+      "frames": 6240,
+      "peak": 0.4411790603809569,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2164.419777379016
+    },
+    {
+      "path": "audio/cream-butter/press/regular_7.wav",
+      "sha256": "276937c74aa46c93d58dca80a83f97d54bfdf9973cc7dde96060602a20a521f0",
+      "frames": 6240,
+      "peak": 0.48750175622320713,
+      "energy": 5.046,
+      "centroidHz": 2157.123649076683
+    },
+    {
+      "path": "audio/cream-butter/release/regular_0.wav",
+      "sha256": "625bc63dec8ef19d7bc646e50f26c2166d058bd1a70d90dac56acb1595e2fa53",
+      "frames": 2692,
+      "peak": 0.0521817633096268,
+      "energy": 0.4849205999999999,
+      "centroidHz": 818.6896606905167
+    },
+    {
+      "path": "audio/cream-butter/release/regular_1.wav",
+      "sha256": "2f7163e75bea2c1dc451d1e2aa32a5692cee666f47f035a1ea9dba4f69187c14",
+      "frames": 2692,
+      "peak": 0.06464671497997634,
+      "energy": 0.4849205999999999,
+      "centroidHz": 860.25024497019
+    },
+    {
+      "path": "audio/cream-butter/release/regular_2.wav",
+      "sha256": "c4d814cf1ec799e9af13c46663cfeaf1afb01772f5ca2840a6b859ed13181fd6",
+      "frames": 2692,
+      "peak": 0.1279027969596457,
+      "energy": 0.48492059999999987,
+      "centroidHz": 1975.5104565688546
+    },
+    {
+      "path": "audio/cream-butter/release/regular_3.wav",
+      "sha256": "73ec6019e4cccf24163d336b46ddc9bd9bc6fe562ae280446413d18f4df10f91",
+      "frames": 2692,
+      "peak": 0.1520343844877821,
+      "energy": 0.48492060000000015,
+      "centroidHz": 1920.751110058014
+    },
+    {
+      "path": "audio/cream-butter/press/space_0.wav",
+      "sha256": "287c8f976b34c85f7aa1a1f94ec6e6c14bf02bd677d0646cee5fb0608069160b",
+      "frames": 9672,
+      "peak": 0.4131655859104438,
+      "energy": 7.026050399999999,
+      "centroidHz": 1397.0999178290842
+    },
+    {
+      "path": "audio/cream-butter/press/space_1.wav",
+      "sha256": "6ce854fa3723c81bbf0d5eb9e8c267515227f13a29d6000559e89c7b18dc54e1",
+      "frames": 9672,
+      "peak": 0.4664588256949485,
+      "energy": 7.026050399999998,
+      "centroidHz": 1726.6840701661415
+    },
+    {
+      "path": "audio/cream-butter/press/space_2.wav",
+      "sha256": "b71685a7233be108e5b3a174624094600bc449f9bb9d8169aa5c558d00bd65c1",
+      "frames": 9672,
+      "peak": 0.3841460372588925,
+      "energy": 7.0260504,
+      "centroidHz": 1799.9030268226563
+    },
+    {
+      "path": "audio/cream-butter/release/space_0.wav",
+      "sha256": "bc4f4623fc687fcce6b418962659e29ac9ee1c83ed638fc7bcf5b29aa406ad1f",
+      "frames": 4173,
+      "peak": 0.07603326643884054,
+      "energy": 0.6752034434399996,
+      "centroidHz": 762.608741090341
+    },
+    {
+      "path": "audio/cream-butter/release/space_1.wav",
+      "sha256": "3375b34580a625dc0c16c70dda9061a8a519c53d3193f7cd5ac76e85749fc962",
+      "frames": 4173,
+      "peak": 0.1438639250550713,
+      "energy": 0.6752034434399999,
+      "centroidHz": 1768.8440656246266
+    },
+    {
+      "path": "audio/cream-butter/press/enter_0.wav",
+      "sha256": "626347b63be5d297d83f5f22748380a8e6b6f835e600e3f35a92dae73b0315e1",
+      "frames": 7612,
+      "peak": 0.44686123376378595,
+      "energy": 5.885654400000001,
+      "centroidHz": 1845.8072748700192
+    },
+    {
+      "path": "audio/cream-butter/press/enter_1.wav",
+      "sha256": "cbab547cbf87f3c4dfd42db3edaaa1f3abed56887bab465fcd9cd840ff6aafe3",
+      "frames": 7612,
+      "peak": 0.37129488111159115,
+      "energy": 5.885654400000001,
+      "centroidHz": 1931.208173436921
+    },
+    {
+      "path": "audio/cream-butter/press/enter_2.wav",
+      "sha256": "a79c4b7c4277a8ad7d0b169903e22aaa71024fa17a94d3ebc3732aa8c954c4cf",
+      "frames": 7612,
+      "peak": 0.4944364266811837,
+      "energy": 5.885654400000002,
+      "centroidHz": 2139.195224784243
+    },
+    {
+      "path": "audio/cream-butter/release/enter_0.wav",
+      "sha256": "040661b7427843dd173a9932c05350d47aaa9e233201a55b2d06440b0bfe5928",
+      "frames": 3285,
+      "peak": 0.1365725213644422,
+      "energy": 0.56561138784,
+      "centroidHz": 1855.2449822019885
+    },
+    {
+      "path": "audio/cream-butter/release/enter_1.wav",
+      "sha256": "f26701f8b91083f8e8c63adab4057fd8b97d2eb280d92908a063a22d1fe1da06",
+      "frames": 3285,
+      "peak": 0.15912613117032223,
+      "energy": 0.5656113878399999,
+      "centroidHz": 1826.258246705595
+    },
+    {
+      "path": "audio/cream-butter/press/backspace_0.wav",
+      "sha256": "4ea7e1fad813b8edca283e8a9b6dee6f87f790620479f06edb7a92735244e0bc",
+      "frames": 5366,
+      "peak": 0.3351251072039036,
+      "energy": 4.4586456,
+      "centroidHz": 2015.0502282109865
+    },
+    {
+      "path": "audio/cream-butter/press/backspace_1.wav",
+      "sha256": "fbb0b12b4387365d94abceb4b1e3d2997ad8133268726a0d8e805cbb0b8eebc9",
+      "frames": 5366,
+      "peak": 0.4588211617517456,
+      "energy": 4.458645599999999,
+      "centroidHz": 2219.7237932836892
+    },
+    {
+      "path": "audio/cream-butter/press/backspace_2.wav",
+      "sha256": "63e73ef55983e24f42d6e6a21b3298b1ba112140be725877fe4f179ba591773f",
+      "frames": 5366,
+      "peak": 0.42580538533999845,
+      "energy": 4.4586456,
+      "centroidHz": 2075.390353311053
+    },
+    {
+      "path": "audio/cream-butter/release/backspace_0.wav",
+      "sha256": "7219fc5be68ffe2037eb584411997f738af1d3051801ff659098505e0836a05a",
+      "frames": 2315,
+      "peak": 0.14365462694068426,
+      "energy": 0.42847584216000006,
+      "centroidHz": 1864.4027813202547
+    },
+    {
+      "path": "audio/cream-butter/release/backspace_1.wav",
+      "sha256": "c9e03e5aa4b25399db91f3426cf25986f817e8878b980e55fa77189768277d43",
+      "frames": 2315,
+      "peak": 0.05246231076138087,
+      "energy": 0.4284758421599999,
+      "centroidHz": 822.4361271828109
+    },
+    {
+      "path": "audio/cream-butter/press/shiftLeft_0.wav",
+      "sha256": "890730be507c95a7379d38fecd686fe305e5259faeebd437924df4db470befda",
+      "frames": 8112,
+      "peak": 0.4574857071406999,
+      "energy": 5.147424599999999,
+      "centroidHz": 2093.2094481493777
+    },
+    {
+      "path": "audio/cream-butter/press/shiftLeft_1.wav",
+      "sha256": "cfd5de646096466a8ed3e5616d17e5993830d6030007894ba2206bda9bf5440c",
+      "frames": 8112,
+      "peak": 0.43061488274348453,
+      "energy": 5.147424599999999,
+      "centroidHz": 1993.9741864975101
+    },
+    {
+      "path": "audio/cream-butter/press/shiftLeft_2.wav",
+      "sha256": "124e5b449280a1430a013ee28561c238dec06527ec5947febf77848d82609b03",
+      "frames": 8112,
+      "peak": 0.4300302968575776,
+      "energy": 5.147424599999998,
+      "centroidHz": 2006.131594507068
+    },
+    {
+      "path": "audio/cream-butter/release/shiftLeft_0.wav",
+      "sha256": "357e41086463cd2c12abec80227d75f0cf9f577ec81780b5c932ce95deb1f41c",
+      "frames": 3500,
+      "peak": 0.05986084539061072,
+      "energy": 0.49466750405999993,
+      "centroidHz": 768.5881926907539
+    },
+    {
+      "path": "audio/cream-butter/release/shiftLeft_1.wav",
+      "sha256": "2d24df0b8132a0f09b840ee1ca5ad90ad02b908e10d12433d5dbbf20e6ce4eda",
+      "frames": 3500,
+      "peak": 0.0646206021998409,
+      "energy": 0.4946675040599998,
+      "centroidHz": 806.8203253986233
+    },
+    {
+      "path": "audio/cream-butter/press/shiftRight_0.wav",
+      "sha256": "2b9e60aca3200aedeaab30c14a30ed4b45c3cb8f4529d38c28a8ba26dc57e915",
+      "frames": 7363,
+      "peak": 0.42707802925173954,
+      "energy": 4.8461783999999986,
+      "centroidHz": 2025.1376073184333
+    },
+    {
+      "path": "audio/cream-butter/press/shiftRight_1.wav",
+      "sha256": "40b46830caf8be5dadc485c17a9f940d2d2573ee521eaf8bd26e5d9a60d40dda",
+      "frames": 7363,
+      "peak": 0.4254529539993873,
+      "energy": 4.8461784,
+      "centroidHz": 2043.3261208904783
+    },
+    {
+      "path": "audio/cream-butter/press/shiftRight_2.wav",
+      "sha256": "2d0175b7830f5a4d228600e1b9575d4f2ed1e3ae4a541a07315df33fa25e772e",
+      "frames": 7363,
+      "peak": 0.4567460959886599,
+      "energy": 4.8461783999999986,
+      "centroidHz": 2017.5519211548099
+    },
+    {
+      "path": "audio/cream-butter/release/shiftRight_0.wav",
+      "sha256": "2e58712e00cd9741855f0f5be04255171a963238c363952dcdc43544ec3b3cfb",
+      "frames": 3177,
+      "peak": 0.0634892160537307,
+      "energy": 0.46571774423999995,
+      "centroidHz": 831.8231197884685
+    },
+    {
+      "path": "audio/cream-butter/release/shiftRight_1.wav",
+      "sha256": "ee472b5c08a35c811e54826c85d249b8c610f4895085186e2fe16db9af61ff64",
+      "frames": 3177,
+      "peak": 0.12282135606835617,
+      "energy": 0.46571774424000006,
+      "centroidHz": 1854.75571576049
+    },
+    {
+      "path": "audio/cream-butter/press/tab_0.wav",
+      "sha256": "792171bdedcd0d668ef12330929cb06057827b77b2770923b65cd1822a8ed6b8",
+      "frames": 5116,
+      "peak": 0.39886477764619277,
+      "energy": 3.9076224,
+      "centroidHz": 2120.3827437964055
+    },
+    {
+      "path": "audio/cream-butter/press/tab_1.wav",
+      "sha256": "43b185df11083f434fc71d4bd2a7915aacea934a607c740a82223d9e73f8afc3",
+      "frames": 5116,
+      "peak": 0.4287365912027332,
+      "energy": 3.907622399999999,
+      "centroidHz": 2087.9122672325716
+    },
+    {
+      "path": "audio/cream-butter/press/tab_2.wav",
+      "sha256": "bd107421093e8c3290eb0dca993d51dcccbcb97b1b62de4ac3eeeb1ad107c6dc",
+      "frames": 5116,
+      "peak": 0.3260503570538929,
+      "energy": 3.9076223999999993,
+      "centroidHz": 1492.8277641585169
+    },
+    {
+      "path": "audio/cream-butter/release/tab_0.wav",
+      "sha256": "f8121e82d5361542b37e720552d19731ae81af210fe856ee9001d6dc392ba7e5",
+      "frames": 2208,
+      "peak": 0.11077117561204883,
+      "energy": 0.37552251263999986,
+      "centroidHz": 1907.090993423474
+    },
+    {
+      "path": "audio/cream-butter/release/tab_1.wav",
+      "sha256": "3ffbadef68c46ecc788f271ac09fc785c0aff2e87ecec1599abead6861ceccf6",
+      "frames": 2208,
+      "peak": 0.13552150084139525,
+      "energy": 0.37552251263999986,
+      "centroidHz": 1874.1998779401092
+    },
+    {
+      "path": "audio/cream-butter/press/caps_0.wav",
+      "sha256": "31f75e27cbfa8820c4651ebb7f199fb6ba655c7c4b31298623f2e543b5a5487c",
+      "frames": 6115,
+      "peak": 0.4481023983721297,
+      "energy": 4.4586456,
+      "centroidHz": 2052.0855264467286
+    },
+    {
+      "path": "audio/cream-butter/press/caps_1.wav",
+      "sha256": "afdffe363dcaa196c87498d04705ad150f2edd6c96710204568d9f1ec005320c",
+      "frames": 6115,
+      "peak": 0.3398236865351314,
+      "energy": 4.4586456,
+      "centroidHz": 1443.2332416393233
+    },
+    {
+      "path": "audio/cream-butter/press/caps_2.wav",
+      "sha256": "9e52815e1d49c7f5f45c69677da98cde5d83f4ec963b7b9fdc09b380ca0edbe3",
+      "frames": 6115,
+      "peak": 0.37074713857312286,
+      "energy": 4.4586456000000005,
+      "centroidHz": 1584.371319498246
+    },
+    {
+      "path": "audio/cream-butter/release/caps_0.wav",
+      "sha256": "f8948611232485b0dfe5f8f917b57cf3dd8c3423ea6a04c5028ad70b5eeec1e9",
+      "frames": 2638,
+      "peak": 0.14204607822999082,
+      "energy": 0.4284758421599998,
+      "centroidHz": 1848.3819987366821
+    },
+    {
+      "path": "audio/cream-butter/release/caps_1.wav",
+      "sha256": "c9f380e053c1b42ea10631c78e973405ec0e8373a69a9d06deec0d74dc13f3af",
+      "frames": 2638,
+      "peak": 0.05325559425889298,
+      "energy": 0.42847584216,
+      "centroidHz": 809.9112560557597
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_0.wav",
+      "sha256": "57d35afe70b4e03188f50d450a7cf198191fae6c17c15352ce2ab99c01a982ec",
+      "frames": 6240,
+      "peak": 0.43908802597614044,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2325.213048116486
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_1.wav",
+      "sha256": "be0c1b8d4ca89a8fecbf7609c1ee6055275273022a4976d62cee96724115f80d",
+      "frames": 6240,
+      "peak": 0.4614333588184516,
+      "energy": 5.046000000000001,
+      "centroidHz": 2348.7318777452215
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_2.wav",
+      "sha256": "c3c5abb2c413c77e147718a6324b05ddd9438c9c4abf70233ee55afe2b36183b",
+      "frames": 6240,
+      "peak": 0.4878349218422385,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2818.705861007541
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_3.wav",
+      "sha256": "053dd69141ca8b437148f86ef5d73316f315e5c11b6d500eb863c5762b32b551",
+      "frames": 6240,
+      "peak": 0.38161815870574806,
+      "energy": 5.045999999999999,
+      "centroidHz": 2757.3119033882335
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_4.wav",
+      "sha256": "5abd4c297cbd69e952dbaa11cb3a56bdb9bf811effcf96767537d381fc3b45b7",
+      "frames": 6240,
+      "peak": 0.5008130760598,
+      "energy": 5.045999999999998,
+      "centroidHz": 3316.137661542491
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_5.wav",
+      "sha256": "03e24aac3a1966a855ff680db00d67d00590354b15188fe2db8129a76b7738b2",
+      "frames": 6240,
+      "peak": 0.534351817631278,
+      "energy": 5.045999999999999,
+      "centroidHz": 3104.6835533791236
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_6.wav",
+      "sha256": "8471eafbf66440e8bfeaa473d8b319b06fcce170ccb1949f0238454a8c221a1e",
+      "frames": 6240,
+      "peak": 0.5007003251339838,
+      "energy": 5.045999999999999,
+      "centroidHz": 3284.935897784157
+    },
+    {
+      "path": "audio/cream-pudding/press/regular_7.wav",
+      "sha256": "c1848b086f7c84de3010828180c95df856f61f2978681a30aed5c0b351ddd0e5",
+      "frames": 6240,
+      "peak": 0.5628354091747397,
+      "energy": 5.045999999999999,
+      "centroidHz": 3094.2587682709072
+    },
+    {
+      "path": "audio/cream-pudding/release/regular_0.wav",
+      "sha256": "969e2e4d3641ef5683c15e2ac9b35f5e9ec8a5b54d120fb378ba2a40b5545fe9",
+      "frames": 2692,
+      "peak": 0.06830759242962572,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1191.9343065915116
+    },
+    {
+      "path": "audio/cream-pudding/release/regular_1.wav",
+      "sha256": "b3d5366fc366a0def7e887628fa28ed7a696cb9553adda0542a8465afa878cf2",
+      "frames": 2692,
+      "peak": 0.08745237582698706,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1203.7581238828423
+    },
+    {
+      "path": "audio/cream-pudding/release/regular_2.wav",
+      "sha256": "43e5637af50e1d520da6c5f9e1563761754f531f5c13e3dd31705d246bbd42c5",
+      "frames": 2692,
+      "peak": 0.1587949945918174,
+      "energy": 0.4849205999999998,
+      "centroidHz": 3127.033024733458
+    },
+    {
+      "path": "audio/cream-pudding/release/regular_3.wav",
+      "sha256": "6fa25d17316cf907906ace18d577d5c406f2a4871ebdd2e064c48476558ad903",
+      "frames": 2692,
+      "peak": 0.17480938216106892,
+      "energy": 0.4849206,
+      "centroidHz": 2783.0689069035902
+    },
+    {
+      "path": "audio/cream-pudding/press/space_0.wav",
+      "sha256": "63a55290d843b49aea442f4089644dbb1a68b6846ce32f3ef62c1736f8ad0563",
+      "frames": 9672,
+      "peak": 0.48530854321472366,
+      "energy": 7.026050399999999,
+      "centroidHz": 1986.803507712366
+    },
+    {
+      "path": "audio/cream-pudding/press/space_1.wav",
+      "sha256": "cff31e19884efe1dabaefb2fd9621d44ee6206e02b866958377d0b0a84755a63",
+      "frames": 9672,
+      "peak": 0.5218251104908015,
+      "energy": 7.026050399999996,
+      "centroidHz": 2526.2329790032627
+    },
+    {
+      "path": "audio/cream-pudding/press/space_2.wav",
+      "sha256": "37e5d9b98d3af22ad5fc3819b614ba31577e62d1eb37e8975711fd93e761c51f",
+      "frames": 9672,
+      "peak": 0.41894140277222236,
+      "energy": 7.026050399999999,
+      "centroidHz": 2450.331628107807
+    },
+    {
+      "path": "audio/cream-pudding/release/space_0.wav",
+      "sha256": "6b0be74bb77bee10771a9e1a9951edd6e326a725c3d69718b2cbe7b2187750b6",
+      "frames": 4173,
+      "peak": 0.10916665873587963,
+      "energy": 0.6752034434399997,
+      "centroidHz": 1078.0200686169676
+    },
+    {
+      "path": "audio/cream-pudding/release/space_1.wav",
+      "sha256": "8323040f199a697fc5d267e2064570bcbb3d112065cacac582d681de65293438",
+      "frames": 4173,
+      "peak": 0.16892087987112406,
+      "energy": 0.6752034434399994,
+      "centroidHz": 2785.6905247819977
+    },
+    {
+      "path": "audio/cream-pudding/press/enter_0.wav",
+      "sha256": "0c452d53cde6d756a2a27891e8026637cc0b3f4b8bfe1049b4b9f261ac7e1d5c",
+      "frames": 7612,
+      "peak": 0.5015136193466957,
+      "energy": 5.8856544,
+      "centroidHz": 2796.800792673306
+    },
+    {
+      "path": "audio/cream-pudding/press/enter_1.wav",
+      "sha256": "be376557320d0bd7fbaf17f9051776b597d4b2b0354457be67be83c1ee30234a",
+      "frames": 7612,
+      "peak": 0.39559913734457913,
+      "energy": 5.885654400000001,
+      "centroidHz": 2709.679650076271
+    },
+    {
+      "path": "audio/cream-pudding/press/enter_2.wav",
+      "sha256": "7489b5450fe00d807a19b45a3af010fd418059a6fab1d7e9efea3c88fe9875f1",
+      "frames": 7612,
+      "peak": 0.49834137739698275,
+      "energy": 5.885654400000002,
+      "centroidHz": 3227.0227014471734
+    },
+    {
+      "path": "audio/cream-pudding/release/enter_0.wav",
+      "sha256": "ba12fe20f9cdd6c4e7dc43da5fec5ae5268783122f8cb3648ec95672c222c097",
+      "frames": 3285,
+      "peak": 0.164552614319274,
+      "energy": 0.56561138784,
+      "centroidHz": 3033.9875322500307
+    },
+    {
+      "path": "audio/cream-pudding/release/enter_1.wav",
+      "sha256": "a49491c0fe0fdde6915942de3bdd176cdfa4ef4f98cd54685aa7ffa8a66128c1",
+      "frames": 3285,
+      "peak": 0.17970444721517734,
+      "energy": 0.5656113878400001,
+      "centroidHz": 2723.713475284935
+    },
+    {
+      "path": "audio/cream-pudding/press/backspace_0.wav",
+      "sha256": "125840f3d850cb6a97da547788b112338d5626d8325e601aa5368ba2ec883550",
+      "frames": 5366,
+      "peak": 0.36333003881231524,
+      "energy": 4.4586456,
+      "centroidHz": 2857.711014517794
+    },
+    {
+      "path": "audio/cream-pudding/press/backspace_1.wav",
+      "sha256": "71da90fadf0bb1dd5253d299b85a342ec2dd020d46f54d9463bf6b0771111223",
+      "frames": 5366,
+      "peak": 0.4687961103571938,
+      "energy": 4.4586456000000005,
+      "centroidHz": 3394.332675955165
+    },
+    {
+      "path": "audio/cream-pudding/press/backspace_2.wav",
+      "sha256": "dba28beb2fd83c5692a105ac4ad190fae63c1549404e72b3e93ec5e0022e8ee0",
+      "frames": 5366,
+      "peak": 0.507805946828499,
+      "energy": 4.4586456000000005,
+      "centroidHz": 3148.701263717361
+    },
+    {
+      "path": "audio/cream-pudding/release/backspace_0.wav",
+      "sha256": "a862c41db2cd1d1f310f973c39414378149cc73a26a42cfc7d2215c0f08c323f",
+      "frames": 2315,
+      "peak": 0.16444641697079967,
+      "energy": 0.4284758421599999,
+      "centroidHz": 2875.4631069091593
+    },
+    {
+      "path": "audio/cream-pudding/release/backspace_1.wav",
+      "sha256": "49d72acc03e615a28f1315d136bbe0aab72da2fa44861d2dee6d65fcf7c9d922",
+      "frames": 2315,
+      "peak": 0.06910982292036483,
+      "energy": 0.4284758421599999,
+      "centroidHz": 1230.2262750739067
+    },
+    {
+      "path": "audio/cream-pudding/press/shiftLeft_0.wav",
+      "sha256": "24016c448c9e8b06b487edf12b5afdedc3c957c50eca312fa5d362a854a104c7",
+      "frames": 8112,
+      "peak": 0.4652778157573128,
+      "energy": 5.1474246,
+      "centroidHz": 3111.10794786236
+    },
+    {
+      "path": "audio/cream-pudding/press/shiftLeft_1.wav",
+      "sha256": "3e58f333367627b1360fcb5ac93d64f1b8e14f61cab22b78d4701900b72b6c70",
+      "frames": 8112,
+      "peak": 0.5086394920432071,
+      "energy": 5.1474246,
+      "centroidHz": 2879.5201324774744
+    },
+    {
+      "path": "audio/cream-pudding/press/shiftLeft_2.wav",
+      "sha256": "fa6dd8cc1793f39ab6cb03b659075f0fd375fbcbfa9c98f42dc92d43f805d57d",
+      "frames": 8112,
+      "peak": 0.47057651084046986,
+      "energy": 5.147424599999998,
+      "centroidHz": 3067.358603267507
+    },
+    {
+      "path": "audio/cream-pudding/release/shiftLeft_0.wav",
+      "sha256": "fd23e2e80887832c41cbfa3e9002d403487685238893641d8e8a451aca5785c2",
+      "frames": 3500,
+      "peak": 0.07372094472445377,
+      "energy": 0.49466750405999993,
+      "centroidHz": 1131.3744065510402
+    },
+    {
+      "path": "audio/cream-pudding/release/shiftLeft_1.wav",
+      "sha256": "5dcd8f5d1531e6869eb0986d12213edc70167545f04128b68ef6eea4b553b143",
+      "frames": 3500,
+      "peak": 0.09350523931710676,
+      "energy": 0.4946675040599998,
+      "centroidHz": 1154.410350576145
+    },
+    {
+      "path": "audio/cream-pudding/press/shiftRight_0.wav",
+      "sha256": "bfdeab3cf07f03883fef09749b33fe276b7a94843ceba46128ea3143c6a30382",
+      "frames": 7363,
+      "peak": 0.5031480100807594,
+      "energy": 4.846178399999999,
+      "centroidHz": 2971.4167428815017
+    },
+    {
+      "path": "audio/cream-pudding/press/shiftRight_1.wav",
+      "sha256": "2bec35b46d9f02dab534c92b07775aaa61c7880c6149d9269eff34f64c639c8e",
+      "frames": 7363,
+      "peak": 0.46822219238471036,
+      "energy": 4.8461784,
+      "centroidHz": 3160.0901156913073
+    },
+    {
+      "path": "audio/cream-pudding/press/shiftRight_2.wav",
+      "sha256": "68e05201dbfa8dcda64e2cb28916eb336192ca5d8720f5b6f2c60b42ebc150cd",
+      "frames": 7363,
+      "peak": 0.5363483355559505,
+      "energy": 4.846178399999999,
+      "centroidHz": 2930.2319735401065
+    },
+    {
+      "path": "audio/cream-pudding/release/shiftRight_0.wav",
+      "sha256": "1bbd4d8760e3498663dd55bda4299a3fece1e4c33eecd52af79d7cd6b805d8df",
+      "frames": 3177,
+      "peak": 0.09019146791082713,
+      "energy": 0.46571774424000006,
+      "centroidHz": 1195.194897983364
+    },
+    {
+      "path": "audio/cream-pudding/release/shiftRight_1.wav",
+      "sha256": "ccfa6ff726da808d410083456e5a63984db0fb9754cb13e49d9c7acf0efdeeb9",
+      "frames": 3177,
+      "peak": 0.15248279617180516,
+      "energy": 0.46571774424000006,
+      "centroidHz": 3037.9321193095716
+    },
+    {
+      "path": "audio/cream-pudding/press/tab_0.wav",
+      "sha256": "923ad4f9607837b4d789e02974273f25d598478d223f5d052ebbb9ac0c2b34b1",
+      "frames": 5116,
+      "peak": 0.44643885376449355,
+      "energy": 3.9076224,
+      "centroidHz": 3358.0387421559976
+    },
+    {
+      "path": "audio/cream-pudding/press/tab_1.wav",
+      "sha256": "568f6081653aec3109d1b7f4e930883cf11c893d1d7828becddf1f42007c0571",
+      "frames": 5116,
+      "peak": 0.511192859244137,
+      "energy": 3.9076223999999993,
+      "centroidHz": 3144.00727917686
+    },
+    {
+      "path": "audio/cream-pudding/press/tab_2.wav",
+      "sha256": "7bc1fafb2dbb71f6abd5ffed2075813606693db40686102df82debcefefeb4a0",
+      "frames": 5116,
+      "peak": 0.39352269645413224,
+      "energy": 3.9076224,
+      "centroidHz": 2378.601664446414
+    },
+    {
+      "path": "audio/cream-pudding/release/tab_0.wav",
+      "sha256": "3e7529ee52bfe9cc1ab08bafb9f11a05da17f984c9103d964d7efd60b5c7c37d",
+      "frames": 2208,
+      "peak": 0.14160010000614726,
+      "energy": 0.3755225126399999,
+      "centroidHz": 3186.561003914141
+    },
+    {
+      "path": "audio/cream-pudding/release/tab_1.wav",
+      "sha256": "fb83b6e2ba11380de9c7ff1a418059924a041faa5d6f17fc0d8182a447927a0b",
+      "frames": 2208,
+      "peak": 0.1562749290253176,
+      "energy": 0.3755225126399999,
+      "centroidHz": 2927.200134595744
+    },
+    {
+      "path": "audio/cream-pudding/press/caps_0.wav",
+      "sha256": "7e69de7f665b4921e6cd899439b0f9abed8a6f6c3de65a953da67da9989a9307",
+      "frames": 6115,
+      "peak": 0.5188397859646061,
+      "energy": 4.458645599999999,
+      "centroidHz": 3034.0913586531797
+    },
+    {
+      "path": "audio/cream-pudding/press/caps_1.wav",
+      "sha256": "6ff6c4edc44361ef79584a267d6d87d4eee4c0909056bb64c2e1bf3debfea087",
+      "frames": 6115,
+      "peak": 0.4074278100913611,
+      "energy": 4.458645599999999,
+      "centroidHz": 2294.8539650975863
+    },
+    {
+      "path": "audio/cream-pudding/press/caps_2.wav",
+      "sha256": "2e11acc694e7a32ce10ac9e0ccd3c2f63ccdd6a7bfa25ce162bbaf7d69093e42",
+      "frames": 6115,
+      "peak": 0.4271450914114572,
+      "energy": 4.4586456,
+      "centroidHz": 2324.502364270611
+    },
+    {
+      "path": "audio/cream-pudding/release/caps_0.wav",
+      "sha256": "31736805cda3d1737f37090600c4c39691e6e389fae3bc49440782726fecf60a",
+      "frames": 2638,
+      "peak": 0.16206373244331604,
+      "energy": 0.4284758421599998,
+      "centroidHz": 2812.438506425129
+    },
+    {
+      "path": "audio/cream-pudding/release/caps_1.wav",
+      "sha256": "e33874b19ee283dd1d3f96f6d19d7e286e53cd03a85440cf5aed326cbf4d8ca9",
+      "frames": 2638,
+      "peak": 0.06945136848377415,
+      "energy": 0.42847584215999995,
+      "centroidHz": 1207.773846531743
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_0.wav",
+      "sha256": "245ce5c14584e94d7fde5ddcce1b5cf9bda7a31d452bf117f02e6d5e0696b354",
+      "frames": 6240,
+      "peak": 0.3069824952138924,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2339.6028099524538
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_1.wav",
+      "sha256": "3f3c804df02fcd90337a27794b74ec373b9cfffa1349cc5278ef8f98dae39e13",
+      "frames": 6240,
+      "peak": 0.28668725311638954,
+      "energy": 5.046,
+      "centroidHz": 2325.41075627104
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_2.wav",
+      "sha256": "f85f0a37ab67232a636ac0ca6c656a0a2fe4ccd4f443f3faacc7fa30c6212733",
+      "frames": 6240,
+      "peak": 0.3087850608037078,
+      "energy": 5.046,
+      "centroidHz": 2297.2405534659692
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_3.wav",
+      "sha256": "f06f6ceed9f18f44efe7b0f8af4415af15589f14accc2166d1da537a602abd96",
+      "frames": 6240,
+      "peak": 0.3090815241122987,
+      "energy": 5.046,
+      "centroidHz": 2344.7058666504845
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_4.wav",
+      "sha256": "3befdbc79fe8f4b22e4eeaaabf93a1bbf695a97d0e6ddace8301b97b2c580c21",
+      "frames": 6240,
+      "peak": 0.3891983099641296,
+      "energy": 5.046,
+      "centroidHz": 2647.9058337462016
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_5.wav",
+      "sha256": "64d45cd3c01318b083dac36664077ee154bd22cf2e70bcb7617d58cdec983b38",
+      "frames": 6240,
+      "peak": 0.3023096642966718,
+      "energy": 5.045999999999999,
+      "centroidHz": 2644.2232288569026
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_6.wav",
+      "sha256": "97493c81e07f2e08b1c5b6817a65b7b3850204ea02f6f7113fd3c8bea7602875",
+      "frames": 6240,
+      "peak": 0.28086991873995415,
+      "energy": 5.046,
+      "centroidHz": 2101.88962116591
+    },
+    {
+      "path": "audio/wood-bamboo/press/regular_7.wav",
+      "sha256": "8a579d5dbca299ffd48b5ef7a8684c0429cdb4b2d2147834e78c22d8c985d1d4",
+      "frames": 6240,
+      "peak": 0.2993431068023341,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1969.840878091435
+    },
+    {
+      "path": "audio/wood-bamboo/release/regular_0.wav",
+      "sha256": "7017819affdb0dbf247cdaae3cb25f8f28e5a64239b43c3318771af11c2334ec",
+      "frames": 2692,
+      "peak": 0.09750721813037835,
+      "energy": 0.4849206,
+      "centroidHz": 1848.710672340536
+    },
+    {
+      "path": "audio/wood-bamboo/release/regular_1.wav",
+      "sha256": "298ec1577e99f0914bbbbdc96d60f53dc46178a883a7024348bf2ae7e31c7322",
+      "frames": 2692,
+      "peak": 0.10019648125074548,
+      "energy": 0.4849206,
+      "centroidHz": 2121.2093661445383
+    },
+    {
+      "path": "audio/wood-bamboo/release/regular_2.wav",
+      "sha256": "cd8ff4c9fe99b1ba28f5a222e7cae7caef164d563bd9650d5368ec5435bf326a",
+      "frames": 2692,
+      "peak": 0.08017427364916817,
+      "energy": 0.4849206,
+      "centroidHz": 2403.3336947970997
+    },
+    {
+      "path": "audio/wood-bamboo/release/regular_3.wav",
+      "sha256": "66974a44d26286c4538dc55f8e3f43ba4ec05292f525e568f74242e97403fc8c",
+      "frames": 2692,
+      "peak": 0.10884154792291664,
+      "energy": 0.48492060000000003,
+      "centroidHz": 2269.3641355577415
+    },
+    {
+      "path": "audio/wood-bamboo/press/space_0.wav",
+      "sha256": "285f17b2c40283a527c6dc89c3cdafbef477c67692110e14a29fcee674f8d8c9",
+      "frames": 9672,
+      "peak": 0.33311756237312634,
+      "energy": 7.026050399999999,
+      "centroidHz": 1935.7402902830418
+    },
+    {
+      "path": "audio/wood-bamboo/press/space_1.wav",
+      "sha256": "1b2de0d64ba6cece8a5d3970788e894acb1dbe99bb0f7ea9fcec459af4eae937",
+      "frames": 9672,
+      "peak": 0.3273984765552692,
+      "energy": 7.026050399999998,
+      "centroidHz": 1919.373652704172
+    },
+    {
+      "path": "audio/wood-bamboo/press/space_2.wav",
+      "sha256": "377e37904effa73099f84c7ee8c8d15496cdf9b865f5f22a3337136c82e96983",
+      "frames": 9672,
+      "peak": 0.30791164998922205,
+      "energy": 7.0260504,
+      "centroidHz": 1939.2862849053042
+    },
+    {
+      "path": "audio/wood-bamboo/release/space_0.wav",
+      "sha256": "0a595473ab301c57b71bae79ed0785c2cd1428a55702d4774c8bb03d59a95268",
+      "frames": 4173,
+      "peak": 0.10176749605633569,
+      "energy": 0.6752034434399996,
+      "centroidHz": 1797.792893077738
+    },
+    {
+      "path": "audio/wood-bamboo/release/space_1.wav",
+      "sha256": "8f94f0ca2a1e2681710c51d9f956564f982df040c56610e8c46954ec354a3388",
+      "frames": 4173,
+      "peak": 0.0843795806059494,
+      "energy": 0.6752034434399995,
+      "centroidHz": 2009.7816541027817
+    },
+    {
+      "path": "audio/wood-bamboo/press/enter_0.wav",
+      "sha256": "5b18cec259cd1fe1e2134b040c70090b9d3c7f95fb22ee2375d3c0a686403d1e",
+      "frames": 7612,
+      "peak": 0.2954387861386644,
+      "energy": 5.885654400000001,
+      "centroidHz": 2121.877627885954
+    },
+    {
+      "path": "audio/wood-bamboo/press/enter_1.wav",
+      "sha256": "a6044aa987a3fcfabbc26a6125c494b1615fc3727366acfd3ff440218e76d685",
+      "frames": 7612,
+      "peak": 0.32576364234891547,
+      "energy": 5.885654400000002,
+      "centroidHz": 2180.7806073032466
+    },
+    {
+      "path": "audio/wood-bamboo/press/enter_2.wav",
+      "sha256": "7513d431e0155a7dd452064e663c44f800c1b15db030fe503205c573f2d68b5f",
+      "frames": 7612,
+      "peak": 0.3881044721436656,
+      "energy": 5.885654400000001,
+      "centroidHz": 2487.7634943680173
+    },
+    {
+      "path": "audio/wood-bamboo/release/enter_0.wav",
+      "sha256": "84bab88bf4c552f06e7223cd94d58484ade4fa7d9c2cc3fc24caa76807460536",
+      "frames": 3285,
+      "peak": 0.08621283954397839,
+      "energy": 0.56561138784,
+      "centroidHz": 2245.112034889564
+    },
+    {
+      "path": "audio/wood-bamboo/release/enter_1.wav",
+      "sha256": "a8e779851475f7a7d25eecb82070c6107948fdbec421aa38acf9b14bc8d40b7c",
+      "frames": 3285,
+      "peak": 0.10747308894989789,
+      "energy": 0.5656113878400001,
+      "centroidHz": 2148.9167422780365
+    },
+    {
+      "path": "audio/wood-bamboo/press/backspace_0.wav",
+      "sha256": "e13f21254fca9d526851012a59632724ed2a737b440b1604c723fcfdfe0b2797",
+      "frames": 5366,
+      "peak": 0.2936781701855932,
+      "energy": 4.458645599999999,
+      "centroidHz": 2336.8318926292645
+    },
+    {
+      "path": "audio/wood-bamboo/press/backspace_1.wav",
+      "sha256": "13be00744b73cdef9b26ff418c6e37f3fce92ef3f01cc56bcceb1100e64b8534",
+      "frames": 5366,
+      "peak": 0.35932772759791026,
+      "energy": 4.4586456000000005,
+      "centroidHz": 2707.5280253255683
+    },
+    {
+      "path": "audio/wood-bamboo/press/backspace_2.wav",
+      "sha256": "10e289d320264e8ae0393c32ecdd8c65f546bdc830d8aceae2e9696bb17e6b7d",
+      "frames": 5366,
+      "peak": 0.2663983570691813,
+      "energy": 4.4586456,
+      "centroidHz": 2649.95471409757
+    },
+    {
+      "path": "audio/wood-bamboo/release/backspace_0.wav",
+      "sha256": "f1353cde023a86b229b32671cba6dab6d39e60598f168eb5e18c47ec41f62347",
+      "frames": 2315,
+      "peak": 0.10142864460650851,
+      "energy": 0.4284758421599999,
+      "centroidHz": 2329.8762518895055
+    },
+    {
+      "path": "audio/wood-bamboo/release/backspace_1.wav",
+      "sha256": "cdef1d3344e3f0053af01e727974c1781673ab0de47d8147e1571e1329f20e33",
+      "frames": 2315,
+      "peak": 0.09270908794693238,
+      "energy": 0.4284758421599999,
+      "centroidHz": 1877.9958815971818
+    },
+    {
+      "path": "audio/wood-bamboo/press/shiftLeft_0.wav",
+      "sha256": "66cb05855e01a95994f93d295f45a382f187f3526f0c345a607e08486ef0c402",
+      "frames": 8112,
+      "peak": 0.3334123700307409,
+      "energy": 5.147424600000001,
+      "centroidHz": 2371.684214353836
+    },
+    {
+      "path": "audio/wood-bamboo/press/shiftLeft_1.wav",
+      "sha256": "5e65ed6ae771f2f7d3d637aa92466fcac5ebae566b639cbecf78bf1271e227a4",
+      "frames": 8112,
+      "peak": 0.27164196961530235,
+      "energy": 5.1474246,
+      "centroidHz": 2391.9474739630473
+    },
+    {
+      "path": "audio/wood-bamboo/press/shiftLeft_2.wav",
+      "sha256": "5bec5341b58baa2b622495a9aa537bbf92b56da6a1592ac9f6a92d3b93d18f4b",
+      "frames": 8112,
+      "peak": 0.2901355504138957,
+      "energy": 5.147424600000001,
+      "centroidHz": 1877.3553172802897
+    },
+    {
+      "path": "audio/wood-bamboo/release/shiftLeft_0.wav",
+      "sha256": "8349dc51d0b37bbcb0a26e84d9fba2253b1532ee38c3f964c5ecc6de34af291a",
+      "frames": 3500,
+      "peak": 0.09360395033777266,
+      "energy": 0.49466750405999976,
+      "centroidHz": 1713.975345313153
+    },
+    {
+      "path": "audio/wood-bamboo/release/shiftLeft_1.wav",
+      "sha256": "338bdb4567754917593220253498ec933adb35f6c9ba9fd7f2a21538bc0edc09",
+      "frames": 3500,
+      "peak": 0.09170449673510109,
+      "energy": 0.4946675040599999,
+      "centroidHz": 1946.9997387628664
+    },
+    {
+      "path": "audio/wood-bamboo/press/shiftRight_0.wav",
+      "sha256": "c0ab72167a33b702c59f02612003a888a0d00fa600668bdff2c6acb0eb94d890",
+      "frames": 7363,
+      "peak": 0.2600012969868177,
+      "energy": 4.8461783999999986,
+      "centroidHz": 2481.330507178824
+    },
+    {
+      "path": "audio/wood-bamboo/press/shiftRight_1.wav",
+      "sha256": "a96bca78097e789533cb3d29f27b0790c1ce89030d18ab1436a7b3c8889b9882",
+      "frames": 7363,
+      "peak": 0.281865205845248,
+      "energy": 4.846178399999999,
+      "centroidHz": 1934.8883776650923
+    },
+    {
+      "path": "audio/wood-bamboo/press/shiftRight_2.wav",
+      "sha256": "91722c1a19488ba0c94b3293bab8d59c781770389c8fd92954d6a191ec2a0457",
+      "frames": 7363,
+      "peak": 0.30373440051140116,
+      "energy": 4.846178399999999,
+      "centroidHz": 1829.9462447281055
+    },
+    {
+      "path": "audio/wood-bamboo/release/shiftRight_0.wav",
+      "sha256": "c5dbf687e829bdfa4e85522c871d25829dac20370088b43999ad497c471d844c",
+      "frames": 3177,
+      "peak": 0.09665460518713553,
+      "energy": 0.46571774424000006,
+      "centroidHz": 2024.2619475816248
+    },
+    {
+      "path": "audio/wood-bamboo/release/shiftRight_1.wav",
+      "sha256": "06a52edb7a7ca2980000db39432b7369bcb1b10ace5ff794c0de73032f2ede04",
+      "frames": 3177,
+      "peak": 0.07839206648862358,
+      "energy": 0.46571774424,
+      "centroidHz": 2271.892272085128
+    },
+    {
+      "path": "audio/wood-bamboo/press/tab_0.wav",
+      "sha256": "df049f845aa78d5305229bbe0f2c46f4c66e75e7c3deade8340486ee8bd8b753",
+      "frames": 5116,
+      "peak": 0.24683281420609737,
+      "energy": 3.9076224,
+      "centroidHz": 2124.1215252901734
+    },
+    {
+      "path": "audio/wood-bamboo/press/tab_1.wav",
+      "sha256": "dce0559e80692b961696a65082688a19d064bba7cefab857f95c9041520e9a25",
+      "frames": 5116,
+      "peak": 0.27228108818553126,
+      "energy": 3.907622399999999,
+      "centroidHz": 1974.8615209175757
+    },
+    {
+      "path": "audio/wood-bamboo/press/tab_2.wav",
+      "sha256": "815c8840bff28b070efd1225d7ece576ff29735c08293eee9e8273397a175fa9",
+      "frames": 5116,
+      "peak": 0.2804296601032504,
+      "energy": 3.9076223999999993,
+      "centroidHz": 2393.737281890409
+    },
+    {
+      "path": "audio/wood-bamboo/release/tab_0.wav",
+      "sha256": "4eed33aa48afff7ff72861b87ebe8edfc81b349d029d2950b6088bfb981d9613",
+      "frames": 2208,
+      "peak": 0.07249955950626784,
+      "energy": 0.3755225126399998,
+      "centroidHz": 2476.0410784294395
+    },
+    {
+      "path": "audio/wood-bamboo/release/tab_1.wav",
+      "sha256": "50c47da74ed3afa851384095b88764e3abcafd5fb715c43760142e695c8ee0b3",
+      "frames": 2208,
+      "peak": 0.09765323655654229,
+      "energy": 0.3755225126399998,
+      "centroidHz": 2394.822618031379
+    },
+    {
+      "path": "audio/wood-bamboo/press/caps_0.wav",
+      "sha256": "dc12a2bf7fa5e8627c3f8d284e1cd959ccf7ebcd2ce1293a27bb54c2aa5625a5",
+      "frames": 6115,
+      "peak": 0.28547021179241483,
+      "energy": 4.4586456,
+      "centroidHz": 1902.308230289739
+    },
+    {
+      "path": "audio/wood-bamboo/press/caps_1.wav",
+      "sha256": "ac54d361e80c12df48367904e6e4583e1c571000973e521f8b6f8aa4a0967a31",
+      "frames": 6115,
+      "peak": 0.2897861832075317,
+      "energy": 4.4586456,
+      "centroidHz": 2283.0090367764215
+    },
+    {
+      "path": "audio/wood-bamboo/press/caps_2.wav",
+      "sha256": "a3080c3bfd6744b47d55e5ba2dfe3e4fbf336cdc4c44af6e3451cca665bea069",
+      "frames": 6115,
+      "peak": 0.2558859674503312,
+      "energy": 4.458645599999999,
+      "centroidHz": 2232.089342801641
+    },
+    {
+      "path": "audio/wood-bamboo/release/caps_0.wav",
+      "sha256": "0ee53abd28ae1bd57066aacb8058165ed6ddae395c09f72a2e54fe72e3e39fd0",
+      "frames": 2638,
+      "peak": 0.09830636194194901,
+      "energy": 0.4284758421599998,
+      "centroidHz": 2261.2836121391015
+    },
+    {
+      "path": "audio/wood-bamboo/release/caps_1.wav",
+      "sha256": "203145040e1369dc3ccec7347bea1d4dc48936f8e54a17c550f28e167519242a",
+      "frames": 2638,
+      "peak": 0.09193977522174292,
+      "energy": 0.4284758421599999,
+      "centroidHz": 1837.6453494006828
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_0.wav",
+      "sha256": "cf9b9cb5435cace5c4a3ce40c86022e5aaef68e3fbd9ed64eb877a11d7386bc1",
+      "frames": 6240,
+      "peak": 0.24894924298873589,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1729.1698312528508
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_1.wav",
+      "sha256": "e9f02132b4dc28bc4bf48fb31f95635ae0575217afd6356148c82a2664aca273",
+      "frames": 6240,
+      "peak": 0.2650360917779611,
+      "energy": 5.045999999999999,
+      "centroidHz": 1754.369168834586
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_2.wav",
+      "sha256": "9c1842a412e2443d87f31a19e5645bd3bba1d95882fa705be91145481b33de80",
+      "frames": 6240,
+      "peak": 0.2726513591535687,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1686.2831494810366
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_3.wav",
+      "sha256": "f1f46df60b0441d21a08b98017a2921af05608530d5568cbd58860dbb8d6f3fd",
+      "frames": 6240,
+      "peak": 0.2575452828461758,
+      "energy": 5.045999999999999,
+      "centroidHz": 1782.6663403903833
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_4.wav",
+      "sha256": "cf5fcce90d5e1bd1f2117395e7fdbab0486db7523f24685397f047b6545b157d",
+      "frames": 6240,
+      "peak": 0.32951395466828814,
+      "energy": 5.046,
+      "centroidHz": 2085.9609397807244
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_5.wav",
+      "sha256": "d957b56b8c42b38487bfe92160f94cf98650cc0a4c569534d4ceba32516b1921",
+      "frames": 6240,
+      "peak": 0.28146777225938124,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2037.6523487140917
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_6.wav",
+      "sha256": "fbe68a4c372e84c5bca27fc8a0e8ab1e27faebba28811533165aeba82cce28d1",
+      "frames": 6240,
+      "peak": 0.2906897125153457,
+      "energy": 5.046,
+      "centroidHz": 1592.3740842330435
+    },
+    {
+      "path": "audio/wood-walnut/press/regular_7.wav",
+      "sha256": "56ea0472dd4ae2f69dc5de3f234b650feafaa2985381158d3a892d488eef620d",
+      "frames": 6240,
+      "peak": 0.2852784095606345,
+      "energy": 5.045999999999999,
+      "centroidHz": 1434.5285512169182
+    },
+    {
+      "path": "audio/wood-walnut/release/regular_0.wav",
+      "sha256": "b6ac4713be49f612ef5dbe23dd71c4b47eb8f9e14d7827cac5d92543b567979a",
+      "frames": 2692,
+      "peak": 0.08335547508702237,
+      "energy": 0.4849206,
+      "centroidHz": 1374.7624603112495
+    },
+    {
+      "path": "audio/wood-walnut/release/regular_1.wav",
+      "sha256": "89f0d9926bb141b650c9ad143871a5005c0d56894b5ac59e005645bba46c961e",
+      "frames": 2692,
+      "peak": 0.07870151644737618,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1621.4556982878555
+    },
+    {
+      "path": "audio/wood-walnut/release/regular_2.wav",
+      "sha256": "0fb4383588b043acd4682b2f74c960fd3c04bf2db69c9a3bc27f233cf6177bfc",
+      "frames": 2692,
+      "peak": 0.07347615264613737,
+      "energy": 0.4849205999999998,
+      "centroidHz": 1835.7589998516514
+    },
+    {
+      "path": "audio/wood-walnut/release/regular_3.wav",
+      "sha256": "2df3800454f98da966023c2e8d6ac63a18e6a5323751c651a5cdf7a34e30af88",
+      "frames": 2692,
+      "peak": 0.07967723035230856,
+      "energy": 0.48492060000000003,
+      "centroidHz": 1675.1864377530044
+    },
+    {
+      "path": "audio/wood-walnut/press/space_0.wav",
+      "sha256": "89b92ea46ec9651caad5fb8a3e155f5cd783f1e7a7e0ec65d23526b8195db072",
+      "frames": 9672,
+      "peak": 0.2283171884624349,
+      "energy": 7.0260504,
+      "centroidHz": 1417.478191980368
+    },
+    {
+      "path": "audio/wood-walnut/press/space_1.wav",
+      "sha256": "15a7aecf0b10b760cbb6b2ca6cfe9c6c0d53aac5cddb36b5eddbedc59f6a24a1",
+      "frames": 9672,
+      "peak": 0.2672195059479966,
+      "energy": 7.026050399999998,
+      "centroidHz": 1364.7631097538533
+    },
+    {
+      "path": "audio/wood-walnut/press/space_2.wav",
+      "sha256": "a3396ac115282e60851c92e6266d247fb3b874b41d9497a1e54fa2c52270096a",
+      "frames": 9672,
+      "peak": 0.2528841849860034,
+      "energy": 7.026050399999999,
+      "centroidHz": 1443.632841358761
+    },
+    {
+      "path": "audio/wood-walnut/release/space_0.wav",
+      "sha256": "0df8f4b5b7d220b1a2558981d1788890a190629f6ab75e0df9ffe858c923c457",
+      "frames": 4173,
+      "peak": 0.0805850346680044,
+      "energy": 0.6752034434399996,
+      "centroidHz": 1333.0404096737464
+    },
+    {
+      "path": "audio/wood-walnut/release/space_1.wav",
+      "sha256": "2e7ec8b6d5db8622461ad30159fb52a0af87f914bfbc0b6eba3338d525434643",
+      "frames": 4173,
+      "peak": 0.07519237038412538,
+      "energy": 0.6752034434399997,
+      "centroidHz": 1532.1300186643093
+    },
+    {
+      "path": "audio/wood-walnut/press/enter_0.wav",
+      "sha256": "d1b5a10e073267b9ee6317f2d34465dce4ed42483525aa9005cff419797f9894",
+      "frames": 7612,
+      "peak": 0.29011261715358994,
+      "energy": 5.8856544,
+      "centroidHz": 1539.755609566951
+    },
+    {
+      "path": "audio/wood-walnut/press/enter_1.wav",
+      "sha256": "5bde3c633680c0e9ea7ac2f884917271bab1d7cc72e89876b73b2b4798854940",
+      "frames": 7612,
+      "peak": 0.26288094279018503,
+      "energy": 5.885654400000002,
+      "centroidHz": 1624.2471064396823
+    },
+    {
+      "path": "audio/wood-walnut/press/enter_2.wav",
+      "sha256": "b3aa5daa3749130f733eccb9a5206a37dcb4fce10d877e95e974e6691bfd5669",
+      "frames": 7612,
+      "peak": 0.31717883754360354,
+      "energy": 5.8856544,
+      "centroidHz": 1937.6005782707814
+    },
+    {
+      "path": "audio/wood-walnut/release/enter_0.wav",
+      "sha256": "c06ee3ca453ee4416fe65fe73922f33d4bcf68e81c9426244d4e379179510be9",
+      "frames": 3285,
+      "peak": 0.07693813549165145,
+      "energy": 0.56561138784,
+      "centroidHz": 1700.6975778632448
+    },
+    {
+      "path": "audio/wood-walnut/release/enter_1.wav",
+      "sha256": "c6aca1f6cfa2610ab71ed86403414ff908cdb250bfb95da2351ae3b5ddcad1ab",
+      "frames": 3285,
+      "peak": 0.07712591597412508,
+      "energy": 0.5656113878400001,
+      "centroidHz": 1585.9699039522768
+    },
+    {
+      "path": "audio/wood-walnut/press/backspace_0.wav",
+      "sha256": "5fd7bb107a3b916b75d2c5f911f055eb5b2c4ea868efe10970cd0b6eaf9aa9b5",
+      "frames": 5366,
+      "peak": 0.2413563173033235,
+      "energy": 4.4586456,
+      "centroidHz": 1771.1387367118753
+    },
+    {
+      "path": "audio/wood-walnut/press/backspace_1.wav",
+      "sha256": "76a69d440d56408a4b21a5afb72f92ea7875960176097e0932e3eda26ed8914b",
+      "frames": 5366,
+      "peak": 0.30594719056654096,
+      "energy": 4.458645599999999,
+      "centroidHz": 2108.7206318151343
+    },
+    {
+      "path": "audio/wood-walnut/press/backspace_2.wav",
+      "sha256": "154a5d1e31165aab1bec9aab9a394c772c24477240b4af19d3b85bc55b3985e6",
+      "frames": 5366,
+      "peak": 0.25022664978911374,
+      "energy": 4.4586456,
+      "centroidHz": 2034.565761639919
+    },
+    {
+      "path": "audio/wood-walnut/release/backspace_0.wav",
+      "sha256": "a8f4069e5a38cbfd37bc3a85e711ba6cbba105447a8d7dbae713ff7dc147dd11",
+      "frames": 2315,
+      "peak": 0.0706203744957144,
+      "energy": 0.42847584215999984,
+      "centroidHz": 1673.8804482254986
+    },
+    {
+      "path": "audio/wood-walnut/release/backspace_1.wav",
+      "sha256": "fec96d1ea7d48c098526bc05c3a725761524012ab4b9fc13b17ead3188f993fe",
+      "frames": 2315,
+      "peak": 0.07806689057102793,
+      "energy": 0.42847584215999973,
+      "centroidHz": 1377.5648866316512
+    },
+    {
+      "path": "audio/wood-walnut/press/shiftLeft_0.wav",
+      "sha256": "810cf8b1d409079316da7eda2ffbde3526cce820e8aaaef489785f42d13b0dd6",
+      "frames": 8112,
+      "peak": 0.2852535637939822,
+      "energy": 5.1474246,
+      "centroidHz": 1854.7104569924027
+    },
+    {
+      "path": "audio/wood-walnut/press/shiftLeft_1.wav",
+      "sha256": "daab31ff46598a73fa90c8c51f257fdaa86502bf3d27bbb3663ea1dd31c723ca",
+      "frames": 8112,
+      "peak": 0.2540126300169085,
+      "energy": 5.147424600000001,
+      "centroidHz": 1843.7015397544246
+    },
+    {
+      "path": "audio/wood-walnut/press/shiftLeft_2.wav",
+      "sha256": "9a7769bf238680f358526b99ea09957f537f7df9a7a8f9d8938ed1c30d77eb3f",
+      "frames": 8112,
+      "peak": 0.2527278978511133,
+      "energy": 5.147424600000001,
+      "centroidHz": 1391.6859838155783
+    },
+    {
+      "path": "audio/wood-walnut/release/shiftLeft_0.wav",
+      "sha256": "71b4776050d75acad916bdc02874f5453531886c95229fd752b177d03bcd129b",
+      "frames": 3500,
+      "peak": 0.07561297223312408,
+      "energy": 0.4946675040599998,
+      "centroidHz": 1220.9126999387206
+    },
+    {
+      "path": "audio/wood-walnut/release/shiftLeft_1.wav",
+      "sha256": "569c54b8fadf11401a2d619a5ace790026a891002334f4e0075a52c5767ad6c4",
+      "frames": 3500,
+      "peak": 0.07547456726104725,
+      "energy": 0.49466750405999993,
+      "centroidHz": 1458.408129077662
+    },
+    {
+      "path": "audio/wood-walnut/press/shiftRight_0.wav",
+      "sha256": "bab2fb5ff7e9dbee0116d1813a11218b7389de3634d6c12db416da7ff0a7176b",
+      "frames": 7363,
+      "peak": 0.26046602846663586,
+      "energy": 4.846178399999999,
+      "centroidHz": 1908.3557086052115
+    },
+    {
+      "path": "audio/wood-walnut/press/shiftRight_1.wav",
+      "sha256": "c5da93a660d0658879eaa784e7b97eb4fefebae9a28a27679fc6b70a48f46426",
+      "frames": 7363,
+      "peak": 0.2657856726235998,
+      "energy": 4.8461783999999986,
+      "centroidHz": 1459.0644361635636
+    },
+    {
+      "path": "audio/wood-walnut/press/shiftRight_2.wav",
+      "sha256": "2825592c46e3091be7d12c238e6f83a646b894b28180151325ad96c691e298ec",
+      "frames": 7363,
+      "peak": 0.24154861868106708,
+      "energy": 4.8461783999999986,
+      "centroidHz": 1336.2682644953388
+    },
+    {
+      "path": "audio/wood-walnut/release/shiftRight_0.wav",
+      "sha256": "54b5522c00d5e7c21bceaec07294f031a2853735f42dfabfcab121f506669174",
+      "frames": 3177,
+      "peak": 0.07506125775042172,
+      "energy": 0.46571774423999995,
+      "centroidHz": 1535.3531059745205
+    },
+    {
+      "path": "audio/wood-walnut/release/shiftRight_1.wav",
+      "sha256": "fe0fe502cecd110ee5dcb59b9c5e47942d9320307a1afd93bc4db7cc1399e29e",
+      "frames": 3177,
+      "peak": 0.07129399322068229,
+      "energy": 0.46571774424,
+      "centroidHz": 1738.2277722827498
+    },
+    {
+      "path": "audio/wood-walnut/press/tab_0.wav",
+      "sha256": "192bcf9b3d4fdf64bcde6ebbfd6179299fa022cdbbc723f6589a63b47ddd3387",
+      "frames": 5116,
+      "peak": 0.2611389458150738,
+      "energy": 3.9076224,
+      "centroidHz": 1588.2124926622762
+    },
+    {
+      "path": "audio/wood-walnut/press/tab_1.wav",
+      "sha256": "defb0467929bc3a72e6d7e838fa56c858a0a280b70141e8f178e00b9641f3cdd",
+      "frames": 5116,
+      "peak": 0.24845463847209218,
+      "energy": 3.907622399999999,
+      "centroidHz": 1419.8684462555798
+    },
+    {
+      "path": "audio/wood-walnut/press/tab_2.wav",
+      "sha256": "0ec0b59e3d75d971793c65719a56aa08155e50e74aab91fc1718d3203cf48f73",
+      "frames": 5116,
+      "peak": 0.2595106658894376,
+      "energy": 3.9076224,
+      "centroidHz": 1766.4000391324057
+    },
+    {
+      "path": "audio/wood-walnut/release/tab_0.wav",
+      "sha256": "4338d607d4436539aaf1127e24641896576e51154b7d8ebb2a23a789c15a3af3",
+      "frames": 2208,
+      "peak": 0.06217655615062325,
+      "energy": 0.37552251263999986,
+      "centroidHz": 1876.167781026201
+    },
+    {
+      "path": "audio/wood-walnut/release/tab_1.wav",
+      "sha256": "5305eaacad28047f4d2fd2bd220745ad92e489bf422f4819260c75a7de1011cf",
+      "frames": 2208,
+      "peak": 0.06738362385188158,
+      "energy": 0.3755225126399998,
+      "centroidHz": 1715.9019455554535
+    },
+    {
+      "path": "audio/wood-walnut/press/caps_0.wav",
+      "sha256": "3d945473502cd4df655c5abefb40a1bbd284be639d25c915370e4832cfe39fb0",
+      "frames": 6115,
+      "peak": 0.259161935460109,
+      "energy": 4.458645599999999,
+      "centroidHz": 1371.2402324630407
+    },
+    {
+      "path": "audio/wood-walnut/press/caps_1.wav",
+      "sha256": "8f4e20a7e16647f739e8363f76018d6e169da00593fe2805a6fdc8de673f13b8",
+      "frames": 6115,
+      "peak": 0.2476681419523337,
+      "energy": 4.458645599999999,
+      "centroidHz": 1656.3799334242533
+    },
+    {
+      "path": "audio/wood-walnut/press/caps_2.wav",
+      "sha256": "0bcdaec400b85503b23a311fccedeeeb246dd53105a09c9f9f8fa465288e22eb",
+      "frames": 6115,
+      "peak": 0.24359092382262193,
+      "energy": 4.458645599999999,
+      "centroidHz": 1695.8265735534403
+    },
+    {
+      "path": "audio/wood-walnut/release/caps_0.wav",
+      "sha256": "d3bcfca78cc9b1d06a47717878da0305718334b59ca4f20c18a5b989e85d5819",
+      "frames": 2638,
+      "peak": 0.06925718704879447,
+      "energy": 0.42847584215999984,
+      "centroidHz": 1633.6770968747032
+    },
+    {
+      "path": "audio/wood-walnut/release/caps_1.wav",
+      "sha256": "752ff326ae4eaea60c570b9f998b0697aaeb889d99dcbaa98c8b31d6acfcd93e",
+      "frames": 2638,
+      "peak": 0.0759702452116461,
+      "energy": 0.4284758421599999,
+      "centroidHz": 1332.5253184895787
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_0.wav",
+      "sha256": "077c5e81d68447fd08775587460054aea2663e6e905ec2673e626d0d8995236a",
+      "frames": 6240,
+      "peak": 0.23233503233610217,
+      "energy": 5.046000000000001,
+      "centroidHz": 1431.614406630357
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_1.wav",
+      "sha256": "1d8f9ef78c3f82048b4b01a8a346a0ece7aba6834880a27da5eb0bad1e3360ac",
+      "frames": 6240,
+      "peak": 0.22304909720677532,
+      "energy": 5.046,
+      "centroidHz": 1403.9111251011636
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_2.wav",
+      "sha256": "a7a7738d3b2bbe7cb37ae182834d3866195aab8725de38111553ea89acada0c9",
+      "frames": 6240,
+      "peak": 0.24137250166706797,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1309.039888255605
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_3.wav",
+      "sha256": "f674a0bc906f53ed2f331121ae0c9311ccc2b46c144531f890fb19a12c8afff8",
+      "frames": 6240,
+      "peak": 0.22783193649999547,
+      "energy": 5.045999999999999,
+      "centroidHz": 1436.5013801844393
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_4.wav",
+      "sha256": "07fe284feb9abf16c9b77ccf8848507db9d6b8e5d20889bac31fd4e8dafda923",
+      "frames": 6240,
+      "peak": 0.2788435129697964,
+      "energy": 5.046,
+      "centroidHz": 1678.7512437092314
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_5.wav",
+      "sha256": "06c6f10be0214dcc3fb7fe1d1918be5825c9caa46732c428fc095d01226a35bd",
+      "frames": 6240,
+      "peak": 0.2752544375930184,
+      "energy": 5.045999999999999,
+      "centroidHz": 1676.1176661383536
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_6.wav",
+      "sha256": "3f06fb5f3f3db48c7fe717fbe4e2e03283d904ba96831e39c7006b26e9fb1a72",
+      "frames": 6240,
+      "peak": 0.2571052143597938,
+      "energy": 5.045999999999999,
+      "centroidHz": 1259.9082597551605
+    },
+    {
+      "path": "audio/wood-ebony/press/regular_7.wav",
+      "sha256": "304516eae6dca90015b42ce7fee6224eeb7b338673e7d00fd12e72f1a222de90",
+      "frames": 6240,
+      "peak": 0.2568016649569899,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1113.3708003828904
+    },
+    {
+      "path": "audio/wood-ebony/release/regular_0.wav",
+      "sha256": "339397764fb1558dcfd18d8b29b1a0228b08b56e7077f9637269c981dccf8ffe",
+      "frames": 2692,
+      "peak": 0.06995953275056994,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1075.2292891951274
+    },
+    {
+      "path": "audio/wood-ebony/release/regular_1.wav",
+      "sha256": "7b5ffb3620d183a3968b26db2299f36bd677ddbe387d0cd168a1e167a6b38f20",
+      "frames": 2692,
+      "peak": 0.07963968204173379,
+      "energy": 0.4849205999999999,
+      "centroidHz": 1346.262969639836
+    },
+    {
+      "path": "audio/wood-ebony/release/regular_2.wav",
+      "sha256": "b3e23a2d9d1615322b395325fb8e9764bbb16e25e046969ee30c97762e683e19",
+      "frames": 2692,
+      "peak": 0.07385889662904514,
+      "energy": 0.4849206,
+      "centroidHz": 1535.6328859278374
+    },
+    {
+      "path": "audio/wood-ebony/release/regular_3.wav",
+      "sha256": "d27fa8b986caeeb2796b9a6d68ccaee5b7a313685621a6ec2dc7975092079880",
+      "frames": 2692,
+      "peak": 0.07591589156426386,
+      "energy": 0.48492059999999987,
+      "centroidHz": 1384.8810983795363
+    },
+    {
+      "path": "audio/wood-ebony/press/space_0.wav",
+      "sha256": "adfde392bef915222525bb04650ea237bcaab0fad366dd2d1ec40686e5fac774",
+      "frames": 9672,
+      "peak": 0.2516693904632339,
+      "energy": 7.026050399999996,
+      "centroidHz": 1166.3924952864202
+    },
+    {
+      "path": "audio/wood-ebony/press/space_1.wav",
+      "sha256": "666bb6fc3487cbeeaa86b2b48e1b57f1211496980b5625f8f627d3a08eb391e8",
+      "frames": 9672,
+      "peak": 0.22189315394470907,
+      "energy": 7.0260504,
+      "centroidHz": 1085.7549698610098
+    },
+    {
+      "path": "audio/wood-ebony/press/space_2.wav",
+      "sha256": "1add55a4fb5fcaa6647818ffaec062ac94b0cf40a5fb14fd08a162df34f97a61",
+      "frames": 9672,
+      "peak": 0.24998592329861732,
+      "energy": 7.026050399999997,
+      "centroidHz": 1226.6263689857622
+    },
+    {
+      "path": "audio/wood-ebony/release/space_0.wav",
+      "sha256": "bfdc1a5a62028e2cd68a4a93ce902bd736842194ff27af54321297d152a4402d",
+      "frames": 4173,
+      "peak": 0.07991808154951396,
+      "energy": 0.6752034434399997,
+      "centroidHz": 1126.7703010124653
+    },
+    {
+      "path": "audio/wood-ebony/release/space_1.wav",
+      "sha256": "7eff076f4fb74e070f9bee620df9740abb973ac084ad664c1dc8c8fb533c539f",
+      "frames": 4173,
+      "peak": 0.08098290978539467,
+      "energy": 0.6752034434399995,
+      "centroidHz": 1315.1366613781809
+    },
+    {
+      "path": "audio/wood-ebony/press/enter_0.wav",
+      "sha256": "09e3cf9f73c1321aaa1ae5398384926bd768308bb7bd2ead7e71fcbb2e44ec93",
+      "frames": 7612,
+      "peak": 0.2436782060474321,
+      "energy": 5.885654400000002,
+      "centroidHz": 1158.2234307656624
+    },
+    {
+      "path": "audio/wood-ebony/press/enter_1.wav",
+      "sha256": "40ca5e0b902991aba1e42fcf4bf86b57997903e106bb1dbdc61349f20916e85b",
+      "frames": 7612,
+      "peak": 0.22183137251981105,
+      "energy": 5.885654400000003,
+      "centroidHz": 1306.9672635391303
+    },
+    {
+      "path": "audio/wood-ebony/press/enter_2.wav",
+      "sha256": "a16f0b4b98d642d6eb0151f318f9aff2fcde7921f70740b67e309e469d721846",
+      "frames": 7612,
+      "peak": 0.2589945929762614,
+      "energy": 5.885654400000003,
+      "centroidHz": 1547.322157517217
+    },
+    {
+      "path": "audio/wood-ebony/release/enter_0.wav",
+      "sha256": "941b3b03a5eb7124acf5f5a5248beb7e9629f42ebaca85f597e274e27f2bb1be",
+      "frames": 3285,
+      "peak": 0.07999303709640282,
+      "energy": 0.5656113878400001,
+      "centroidHz": 1423.7460565549645
+    },
+    {
+      "path": "audio/wood-ebony/release/enter_1.wav",
+      "sha256": "d5eca4d8eb92c41e44402d3fda7e4c684e568ca9fc698f1d65590b230d371b8c",
+      "frames": 3285,
+      "peak": 0.07090152846240998,
+      "energy": 0.5656113878400001,
+      "centroidHz": 1248.018264251978
+    },
+    {
+      "path": "audio/wood-ebony/press/backspace_0.wav",
+      "sha256": "f0ed3c12914738dee07d223d1689ba3cb4975d40a40302e190636b01507607ac",
+      "frames": 5366,
+      "peak": 0.2108690467968936,
+      "energy": 4.458645599999999,
+      "centroidHz": 1413.7066779035936
+    },
+    {
+      "path": "audio/wood-ebony/press/backspace_1.wav",
+      "sha256": "72fa8624315de7ada7bc78a52cb99650f68ba977448dd5f017af31e7bfd42369",
+      "frames": 5366,
+      "peak": 0.2541829971458132,
+      "energy": 4.4586456000000005,
+      "centroidHz": 1660.9509360391294
+    },
+    {
+      "path": "audio/wood-ebony/press/backspace_2.wav",
+      "sha256": "df5cba96f2ce3ed3952d8296bd28c20d49828145fbbe5c319f7ae0c296fc7b04",
+      "frames": 5366,
+      "peak": 0.2429413828931306,
+      "energy": 4.458645599999999,
+      "centroidHz": 1649.4997948529508
+    },
+    {
+      "path": "audio/wood-ebony/release/backspace_0.wav",
+      "sha256": "572181e5eb3407daccf80fc70628e8fb7c629ef893abd103f08fb44efb0c7b82",
+      "frames": 2315,
+      "peak": 0.07067024006578092,
+      "energy": 0.4284758421599998,
+      "centroidHz": 1389.4350363767553
+    },
+    {
+      "path": "audio/wood-ebony/release/backspace_1.wav",
+      "sha256": "b2e0c3ddf4c140d7b18b55c885db0b1d63a2363371aff3abf03a5c82fe84490d",
+      "frames": 2315,
+      "peak": 0.06506030322580786,
+      "energy": 0.4284758421599998,
+      "centroidHz": 1067.553324086077
+    },
+    {
+      "path": "audio/wood-ebony/press/shiftLeft_0.wav",
+      "sha256": "00180f6e2039e629782d453005240f8cc8350d92bc617f295e8b0e6e34539551",
+      "frames": 8112,
+      "peak": 0.24734036564955708,
+      "energy": 5.147424599999997,
+      "centroidHz": 1538.4346783334065
+    },
+    {
+      "path": "audio/wood-ebony/press/shiftLeft_1.wav",
+      "sha256": "0eefe0a5047b59ed35876295ac59a5df04d701a5e041315b60b2375654d2579b",
+      "frames": 8112,
+      "peak": 0.25103538697663963,
+      "energy": 5.147424599999998,
+      "centroidHz": 1520.7626809121527
+    },
+    {
+      "path": "audio/wood-ebony/press/shiftLeft_2.wav",
+      "sha256": "c7f0e2f851b0f21fcd8800f7150647f0b3d3be1508ef490f817f63571bb2a520",
+      "frames": 8112,
+      "peak": 0.23460848929879555,
+      "energy": 5.147424599999999,
+      "centroidHz": 1086.010615103105
+    },
+    {
+      "path": "audio/wood-ebony/release/shiftLeft_0.wav",
+      "sha256": "86a513e3a45a54953ef3c6e974e439c065c63bc5b2c641614d675ebae0026e75",
+      "frames": 3500,
+      "peak": 0.06438693261210846,
+      "energy": 0.4946675040599999,
+      "centroidHz": 957.8304536482768
+    },
+    {
+      "path": "audio/wood-ebony/release/shiftLeft_1.wav",
+      "sha256": "a9cc462c53316a2c737ff75d6ab8240cddd9e3a39b883864f7a8052bfc3e30aa",
+      "frames": 3500,
+      "peak": 0.07221974281889824,
+      "energy": 0.49466750405999993,
+      "centroidHz": 1229.8496667264667
+    },
+    {
+      "path": "audio/wood-ebony/press/shiftRight_0.wav",
+      "sha256": "5f794b7df8c2e00c7bc821d4660f0cbbb6d6d5ba99e9d5edf0866f53126cb135",
+      "frames": 7363,
+      "peak": 0.2323945051205249,
+      "energy": 4.8461783999999986,
+      "centroidHz": 1572.1919669025644
+    },
+    {
+      "path": "audio/wood-ebony/press/shiftRight_1.wav",
+      "sha256": "1cbb225cf855c346fc1b9908786a485352bf443f1aa3c67e3dbe7f8a7ab38d88",
+      "frames": 7363,
+      "peak": 0.24543091834868255,
+      "energy": 4.8461783999999986,
+      "centroidHz": 1141.8941857562959
+    },
+    {
+      "path": "audio/wood-ebony/press/shiftRight_2.wav",
+      "sha256": "b674ca6e21d2023040b1a5eea20afa146354cf100a73b52aa8b48375e0085a29",
+      "frames": 7363,
+      "peak": 0.22906728540205323,
+      "energy": 4.846178399999998,
+      "centroidHz": 1030.5000388696146
+    },
+    {
+      "path": "audio/wood-ebony/release/shiftRight_0.wav",
+      "sha256": "c32eea6e94df945461ab499dac617b10b42aea989e5cf275c50fe9541ee38aeb",
+      "frames": 3177,
+      "peak": 0.07356657176541428,
+      "energy": 0.46571774424,
+      "centroidHz": 1273.7618084026697
+    },
+    {
+      "path": "audio/wood-ebony/release/shiftRight_1.wav",
+      "sha256": "335ab52e22cb394d8cd12bd967b471413c0c6f8eacf7ef672c66c349454a4e4c",
+      "frames": 3177,
+      "peak": 0.07342112816675161,
+      "energy": 0.46571774423999995,
+      "centroidHz": 1469.0166930827986
+    },
+    {
+      "path": "audio/wood-ebony/press/tab_0.wav",
+      "sha256": "151d2bff62b7fbcc29edf925692168c5dc37eebe32dfc15f0f0946a2f98f7592",
+      "frames": 5116,
+      "peak": 0.2192761347977278,
+      "energy": 3.9076223999999984,
+      "centroidHz": 1231.2977628504086
+    },
+    {
+      "path": "audio/wood-ebony/press/tab_1.wav",
+      "sha256": "a2f9a68bdc09beb2f87e3d145c5d20341abedd44980f526556b6167f4bc0c753",
+      "frames": 5116,
+      "peak": 0.22370766392511102,
+      "energy": 3.9076224,
+      "centroidHz": 1109.8181495321594
+    },
+    {
+      "path": "audio/wood-ebony/press/tab_2.wav",
+      "sha256": "3dbc8fdfc2dc6bfb3885eaa5cf729a6ab8ed132b09a4d76570a1504c1b1bd229",
+      "frames": 5116,
+      "peak": 0.21592487639223892,
+      "energy": 3.9076223999999993,
+      "centroidHz": 1437.3175911253682
+    },
+    {
+      "path": "audio/wood-ebony/release/tab_0.wav",
+      "sha256": "49cd1f669d355c132d5b669a4c5b42cde1e7be22815bcdd337a9282654a97c17",
+      "frames": 2208,
+      "peak": 0.06589138989750186,
+      "energy": 0.3755225126399998,
+      "centroidHz": 1552.5835082941771
+    },
+    {
+      "path": "audio/wood-ebony/release/tab_1.wav",
+      "sha256": "b36a6c6720f9b006e36ea9ff2d436838bd0abf5834b591268b623998fda85341",
+      "frames": 2208,
+      "peak": 0.06517409413811003,
+      "energy": 0.3755225126399999,
+      "centroidHz": 1384.1370159383055
+    },
+    {
+      "path": "audio/wood-ebony/press/caps_0.wav",
+      "sha256": "b815a7bdb161dc579c0b6f1669734c553f2c29b38f89142ba25282f906171abe",
+      "frames": 6115,
+      "peak": 0.2340088153257169,
+      "energy": 4.4586456,
+      "centroidHz": 1057.497103884781
+    },
+    {
+      "path": "audio/wood-ebony/press/caps_1.wav",
+      "sha256": "7cda58e95978ead43cfb458e2bf7a64b2fbdb0121f9389b153f87f94acba40da",
+      "frames": 6115,
+      "peak": 0.22489698157063012,
+      "energy": 4.458645599999998,
+      "centroidHz": 1361.3025642476105
+    },
+    {
+      "path": "audio/wood-ebony/press/caps_2.wav",
+      "sha256": "4e39964b09a1d4da039de83edbb74c6e6c04156e30ceefb7d19e2a3c9127120a",
+      "frames": 6115,
+      "peak": 0.2086531567899396,
+      "energy": 4.458645599999999,
+      "centroidHz": 1351.2986152707338
+    },
+    {
+      "path": "audio/wood-ebony/release/caps_0.wav",
+      "sha256": "563ef231617ba557d536c5604d2c4973330ecf1b8a732bae8836780fc3e09e96",
+      "frames": 2638,
+      "peak": 0.06503857131617603,
+      "energy": 0.42847584215999984,
+      "centroidHz": 1322.1654574173333
+    },
+    {
+      "path": "audio/wood-ebony/release/caps_1.wav",
+      "sha256": "d1bb9673602a0334f6e2ebc21afac32567024f028e8957cf6d1d5eb4a0bf4c5a",
+      "frames": 2638,
+      "peak": 0.06304923839012104,
+      "energy": 0.42847584215999995,
+      "centroidHz": 1033.3694686206254
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_0.wav",
+      "sha256": "7132f3625316af084b766f7e0a5b673f2f6359a97edc299e22f69e092d98194c",
+      "frames": 6240,
+      "peak": 0.221016556556307,
+      "energy": 5.045999999999999,
+      "centroidHz": 2035.9070702516349
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_1.wav",
+      "sha256": "b3118d6aeda868f6ccef94925bd1711b335a953908124536545498803ff73853",
+      "frames": 6240,
+      "peak": 0.2717646296342902,
+      "energy": 5.045999999999999,
+      "centroidHz": 1162.5070360839857
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_2.wav",
+      "sha256": "c2cbc4582c9e48c3a3d2a8ddc68c3111d7ac199638bb8bf39b470a4adcee17e9",
+      "frames": 6240,
+      "peak": 0.3589660571687198,
+      "energy": 5.046000000000001,
+      "centroidHz": 2155.4567177093477
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_3.wav",
+      "sha256": "9967ba58821cf20ee4c8077542cf26cbd2bcd238344491d43bd3a823cf56aee0",
+      "frames": 6240,
+      "peak": 0.25285871582055497,
+      "energy": 5.045999999999999,
+      "centroidHz": 1724.2625839434172
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_4.wav",
+      "sha256": "863c2d36b714407db9689f7695817a629cde0cd462b0427dcc3816d266b3809f",
+      "frames": 6240,
+      "peak": 0.25556320093088186,
+      "energy": 5.045999999999999,
+      "centroidHz": 1182.71517416056
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_5.wav",
+      "sha256": "96381ae68879b64b1eb88e86dd0f6512b3f6b457c40827d06c96e8493cf9258d",
+      "frames": 6240,
+      "peak": 0.21284210714741092,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1764.2578725319293
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_6.wav",
+      "sha256": "2ffbe5d394ef677939dd5d4c95cd56afe1ffba3acb33f2c82693ca5c088085a6",
+      "frames": 6240,
+      "peak": 0.29226650300156104,
+      "energy": 5.045999999999998,
+      "centroidHz": 1228.3127221979903
+    },
+    {
+      "path": "audio/soft-velvet/press/regular_7.wav",
+      "sha256": "9c111ef9577cd311e90ec0030587c7b01895d6265db6a9672723b4dcb1c591cc",
+      "frames": 6240,
+      "peak": 0.2331481791164417,
+      "energy": 5.046,
+      "centroidHz": 1470.9424043591168
+    },
+    {
+      "path": "audio/soft-velvet/release/regular_0.wav",
+      "sha256": "80c4251265a1a8af3c77f905100c7af447fe46dd9749405cb5c7826d4ece01c0",
+      "frames": 2692,
+      "peak": 0.06933296773641254,
+      "energy": 0.4849206,
+      "centroidHz": 747.892558851705
+    },
+    {
+      "path": "audio/soft-velvet/release/regular_1.wav",
+      "sha256": "595e4182df68dc8ad94dbc7b66fcb291185a8450bf77efc2378fe7f9396bef9b",
+      "frames": 2692,
+      "peak": 0.08011486921853025,
+      "energy": 0.48492059999999987,
+      "centroidHz": 650.9339711021214
+    },
+    {
+      "path": "audio/soft-velvet/release/regular_2.wav",
+      "sha256": "e19a147d58547b8fb0d652742a39bf942eec41e55e6a59498caa9c3f2b562ed8",
+      "frames": 2692,
+      "peak": 0.055947622590811846,
+      "energy": 0.4849205999999999,
+      "centroidHz": 709.6179086891418
+    },
+    {
+      "path": "audio/soft-velvet/release/regular_3.wav",
+      "sha256": "e875490d5250b742cb1ba3a65e5d25c228bf9d42a0065fce19df8eb92b79020a",
+      "frames": 2692,
+      "peak": 0.061812181579771974,
+      "energy": 0.4849206,
+      "centroidHz": 1152.4463440993418
+    },
+    {
+      "path": "audio/soft-velvet/press/space_0.wav",
+      "sha256": "3bad86b0433410bb3b13765a9eae1f50133ca73acbe553aee6f748ec792c5b15",
+      "frames": 9672,
+      "peak": 0.2933275591242842,
+      "energy": 7.026050399999998,
+      "centroidHz": 1019.9189070786914
+    },
+    {
+      "path": "audio/soft-velvet/press/space_1.wav",
+      "sha256": "c81eda5b731c37c4ab8b051f32d0d692b4fccc8377e95b0a7a28d5ff4e99f57c",
+      "frames": 9672,
+      "peak": 0.3984021257280868,
+      "energy": 7.026050399999999,
+      "centroidHz": 1903.7866746309576
+    },
+    {
+      "path": "audio/soft-velvet/press/space_2.wav",
+      "sha256": "c17cb0ebd1646a251a02b09619a08180609fdab3cb6e23acc3938d3f73474b63",
+      "frames": 9672,
+      "peak": 0.3083390214628459,
+      "energy": 7.026050399999999,
+      "centroidHz": 1557.684272424303
+    },
+    {
+      "path": "audio/soft-velvet/release/space_0.wav",
+      "sha256": "e935e5c620ddfff5e99b424a9b335d7b8ebf010bf38076940d9d183269e4d5f2",
+      "frames": 4173,
+      "peak": 0.09009744358434596,
+      "energy": 0.6752034434399996,
+      "centroidHz": 610.5338915966734
+    },
+    {
+      "path": "audio/soft-velvet/release/space_1.wav",
+      "sha256": "6480a953611348dde63b6f0e344090133c4a87007ec4de744191dce886886008",
+      "frames": 4173,
+      "peak": 0.07074237756879115,
+      "energy": 0.6752034434399997,
+      "centroidHz": 669.2903162942774
+    },
+    {
+      "path": "audio/soft-velvet/press/enter_0.wav",
+      "sha256": "90a19f846deed30ebbc922dcbc209e599388eeef35d4b6246322869557e24941",
+      "frames": 7612,
+      "peak": 0.36697772040498694,
+      "energy": 5.8856544000000035,
+      "centroidHz": 1971.8959586462438
+    },
+    {
+      "path": "audio/soft-velvet/press/enter_1.wav",
+      "sha256": "be1169c35634bc67f32ab998b3512ae153fbfba2465a19718732bb0076b9f4cb",
+      "frames": 7612,
+      "peak": 0.2779891214700152,
+      "energy": 5.8856544000000035,
+      "centroidHz": 1598.635604088181
+    },
+    {
+      "path": "audio/soft-velvet/press/enter_2.wav",
+      "sha256": "aeb59cfdacf90f519527a92cbcf10e68137dba04b0247c88fe0026600e96081b",
+      "frames": 7612,
+      "peak": 0.2802090976123999,
+      "energy": 5.885654400000001,
+      "centroidHz": 1095.096794183952
+    },
+    {
+      "path": "audio/soft-velvet/release/enter_0.wav",
+      "sha256": "ed7958af3ff6681271be90016e31f3e75c0cf792f969b47d75da5a4ce30a5dfc",
+      "frames": 3285,
+      "peak": 0.06409582940782432,
+      "energy": 0.56561138784,
+      "centroidHz": 688.0625601512862
+    },
+    {
+      "path": "audio/soft-velvet/release/enter_1.wav",
+      "sha256": "265bd63bf445d20f9d7fe3ffcff325b36fe1feb664d7cda8a41169403fe553c9",
+      "frames": 3285,
+      "peak": 0.07244790925793035,
+      "energy": 0.5656113878400002,
+      "centroidHz": 1065.4990990186525
+    },
+    {
+      "path": "audio/soft-velvet/press/backspace_0.wav",
+      "sha256": "0901e5cd39693982b69c86f9ec1865fb656365ae8c642863d5d6cc0f8d78a15f",
+      "frames": 5366,
+      "peak": 0.22296572085028699,
+      "energy": 4.4586456,
+      "centroidHz": 1606.4417360477128
+    },
+    {
+      "path": "audio/soft-velvet/press/backspace_1.wav",
+      "sha256": "b56a26279c2f226857a674c3cbec4d58d02f32e95352d04db9e3c8dd388fff3b",
+      "frames": 5366,
+      "peak": 0.24376964200704773,
+      "energy": 4.4586456,
+      "centroidHz": 1102.011770654179
+    },
+    {
+      "path": "audio/soft-velvet/press/backspace_2.wav",
+      "sha256": "4a6c0dd6de852a9088bdedc40f5e4473b87a34cd20cbe595bad35a64a488a919",
+      "frames": 5366,
+      "peak": 0.19692736923997353,
+      "energy": 4.4586456,
+      "centroidHz": 1602.3293690103424
+    },
+    {
+      "path": "audio/soft-velvet/release/backspace_0.wav",
+      "sha256": "b19ec42dcbceca8e3d7fd9f2dc47247a2c5bfe57f50278452439d1ca2338ac36",
+      "frames": 2315,
+      "peak": 0.060208687927849405,
+      "energy": 0.42847584215999973,
+      "centroidHz": 1072.4475661996985
+    },
+    {
+      "path": "audio/soft-velvet/release/backspace_1.wav",
+      "sha256": "e33ea109269a2fd79839971d56acf2847f3ce8270d4372c23d165d1ecee7638d",
+      "frames": 2315,
+      "peak": 0.06718978371066028,
+      "energy": 0.4284758421599999,
+      "centroidHz": 693.6576574255821
+    },
+    {
+      "path": "audio/soft-velvet/press/shiftLeft_0.wav",
+      "sha256": "38298816ab2cb425f0d1ef6785037767bde3d8c500a427164d64fc8f47537fb0",
+      "frames": 8112,
+      "peak": 0.26071554726996027,
+      "energy": 5.147424599999998,
+      "centroidHz": 1080.6829956821991
+    },
+    {
+      "path": "audio/soft-velvet/press/shiftLeft_1.wav",
+      "sha256": "77ae91ad5a987beccef563796c68970e8c15594d2670c459e0e28ce2d6437a3d",
+      "frames": 8112,
+      "peak": 0.203265144711251,
+      "energy": 5.1474246,
+      "centroidHz": 1620.3930805529278
+    },
+    {
+      "path": "audio/soft-velvet/press/shiftLeft_2.wav",
+      "sha256": "df3e3c4fa8d67662b422fe1a0b6099c999b7a7ec54bb4cba5a166e192bf28125",
+      "frames": 8112,
+      "peak": 0.2894495402197763,
+      "energy": 5.1474246,
+      "centroidHz": 1120.4274526890483
+    },
+    {
+      "path": "audio/soft-velvet/release/shiftLeft_0.wav",
+      "sha256": "e0be0f9bd93aa743347d150507394ba270df000e8bf311a23dbd776bab878fb5",
+      "frames": 3500,
+      "peak": 0.07386548258356862,
+      "energy": 0.49466750405999993,
+      "centroidHz": 704.8928743268043
+    },
+    {
+      "path": "audio/soft-velvet/release/shiftLeft_1.wav",
+      "sha256": "9314b3235c1181683f27e940981e7055de1ecf361d8a3eb73758fa64242f161b",
+      "frames": 3500,
+      "peak": 0.08010797937361545,
+      "energy": 0.49466750406,
+      "centroidHz": 627.2477748655396
+    },
+    {
+      "path": "audio/soft-velvet/press/shiftRight_0.wav",
+      "sha256": "fb05cbdfbea4d47259e817ec1b3497972d99ff83222ffd856df6e33a821a285d",
+      "frames": 7363,
+      "peak": 0.19517544282197433,
+      "energy": 4.8461783999999986,
+      "centroidHz": 1619.254304143002
+    },
+    {
+      "path": "audio/soft-velvet/press/shiftRight_1.wav",
+      "sha256": "d07a13c09c12fdd4561b5dbd765cb980dc1cf9c65175f01056189c1aa5b34d47",
+      "frames": 7363,
+      "peak": 0.28543970378823436,
+      "energy": 4.846178399999998,
+      "centroidHz": 1135.689613525145
+    },
+    {
+      "path": "audio/soft-velvet/press/shiftRight_2.wav",
+      "sha256": "a2295cf6a12398fe7c5870c388f823ffbb1177400f575ee745e8cb356609d4d2",
+      "frames": 7363,
+      "peak": 0.2293713904535229,
+      "energy": 4.846178399999998,
+      "centroidHz": 1348.7516907342244
+    },
+    {
+      "path": "audio/soft-velvet/release/shiftRight_0.wav",
+      "sha256": "9af815f209279c5d6c5b685a38d7b8b366a16bf1d3e986bbb42e2738eceed4de",
+      "frames": 3177,
+      "peak": 0.07823371455633317,
+      "energy": 0.46571774423999984,
+      "centroidHz": 636.309535358144
+    },
+    {
+      "path": "audio/soft-velvet/release/shiftRight_1.wav",
+      "sha256": "7deb53df80df936fb22c3d8eca6d0104b077be46888a8dfef973a36d94ce9671",
+      "frames": 3177,
+      "peak": 0.056976491846554234,
+      "energy": 0.46571774424,
+      "centroidHz": 683.0782178644337
+    },
+    {
+      "path": "audio/soft-velvet/press/tab_0.wav",
+      "sha256": "8dfb3412b7ccce6f15b7ab77e36990debc492f3c898db324434af239121caca9",
+      "frames": 5116,
+      "peak": 0.2646490515460531,
+      "energy": 3.9076223999999997,
+      "centroidHz": 1139.858655917232
+    },
+    {
+      "path": "audio/soft-velvet/press/tab_1.wav",
+      "sha256": "5ab4973ff896ec3aa8a5459fea00360789996360e4f54a16565bb3b0bdf908f9",
+      "frames": 5116,
+      "peak": 0.21223521945090765,
+      "energy": 3.9076223999999984,
+      "centroidHz": 1344.731433210769
+    },
+    {
+      "path": "audio/soft-velvet/press/tab_2.wav",
+      "sha256": "d00f8cf34d399c8b453bae4b8e7f08cfd3adf083403fbefec8caf2aaf2933848",
+      "frames": 5116,
+      "peak": 0.19041882898415277,
+      "energy": 3.907622399999999,
+      "centroidHz": 1866.4869277637567
+    },
+    {
+      "path": "audio/soft-velvet/release/tab_0.wav",
+      "sha256": "d98a273af926393d8fd03f2a168f51b7cb231ba18188c011d31f235685c48aeb",
+      "frames": 2208,
+      "peak": 0.05006907340717212,
+      "energy": 0.3755225126399999,
+      "centroidHz": 687.3570144511428
+    },
+    {
+      "path": "audio/soft-velvet/release/tab_1.wav",
+      "sha256": "7ed9d6c6f7e83919b06688111b9e3004fe6be8f4edcf99d5529ab8d9a5503a0c",
+      "frames": 2208,
+      "peak": 0.05524499842338402,
+      "energy": 0.3755225126399999,
+      "centroidHz": 1067.2461195432927
+    },
+    {
+      "path": "audio/soft-velvet/press/caps_0.wav",
+      "sha256": "3c40f7500375880a4a1a765b62170736c1808f3028004ed989647e2eb27fe552",
+      "frames": 6115,
+      "peak": 0.22431450399490863,
+      "energy": 4.458645599999999,
+      "centroidHz": 1356.852954255036
+    },
+    {
+      "path": "audio/soft-velvet/press/caps_1.wav",
+      "sha256": "5531ce15651ab947c07f07e39e337f692348b4e97c0ca714fd4a87b6121b8f9e",
+      "frames": 6115,
+      "peak": 0.19721394001649498,
+      "energy": 4.4586456,
+      "centroidHz": 1874.7633627609775
+    },
+    {
+      "path": "audio/soft-velvet/press/caps_2.wav",
+      "sha256": "91819739b46252854f252f0fe60d3817ac43854993bec088ecbcf5c3b992c598",
+      "frames": 6115,
+      "peak": 0.25686916929106407,
+      "energy": 4.458645600000001,
+      "centroidHz": 1074.931028857893
+    },
+    {
+      "path": "audio/soft-velvet/release/caps_0.wav",
+      "sha256": "d0ef1dd5581e888f0d3fbab68ca494ebb1551b5155c39c078c657b5b2aa30599",
+      "frames": 2638,
+      "peak": 0.061134467887139214,
+      "energy": 0.42847584215999995,
+      "centroidHz": 1069.5195742523376
+    },
+    {
+      "path": "audio/soft-velvet/release/caps_1.wav",
+      "sha256": "b7fca0639fa0cf802928edd192353b582f0629c4bff41b2aa0bde2b1a4203ecb",
+      "frames": 2638,
+      "peak": 0.0675309585290552,
+      "energy": 0.4284758421599999,
+      "centroidHz": 701.6076562661581
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_0.wav",
+      "sha256": "e8b555dcb6405aeab7a529950b2aaa5a745e0c67963db04420e21eb9fd362460",
+      "frames": 6240,
+      "peak": 0.19873601804099605,
+      "energy": 5.046,
+      "centroidHz": 1732.6260672292908
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_1.wav",
+      "sha256": "ff5686ea7728017fc6383770cf1ce973c87f3f41151bbc8c1bdf0ef107477044",
+      "frames": 6240,
+      "peak": 0.2513621570998539,
+      "energy": 5.046,
+      "centroidHz": 961.9183255798133
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_2.wav",
+      "sha256": "0176f5e7c688a1c41bae56c9b5653c6c99faaf1671a4661a46b8c859ef8933de",
+      "frames": 6240,
+      "peak": 0.3124547449445906,
+      "energy": 5.046000000000001,
+      "centroidHz": 1814.534898496986
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_3.wav",
+      "sha256": "5d11149c98c39962d18655d1dab6446547ed3d67ce734965d81f09223e06b723",
+      "frames": 6240,
+      "peak": 0.21828855615333972,
+      "energy": 5.045999999999999,
+      "centroidHz": 1446.1875859247002
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_4.wav",
+      "sha256": "0fabd2a814ce00477568ea2c4e79c1e89e01d257b0d8be0b1bb57d6dca19fe05",
+      "frames": 6240,
+      "peak": 0.24621644828682535,
+      "energy": 5.045999999999997,
+      "centroidHz": 981.8959782133173
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_5.wav",
+      "sha256": "0488f4af9a38499ccd3db89c77706d1e2ee05c74e40ca80765a2aa5c63392e0a",
+      "frames": 6240,
+      "peak": 0.17897149086339964,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1470.3120893680928
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_6.wav",
+      "sha256": "b19740abaabfa05f5bb281c0140d7544595ce5bbe172e964f6e44069cd2229e0",
+      "frames": 6240,
+      "peak": 0.27736104790490196,
+      "energy": 5.046000000000001,
+      "centroidHz": 1018.3108308085975
+    },
+    {
+      "path": "audio/soft-cushion/press/regular_7.wav",
+      "sha256": "8628f3a110ab0dfaef9c8eceabd9ca0d3822e0647cf1e9ca104d1d39a9fd569d",
+      "frames": 6240,
+      "peak": 0.21011443657191634,
+      "energy": 5.045999999999999,
+      "centroidHz": 1223.641287094842
+    },
+    {
+      "path": "audio/soft-cushion/release/regular_0.wav",
+      "sha256": "4e384452b6e69f7eb7d02e40c2f4253750a40076249b9fad6143c173352a0103",
+      "frames": 2692,
+      "peak": 0.0688242717240917,
+      "energy": 0.4849205999999999,
+      "centroidHz": 642.6319713727568
+    },
+    {
+      "path": "audio/soft-cushion/release/regular_1.wav",
+      "sha256": "632cc8bac50b003f26e1c6fafd9c9ce1c115e127d46589f6dd1e2455c4bcadc2",
+      "frames": 2692,
+      "peak": 0.07651707708041033,
+      "energy": 0.4849206,
+      "centroidHz": 570.935181749234
+    },
+    {
+      "path": "audio/soft-cushion/release/regular_2.wav",
+      "sha256": "7f9918a6dab0b969ad3b21587108a99f56a6c3e889963b63340aa59a95c4bd93",
+      "frames": 2692,
+      "peak": 0.05405392129752398,
+      "energy": 0.4849205999999999,
+      "centroidHz": 614.2511984458704
+    },
+    {
+      "path": "audio/soft-cushion/release/regular_3.wav",
+      "sha256": "413a52af18a08eef2a3b3d25e3fc654e7479e5898147bc22be4cb11c4799f40d",
+      "frames": 2692,
+      "peak": 0.05932377161498531,
+      "energy": 0.48492060000000003,
+      "centroidHz": 962.0225622776877
+    },
+    {
+      "path": "audio/soft-cushion/press/space_0.wav",
+      "sha256": "9ad2cbab5711d23d251c920965e0444fb5ebf7c48ef3a81624bf520d9208a015",
+      "frames": 9672,
+      "peak": 0.25214954078403834,
+      "energy": 7.026050399999999,
+      "centroidHz": 810.3625415561768
+    },
+    {
+      "path": "audio/soft-cushion/press/space_1.wav",
+      "sha256": "ab5eb05578fc5567e5fbd7c3fdf43df91eeee5d3c016cab32221e929572c3b50",
+      "frames": 9672,
+      "peak": 0.33847338551151573,
+      "energy": 7.026050399999997,
+      "centroidHz": 1595.0487525049432
+    },
+    {
+      "path": "audio/soft-cushion/press/space_2.wav",
+      "sha256": "470bf3f7fcc934ffabaeb84eec8e5d7418da530b955d71b9e0d0d2b63f3c7f25",
+      "frames": 9672,
+      "peak": 0.24584606943181447,
+      "energy": 7.026050399999999,
+      "centroidHz": 1276.6947466528295
+    },
+    {
+      "path": "audio/soft-cushion/release/space_0.wav",
+      "sha256": "d8313d71cedecd161fe5b39fc84680682bbb0d31f4bc9a574eced6c673e002a9",
+      "frames": 4173,
+      "peak": 0.08256640302005938,
+      "energy": 0.6752034434399996,
+      "centroidHz": 517.5969247370306
+    },
+    {
+      "path": "audio/soft-cushion/release/space_1.wav",
+      "sha256": "b6edfba75d1e2a04a03e528d920340bb324b3e8b7dc94ed0c444423011b6d582",
+      "frames": 4173,
+      "peak": 0.0670030177778193,
+      "energy": 0.6752034434399996,
+      "centroidHz": 557.3715625762399
+    },
+    {
+      "path": "audio/soft-cushion/press/enter_0.wav",
+      "sha256": "2c2028fcd9a4a04d164ed2c065edbf64bee6cff9a2295c07a3845bc923255c5a",
+      "frames": 7612,
+      "peak": 0.30798096021817944,
+      "energy": 5.885654400000001,
+      "centroidHz": 1636.697866236762
+    },
+    {
+      "path": "audio/soft-cushion/press/enter_1.wav",
+      "sha256": "f8c93b16e7cdac8d5bbdb1f9084482b566c7151eafd221f7a3f3fe87d2beb826",
+      "frames": 7612,
+      "peak": 0.2307835544011044,
+      "energy": 5.885654400000003,
+      "centroidHz": 1321.5153293375918
+    },
+    {
+      "path": "audio/soft-cushion/press/enter_2.wav",
+      "sha256": "26184da51982d50148a360151678b9740b5d7b76cdd1cb00257307ac3b531e48",
+      "frames": 7612,
+      "peak": 0.2606826325291524,
+      "energy": 5.885654399999999,
+      "centroidHz": 886.9684712294658
+    },
+    {
+      "path": "audio/soft-cushion/release/enter_0.wav",
+      "sha256": "d1c1a3cccbbca4e9581519cc8a792505951e0d22eb7dab6253a2daa737cb206f",
+      "frames": 3285,
+      "peak": 0.059889943514530225,
+      "energy": 0.5656113878400001,
+      "centroidHz": 583.7710012347412
+    },
+    {
+      "path": "audio/soft-cushion/release/enter_1.wav",
+      "sha256": "7526a3bc2302013261ada86174e4cf4d210d23927ceefcff4d43d80c6c0cc916",
+      "frames": 3285,
+      "peak": 0.06689931248442475,
+      "energy": 0.56561138784,
+      "centroidHz": 872.2291775338057
+    },
+    {
+      "path": "audio/soft-cushion/press/backspace_0.wav",
+      "sha256": "662e248ce20e3133eb4412c2f2f0d1c0bf7eac5836902f9c096c230b37c1c9ac",
+      "frames": 5366,
+      "peak": 0.1926845784814535,
+      "energy": 4.4586456,
+      "centroidHz": 1338.4904468485838
+    },
+    {
+      "path": "audio/soft-cushion/press/backspace_1.wav",
+      "sha256": "59ef370962af62f0dcded010f9aadb0f6fcb72e18524b1b6084b267e0e63376c",
+      "frames": 5366,
+      "peak": 0.23597745424130376,
+      "energy": 4.4586456,
+      "centroidHz": 906.0943029329605
+    },
+    {
+      "path": "audio/soft-cushion/press/backspace_2.wav",
+      "sha256": "326d057d678313e96377bcfe0e352955373b651762fd32c447c54c96f6976656",
+      "frames": 5366,
+      "peak": 0.1663020950158483,
+      "energy": 4.4586456,
+      "centroidHz": 1321.6833095641848
+    },
+    {
+      "path": "audio/soft-cushion/release/backspace_0.wav",
+      "sha256": "b8e486db27484e36cfbd866038680c4e12dec2a1d8177abf9dac2c885b3feb4a",
+      "frames": 2315,
+      "peak": 0.05840493511796499,
+      "energy": 0.4284758421599999,
+      "centroidHz": 891.6513295540983
+    },
+    {
+      "path": "audio/soft-cushion/release/backspace_1.wav",
+      "sha256": "f493ce5cf799f1064ad5ffd63315df9ca8bce83d445759e1cc293c2d06f42759",
+      "frames": 2315,
+      "peak": 0.06651049026039377,
+      "energy": 0.42847584215999984,
+      "centroidHz": 605.1381948580768
+    },
+    {
+      "path": "audio/soft-cushion/press/shiftLeft_0.wav",
+      "sha256": "5726cd8f7693a04c330ccbe0198892927143bb4e98769e1dd88562efcd3bf4b8",
+      "frames": 8112,
+      "peak": 0.23854306563789057,
+      "energy": 5.1474246,
+      "centroidHz": 874.7195889668701
+    },
+    {
+      "path": "audio/soft-cushion/press/shiftLeft_1.wav",
+      "sha256": "cc6c651682ed776e75ba332f4d6638ecdd9cea886caca3d942c5f5ff496143ed",
+      "frames": 8112,
+      "peak": 0.17721191859460098,
+      "energy": 5.1474246,
+      "centroidHz": 1318.5167412345193
+    },
+    {
+      "path": "audio/soft-cushion/press/shiftLeft_2.wav",
+      "sha256": "e24d062f26e035954d6a6b79ada1370133ec6d38aaca81322be630f29315bcdd",
+      "frames": 8112,
+      "peak": 0.2602284501534239,
+      "energy": 5.1474246,
+      "centroidHz": 905.4537576845202
+    },
+    {
+      "path": "audio/soft-cushion/release/shiftLeft_0.wav",
+      "sha256": "827c6bfc82e9c1dd57125282ec191027cea0f3531295918bf4467ef4ee73a1fd",
+      "frames": 3500,
+      "peak": 0.07104003978245,
+      "energy": 0.4946675040599999,
+      "centroidHz": 596.2548406700574
+    },
+    {
+      "path": "audio/soft-cushion/release/shiftLeft_1.wav",
+      "sha256": "e85d121e100753b4693e1da7507fdab51a011c1cf149167e96f4166b28c5717c",
+      "frames": 3500,
+      "peak": 0.07532150064832267,
+      "energy": 0.4946675040599998,
+      "centroidHz": 539.6668448813159
+    },
+    {
+      "path": "audio/soft-cushion/press/shiftRight_0.wav",
+      "sha256": "b3022ddcc73309b2a4416feb5f3684211dd75223931381420126398e673fed3e",
+      "frames": 7363,
+      "peak": 0.1629461358950396,
+      "energy": 4.846178399999999,
+      "centroidHz": 1328.3657444503845
+    },
+    {
+      "path": "audio/soft-cushion/press/shiftRight_1.wav",
+      "sha256": "ccb140349d40b9beb6bef20c3b3505f3f1389bb572b20ecd60b7d74b68c6358d",
+      "frames": 7363,
+      "peak": 0.26227689063445897,
+      "energy": 4.846178399999997,
+      "centroidHz": 922.3743823892423
+    },
+    {
+      "path": "audio/soft-cushion/press/shiftRight_2.wav",
+      "sha256": "b4ec8286f67994f87371823d21eb910aeadb8f2badddebd3f34d362943e0de2f",
+      "frames": 7363,
+      "peak": 0.19351551929116995,
+      "energy": 4.8461783999999986,
+      "centroidHz": 1105.2578095462936
+    },
+    {
+      "path": "audio/soft-cushion/release/shiftRight_0.wav",
+      "sha256": "3eaad8788b616739ef42c6a17198a08a808185ed78e3dfc90c627d2f062e7a49",
+      "frames": 3177,
+      "peak": 0.07409750814098663,
+      "energy": 0.46571774424,
+      "centroidHz": 550.8276515818864
+    },
+    {
+      "path": "audio/soft-cushion/release/shiftRight_1.wav",
+      "sha256": "3817640fa7739839a71279167c6227cccf6c5b8a2e8977aa95adbe68e5892b38",
+      "frames": 3177,
+      "peak": 0.05369818635459998,
+      "energy": 0.4657177442400002,
+      "centroidHz": 582.9861171532796
+    },
+    {
+      "path": "audio/soft-cushion/press/tab_0.wav",
+      "sha256": "8c68418bf8783a2d4e491edd497b75f7860b83cc101ecb4dab3bee2091e5fea4",
+      "frames": 5116,
+      "peak": 0.24872856515285832,
+      "energy": 3.9076223999999984,
+      "centroidHz": 938.0528205586262
+    },
+    {
+      "path": "audio/soft-cushion/press/tab_1.wav",
+      "sha256": "5bcfd56a45bb3db12dfc34a770898dd7912fad7a9a25e3c9e2516010514fc96f",
+      "frames": 5116,
+      "peak": 0.1894332041517745,
+      "energy": 3.907622399999999,
+      "centroidHz": 1114.3952546122532
+    },
+    {
+      "path": "audio/soft-cushion/press/tab_2.wav",
+      "sha256": "af3730fa7d28e89cc993acdea556352f669abe782a87597d7170fac9acc5036d",
+      "frames": 5116,
+      "peak": 0.1830076261629511,
+      "energy": 3.9076223999999993,
+      "centroidHz": 1571.1964637796511
+    },
+    {
+      "path": "audio/soft-cushion/release/tab_0.wav",
+      "sha256": "023ff41eefafe38a2faa25000604f98f79beaa299fe94e70eaac0cfc50729baa",
+      "frames": 2208,
+      "peak": 0.049302036855541694,
+      "energy": 0.37552251264,
+      "centroidHz": 596.3338076510939
+    },
+    {
+      "path": "audio/soft-cushion/release/tab_1.wav",
+      "sha256": "ad2e409a48868e63a9b404ecba6077bcf347420153356ea04ada50ad91592049",
+      "frames": 2208,
+      "peak": 0.05414118881440931,
+      "energy": 0.37552251264,
+      "centroidHz": 890.9625261872903
+    },
+    {
+      "path": "audio/soft-cushion/press/caps_0.wav",
+      "sha256": "cef7e42689e4d8f7545260b0ee8550a1797a8ac3b24aa7eb2549e1b5027725ae",
+      "frames": 6115,
+      "peak": 0.1952182734947691,
+      "energy": 4.458645599999998,
+      "centroidHz": 1115.1142907865444
+    },
+    {
+      "path": "audio/soft-cushion/press/caps_1.wav",
+      "sha256": "44e91cdf8902ab621e576bf2843a83604c62820015d5779ca50ed2c7f5b51be2",
+      "frames": 6115,
+      "peak": 0.1869919873156025,
+      "energy": 4.4586456,
+      "centroidHz": 1582.0785002479663
+    },
+    {
+      "path": "audio/soft-cushion/press/caps_2.wav",
+      "sha256": "defbf9924efb35898ef978e0af8f138802d53cee4dd8492fa3a5440b7daa7f28",
+      "frames": 6115,
+      "peak": 0.2346874024552573,
+      "energy": 4.4586456000000005,
+      "centroidHz": 880.3308831344945
+    },
+    {
+      "path": "audio/soft-cushion/release/caps_0.wav",
+      "sha256": "43959f798f64d24f8cf5db9b51e7f293b5f12ee47ae4e7d10907fa42470590a0",
+      "frames": 2638,
+      "peak": 0.05830887294577902,
+      "energy": 0.42847584215999995,
+      "centroidHz": 885.1738698457136
+    },
+    {
+      "path": "audio/soft-cushion/release/caps_1.wav",
+      "sha256": "96eb89f84bd4d05cc87edbc09588c7ac8817db29eba18a401d45a57af2123b39",
+      "frames": 2638,
+      "peak": 0.06673755460816366,
+      "energy": 0.4284758421599999,
+      "centroidHz": 598.7588339830565
+    },
+    {
+      "path": "audio/soft-light/press/regular_0.wav",
+      "sha256": "8604950e9cad3934d003cf2a0c6bef7621ad21051461923bf742ca7baa96dd3d",
+      "frames": 6240,
+      "peak": 0.29383818836585884,
+      "energy": 5.046000000000001,
+      "centroidHz": 2761.6011535139646
+    },
+    {
+      "path": "audio/soft-light/press/regular_1.wav",
+      "sha256": "8ab29eacf22a5c8815fa6c03781438cfe97da0b881965ead27730e7a8deec89b",
+      "frames": 6240,
+      "peak": 0.2773563784176532,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1594.6229020118335
+    },
+    {
+      "path": "audio/soft-light/press/regular_2.wav",
+      "sha256": "6682ff166e408b1d5638c1533f87779a2b90f33ed88b0304f7a5ed7ecfbb1344",
+      "frames": 6240,
+      "peak": 0.43781439935449595,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2891.296173541017
+    },
+    {
+      "path": "audio/soft-light/press/regular_3.wav",
+      "sha256": "9d1f8ddd3a1daae39b70dfa44a51ee888a38f9fc0297cb5f4ed8b2672b5920c5",
+      "frames": 6240,
+      "peak": 0.29799699451881856,
+      "energy": 5.046000000000001,
+      "centroidHz": 2269.761735974312
+    },
+    {
+      "path": "audio/soft-light/press/regular_4.wav",
+      "sha256": "b1aa1d47cec6acae4a8d2ebe5abf4b4cbea440ea478f5151915b35d25f7e510f",
+      "frames": 6240,
+      "peak": 0.2712022218922909,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1627.6985785690645
+    },
+    {
+      "path": "audio/soft-light/press/regular_5.wav",
+      "sha256": "d0d5189364a54e58ab601e53491c0e2896d4930d11a02e8c3d17547d3c488a2b",
+      "frames": 6240,
+      "peak": 0.3214371588641475,
+      "energy": 5.0459999999999985,
+      "centroidHz": 2467.8734566267417
+    },
+    {
+      "path": "audio/soft-light/press/regular_6.wav",
+      "sha256": "847aa5048e6ce1db30e755c3f6ace8b547f692c419f783856df21f668f61021c",
+      "frames": 6240,
+      "peak": 0.31775699214802733,
+      "energy": 5.0459999999999985,
+      "centroidHz": 1689.3566515128136
+    },
+    {
+      "path": "audio/soft-light/press/regular_7.wav",
+      "sha256": "1bde2892d52b743bedbe81678b3cae18cccddd28152c2cc73d818204c26ccaa7",
+      "frames": 6240,
+      "peak": 0.23547847882624265,
+      "energy": 5.046,
+      "centroidHz": 2066.703839783466
+    },
+    {
+      "path": "audio/soft-light/release/regular_0.wav",
+      "sha256": "5c9bce0dffc05ec05f65d4e17f7b062e0b71ef6c82f68df2006ff851188416c5",
+      "frames": 2692,
+      "peak": 0.06686493632036762,
+      "energy": 0.4849206,
+      "centroidHz": 1039.8714156908175
+    },
+    {
+      "path": "audio/soft-light/release/regular_1.wav",
+      "sha256": "cb5e88f5efef634d61799adc0c79b9bc4936f42e9a813060339752003143ade1",
+      "frames": 2692,
+      "peak": 0.08256585980364285,
+      "energy": 0.48492059999999987,
+      "centroidHz": 810.577811800672
+    },
+    {
+      "path": "audio/soft-light/release/regular_2.wav",
+      "sha256": "d66a9880939ae77181619b70ed0040e69025fc19a4bc712cd3c6d0ff9fcdbd89",
+      "frames": 2692,
+      "peak": 0.05748828855327852,
+      "energy": 0.4849206,
+      "centroidHz": 916.9281476881526
+    },
+    {
+      "path": "audio/soft-light/release/regular_3.wav",
+      "sha256": "f2224e3a9c798414d8aacdc36737952256fe5f969a697256ff0f58712ca09997",
+      "frames": 2692,
+      "peak": 0.0679887428491936,
+      "energy": 0.48492060000000015,
+      "centroidHz": 1587.8186179591512
+    },
+    {
+      "path": "audio/soft-light/press/space_0.wav",
+      "sha256": "08a66b3ced27dfbf1e2431837fc3deda61de6f905a126deac568bf49cef64e38",
+      "frames": 9672,
+      "peak": 0.3178850881807406,
+      "energy": 7.026050400000001,
+      "centroidHz": 1429.4334709808768
+    },
+    {
+      "path": "audio/soft-light/press/space_1.wav",
+      "sha256": "4f57fca4c20f621bfcfa41283a39c5fc42cd2e41f621fed19393fb68101fc738",
+      "frames": 9672,
+      "peak": 0.479505863814037,
+      "energy": 7.026050399999999,
+      "centroidHz": 2576.03936965788
+    },
+    {
+      "path": "audio/soft-light/press/space_2.wav",
+      "sha256": "db20bdddd34015714b09847ba0b0e26f6c3a176f9064e932471fd1f5c3248a35",
+      "frames": 9672,
+      "peak": 0.3555954693497584,
+      "energy": 7.026050399999996,
+      "centroidHz": 2058.1245017838737
+    },
+    {
+      "path": "audio/soft-light/release/space_0.wav",
+      "sha256": "052e2df0c5cf7d169952ac16e6ec528b0868a57c80b9f3a28e50b8ba0dfd1a0e",
+      "frames": 4173,
+      "peak": 0.09395076964902552,
+      "energy": 0.6752034434399997,
+      "centroidHz": 771.9363332812227
+    },
+    {
+      "path": "audio/soft-light/release/space_1.wav",
+      "sha256": "925587444e81f249ecdf2fa7b8ced7486ba67f1164e2de69c574e6cc305cff23",
+      "frames": 4173,
+      "peak": 0.07670886305109424,
+      "energy": 0.6752034434399996,
+      "centroidHz": 880.5345470958803
+    },
+    {
+      "path": "audio/soft-light/press/enter_0.wav",
+      "sha256": "3a9594e77df0f20d18cdd9ece6c22e99598f04ed14159f6c62e04b5c4cdce826",
+      "frames": 7612,
+      "peak": 0.4490720647611367,
+      "energy": 5.885654400000001,
+      "centroidHz": 2680.2498783036262
+    },
+    {
+      "path": "audio/soft-light/press/enter_1.wav",
+      "sha256": "33c154904bac7c6ab26652cb856e9a84251688f9f676a4739528fd89b00a3a44",
+      "frames": 7612,
+      "peak": 0.32171439873487273,
+      "energy": 5.885654400000002,
+      "centroidHz": 2121.919014306008
+    },
+    {
+      "path": "audio/soft-light/press/enter_2.wav",
+      "sha256": "8627a0a6669a1aa78b190ef490c04582f7eed0ba3c0df80f8fdde4c4611a972b",
+      "frames": 7612,
+      "peak": 0.2889951077145833,
+      "energy": 5.8856544000000035,
+      "centroidHz": 1521.6400308640768
+    },
+    {
+      "path": "audio/soft-light/release/enter_0.wav",
+      "sha256": "827888db168bc01e28e94d5c1b6fecf503a7abb9c10c50f3b6d9db5367b725b6",
+      "frames": 3285,
+      "peak": 0.06608551394977494,
+      "energy": 0.56561138784,
+      "centroidHz": 888.8894368917921
+    },
+    {
+      "path": "audio/soft-light/release/enter_1.wav",
+      "sha256": "6fa6cdc1d4a450a538b81171fc51b545f06223df5316fc5a96a6b9bce4faf585",
+      "frames": 3285,
+      "peak": 0.07098738109601596,
+      "energy": 0.56561138784,
+      "centroidHz": 1475.2457317018113
+    },
+    {
+      "path": "audio/soft-light/press/backspace_0.wav",
+      "sha256": "1d6c21024d949fed7e4a4210c171c0916a9277bde43e8928c352efb1fc4b4ffc",
+      "frames": 5366,
+      "peak": 0.2645595840369242,
+      "energy": 4.4586456,
+      "centroidHz": 2138.8911748401056
+    },
+    {
+      "path": "audio/soft-light/press/backspace_1.wav",
+      "sha256": "972b25ac4147de4cf6b26f41f63fd2d644da08f6daea63b55271515aef6e604d",
+      "frames": 5366,
+      "peak": 0.24509225529013215,
+      "energy": 4.458645599999998,
+      "centroidHz": 1529.4483927095498
+    },
+    {
+      "path": "audio/soft-light/press/backspace_2.wav",
+      "sha256": "d3b3a2dbb1b07ce121cd3c34c2c0d146089910484964123c6983d3769ee41740",
+      "frames": 5366,
+      "peak": 0.26069128002401837,
+      "energy": 4.458645599999997,
+      "centroidHz": 2267.3365025063163
+    },
+    {
+      "path": "audio/soft-light/release/backspace_0.wav",
+      "sha256": "e74173232f9c837b94024abd07033e078e6446ffd52312d3500802db010add41",
+      "frames": 2315,
+      "peak": 0.06239714843938251,
+      "energy": 0.4284758421599999,
+      "centroidHz": 1464.9212915891692
+    },
+    {
+      "path": "audio/soft-light/release/backspace_1.wav",
+      "sha256": "1893a44fc1cb53651119a6ce7bf859e67f86bfc47879221bac45bc5a38983e2d",
+      "frames": 2315,
+      "peak": 0.06489103863168055,
+      "energy": 0.4284758421599998,
+      "centroidHz": 945.3814092865792
+    },
+    {
+      "path": "audio/soft-light/press/shiftLeft_0.wav",
+      "sha256": "20ccb9e323884512d8ed91a3439360f7b1775fac4b92f2e3077e562e3c652754",
+      "frames": 8112,
+      "peak": 0.2718289580035233,
+      "energy": 5.147424599999999,
+      "centroidHz": 1502.3077270342092
+    },
+    {
+      "path": "audio/soft-light/press/shiftLeft_1.wav",
+      "sha256": "bdbe5c219732e66cc24d891456e6527f9d51a84ff6e8a694798d981ca44f0596",
+      "frames": 8112,
+      "peak": 0.2845989568823861,
+      "energy": 5.147424599999999,
+      "centroidHz": 2284.431192610878
+    },
+    {
+      "path": "audio/soft-light/press/shiftLeft_2.wav",
+      "sha256": "9b66cdc139d27344b94ca03ea8f65a20a87446cda0aa5fc8dd9507e5dd76f47a",
+      "frames": 8112,
+      "peak": 0.2970122915602452,
+      "energy": 5.1474246,
+      "centroidHz": 1561.8133040422995
+    },
+    {
+      "path": "audio/soft-light/release/shiftLeft_0.wav",
+      "sha256": "dbc8d10d89cbf60c890649a1c6f4db4bb3278de00b6a491db952a5455d93a5a2",
+      "frames": 3500,
+      "peak": 0.0717406975462829,
+      "energy": 0.4946675040599998,
+      "centroidHz": 988.5274281714194
+    },
+    {
+      "path": "audio/soft-light/release/shiftLeft_1.wav",
+      "sha256": "076e1a0057b17c0c728bbe6a72a89d3dec2ff543dd80b1bb729ecd1ba57e9b4d",
+      "frames": 3500,
+      "peak": 0.08275544750980034,
+      "energy": 0.49466750406000004,
+      "centroidHz": 782.7155284027754
+    },
+    {
+      "path": "audio/soft-light/press/shiftRight_0.wav",
+      "sha256": "04c09cdd17b0ff8ac2fea1268a1362d51325a4afbecbd84ccb45fb6519417207",
+      "frames": 7363,
+      "peak": 0.27929095243348095,
+      "energy": 4.846178399999999,
+      "centroidHz": 2288.859847264778
+    },
+    {
+      "path": "audio/soft-light/press/shiftRight_1.wav",
+      "sha256": "5f196bddaab3b26547091e3e7d6d5f9817762abe1f1d4986f67da5756846a892",
+      "frames": 7363,
+      "peak": 0.2894669578202232,
+      "energy": 4.846178399999999,
+      "centroidHz": 1576.4508150657512
+    },
+    {
+      "path": "audio/soft-light/press/shiftRight_2.wav",
+      "sha256": "80ed67a128d972216a75eb3c6eedba1ec9926698e75cd8ebecfdc3f990b2b62b",
+      "frames": 7363,
+      "peak": 0.23856041476138484,
+      "energy": 4.846178399999999,
+      "centroidHz": 1916.1134621589297
+    },
+    {
+      "path": "audio/soft-light/release/shiftRight_0.wav",
+      "sha256": "d519e344d7287b123d728695aede51aa5fc5a907f284d4caf7ff6d525f2ec03b",
+      "frames": 3177,
+      "peak": 0.08071460286631972,
+      "energy": 0.46571774423999984,
+      "centroidHz": 788.6434487218106
+    },
+    {
+      "path": "audio/soft-light/release/shiftRight_1.wav",
+      "sha256": "045c83d4c03f51127e668dfc3560be95f42755f0c2b0df7d852092f308d8a519",
+      "frames": 3177,
+      "peak": 0.05895677076369064,
+      "energy": 0.46571774423999995,
+      "centroidHz": 881.3594383400955
+    },
+    {
+      "path": "audio/soft-light/press/tab_0.wav",
+      "sha256": "a32ca66a3508312211e60bcee3cd5075099495557af0a2c6b915496d37ed1f17",
+      "frames": 5116,
+      "peak": 0.26814586807655816,
+      "energy": 3.9076223999999997,
+      "centroidHz": 1584.834446423136
+    },
+    {
+      "path": "audio/soft-light/press/tab_1.wav",
+      "sha256": "7d2a03b456604f16166e1cde54c3e1259790a2b9f36ff769652ad02af17d3c25",
+      "frames": 5116,
+      "peak": 0.21404334776104406,
+      "energy": 3.9076223999999984,
+      "centroidHz": 1880.0664251578148
+    },
+    {
+      "path": "audio/soft-light/press/tab_2.wav",
+      "sha256": "fb6ad0e007f798f976bf408e071d85977410d65e0200b3b18594a28ccb43242d",
+      "frames": 5116,
+      "peak": 0.2488848827409868,
+      "energy": 3.907622399999999,
+      "centroidHz": 2578.1931057644133
+    },
+    {
+      "path": "audio/soft-light/release/tab_0.wav",
+      "sha256": "868d855693345937eb58782bc20a0afa693111f4a4d9c61c24deb32882a5d987",
+      "frames": 2208,
+      "peak": 0.05086818821657879,
+      "energy": 0.3755225126399999,
+      "centroidHz": 879.0295945661122
+    },
+    {
+      "path": "audio/soft-light/release/tab_1.wav",
+      "sha256": "e866305b51598c4cd0a407a9ebbafd5b91250198264cf02ab583198693aa97bf",
+      "frames": 2208,
+      "peak": 0.058300119734365025,
+      "energy": 0.3755225126399999,
+      "centroidHz": 1452.748344533291
+    },
+    {
+      "path": "audio/soft-light/press/caps_0.wav",
+      "sha256": "bf214888fe12688563138dc1a1e6cd1e9b11eac5b6d7ed47f3bbc194ea75a68f",
+      "frames": 6115,
+      "peak": 0.22940965518669434,
+      "energy": 4.458645599999998,
+      "centroidHz": 1912.8349256261745
+    },
+    {
+      "path": "audio/soft-light/press/caps_1.wav",
+      "sha256": "dc8a4cbc16f77044090915cc12839b92a02e77df6ea7187e38a1c9e57201ac0b",
+      "frames": 6115,
+      "peak": 0.26598833156182156,
+      "energy": 4.4586456,
+      "centroidHz": 2570.7279082563864
+    },
+    {
+      "path": "audio/soft-light/press/caps_2.wav",
+      "sha256": "03fcc27ad61e9ab44761ee34d411c0c00df509081d145b39e6c71b274d2d60e4",
+      "frames": 6115,
+      "peak": 0.26543411140381584,
+      "energy": 4.4586456,
+      "centroidHz": 1486.6841125214312
+    },
+    {
+      "path": "audio/soft-light/release/caps_0.wav",
+      "sha256": "ce8700286a452c661b319ca86d77e80700e2f2ee08be01b2a38bcd338e0fbb22",
+      "frames": 2638,
+      "peak": 0.06238921574912554,
+      "energy": 0.4284758421599998,
+      "centroidHz": 1469.8320999918637
+    },
+    {
+      "path": "audio/soft-light/release/caps_1.wav",
+      "sha256": "0db9a40a05602a76f97bd398047ae946d7057be6bf860695101e4b9c8f17e3ae",
+      "frames": 2638,
+      "peak": 0.06507859301825601,
+      "energy": 0.4284758421599999,
+      "centroidHz": 961.4354964621452
+    }
+  ]
+}

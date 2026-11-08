@@ -12,6 +12,15 @@ test('native F row handles secondaryFn, ignores modified typing, deduplicates an
   // Compile the production handler without starting NSApplication, installing
   // any event tap, posting events or reaching a downstream app/network.
   const body=source+`
+extension AppDelegate {
+ func typingCodesForCheck() -> Set<UInt32> { dictationKeyCodes }
+}
+let sourceCheck=AppDelegate()
+let sourceBindings=functionKeyCodes.sorted{$0.key<$1.key}.map{["code":$0.value,"keyCode":Int($0.key)] as [String:Any]}
+sourceCheck.applyKeyConfiguration(["source":"claude","bindings":sourceBindings,"dictationCodes":["F11"],"enabled":false])
+precondition(sourceCheck.typingCodesForCheck().isEmpty,"Claude keys must not acquire a Codex dictation audio pause")
+sourceCheck.applyKeyConfiguration(["source":"codex","bindings":sourceBindings,"dictationCodes":["F11"],"enabled":false])
+precondition(sourceCheck.typingCodesForCheck()==[103],"Codex dictation keeps its configured audio pause")
 let host=AppDelegate()
 host.hotkeysEnabled=true;host.keyConfiguration=[("F11",103)]
 func event(_ code:CGKeyCode=103,_ flags:CGEventFlags = .maskSecondaryFn,_ repeatValue:Int64=0)->CGEvent {

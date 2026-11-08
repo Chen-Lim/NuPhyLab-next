@@ -20,6 +20,7 @@ import {
   Folder,
   Keyboard,
   Gamepad2,
+  AudioLines,
   Lightbulb,
   SlidersHorizontal,
 } from "lucide-react";
@@ -35,6 +36,7 @@ import { ClaudeCode } from "./ClaudeCode";
 import { agentSource } from "./AgentSourceSwitch";
 import { Device } from "./Device";
 import {SelectionLab} from "./SelectionLab";
+import {TypingSounds} from "./TypingSounds";
 import { Settings } from "./Settings";
 import {availableFirmwareUpdate} from '../../shared/firmware-onboarding.mjs';
 import './update-notices.css';
@@ -48,7 +50,7 @@ import { triggerPlaybackConfig } from "../../shared/trigger.mjs";
 import { blankColors, DEFAULT_ANIMATION } from "./types";
 import type { Scene, StudioMode } from "./types";
 import {useLanguage, setLanguage} from "./i18n";
-type Page = "selection-question" | "studio" | "library" | "codex" | "device" | "settings" | "game" | "audio" | "offline";
+type Page = "typing-sounds" | "selection-question" | "studio" | "library" | "codex" | "device" | "settings" | "game" | "audio" | "offline";
 const cloneScene = (scene: Scene): Scene => JSON.parse(JSON.stringify(scene));
 const modeForScene = (scene: Scene): StudioMode =>
   scene.trigger ? "trigger" : scene.animation.effect === "static" ? "paint" : "animation";
@@ -296,7 +298,7 @@ export default function App() {
   };
   const creative = ["studio", "audio", "offline"].includes(page);
   useEffect(()=>{window.scrollTo(0,0);},[page]);
-  const pageTitle = page === "selection-question" ? "框选提问" : creative ? "灯光创作" : page === "library" ? "作品库" : page === "codex" ? "AI 助手" : page === "game" ? "灯光游戏" : page === "settings" ? "设置" : "设备";
+  const pageTitle = page === "typing-sounds" ? "模拟声浪" : page === "selection-question" ? "框选提问" : creative ? "灯光创作" : page === "library" ? "作品库" : page === "codex" ? "AI 助手" : page === "game" ? "灯光游戏" : page === "settings" ? "设置" : "设备";
   return (
     <KeyboardModuleContext.Provider value={state?.settings.airTopRightModule === "keycap" ? "keycap" : "rotary"}>
     <div className="app-shell lab-v5" data-page={page} data-native={Boolean((window as Window & {webkit?:unknown}).webkit)}>
@@ -309,6 +311,7 @@ export default function App() {
             ["library", "作品库", Folder],
             ["codex", "AI 助手", SquareTerminal],
             ["game", "灯光游戏", Gamepad2],
+            ["typing-sounds", "模拟声浪", AudioLines],
           ] as const).map(([id, label, Icon]) => <button key={id} aria-label={tr(label)} title={tr(label)} className={(id === "studio" ? creative : page === id) ? "active" : ""} aria-current={(id === "studio" ? creative : page === id) ? "page" : undefined} onClick={()=>setPage(id)}><Icon size={18} strokeWidth={1.5}/><span>{tr(label)}</span></button>)}
           <button className={'lab-nav-parent '+(page==='selection-question'?'contains-active':'')} aria-label={tr('实验室')} aria-expanded={labExpanded} aria-controls="lab-feature-navigation" onClick={()=>setLabExpanded(value=>!value)}><FlaskConical size={18} strokeWidth={1.5}/><span>{tr('实验室')}</span><ChevronDown className="lab-nav-chevron" size={13}/></button>
           <div id="lab-feature-navigation" className="lab-subnav" hidden={!labExpanded}>
@@ -391,6 +394,7 @@ export default function App() {
               onOffline={()=>setPage(nativeOnly ? "offline" : "studio")}
             />
           ))}
+          {page === "typing-sounds" && <TypingSounds/>}
           {page === "selection-question" && <SelectionLab/>}
           {page === "settings" && <Settings state={state} command={command} display={connectionDisplay} onNavigateStudio={()=>setPage("studio")} initialTab={settingsTab}/>}
         </div>

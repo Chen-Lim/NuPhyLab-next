@@ -1362,6 +1362,7 @@ export const messages = {
   "任务与快捷键": "Tasks and shortcuts",
   "接入设置": "Integration setup",
   "灯光创作": "Lighting studio",
+  "模拟声浪": "Typing Sounds",
   "灯光游戏": "Lighting games",
   "设置": "Settings",
   "灯光已休眠": "Lighting is asleep",

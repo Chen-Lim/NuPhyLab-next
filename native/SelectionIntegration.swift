@@ -73,6 +73,7 @@ enum SelectionPermissionProbe {
     var showSettings: (() -> Void)? { get set }
     var requestRelaunch: (() -> Bool)? { get set }
     var recordingChanged: ((Bool) -> Void)? { get set }
+    var voiceActivityChanged: ((Bool) -> Void)? { get set }
     var isBusy: Bool { get }
     func updateLanguage(_ language: AppLanguage)
     func updateReservedKeys(_ codes: Set<UInt32>)
@@ -99,6 +100,7 @@ extension SelectionFeature { func cancel() { cancel(animatePanel: false) } }
     var showSettings: (() -> Void)?
     var requestRelaunch: (() -> Bool)?
     var recordingChanged: ((Bool) -> Void)?
+    var voiceActivityChanged: ((Bool) -> Void)?
     var isBusy: Bool { false }
     func updateReservedKeys(_ codes: Set<UInt32>) {}
     func handle(_ body: [String:Any], reply: @escaping (Any?, String?) -> Void) {

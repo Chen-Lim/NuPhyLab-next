@@ -23,7 +23,7 @@ enum LabKeychain {
 }
 @available(macOS 14, *)
 @MainActor final class SelectionLab:NSObject,NSWindowDelegate,SelectionFeature {
- let directory:URL;var showSettings:(()->Void)?;var requestRelaunch:(()->Bool)?;var recordingChanged:((Bool)->Void)?
+ let directory:URL;var showSettings:(()->Void)?;var requestRelaunch:(()->Bool)?;var recordingChanged:((Bool)->Void)?;var voiceActivityChanged:((Bool)->Void)?
  private var language=AppLanguage.zh
  private var stopping=false
  private var keyboardReservedKeys=Set<UInt32>()
@@ -42,7 +42,7 @@ enum LabKeychain {
  private var overlays:[SelectionOverlayWindow]=[];private var panel:SelectionResultPanel?;private var task:Task<Void,Never>?;private var utilityTask:Task<Void,Never>?
  private var utilityGeneration=UUID();private var generation=UUID();private var imagePNG:Data?;private var observers:[NSObjectProtocol]=[];private var monitor:Timer?
  private let viewState=SelectionPanelState();private var registrationIssue="";private var hold=LabHoldState();private var selectionRect:NSRect?
- private var captureReady=false;private var voicePending=false;private var speechFailed=false;private var speechStarted=false;private var voiceToken:UUID?;private var voiceDelay:Task<Void,Never>?
+ private var captureReady=false;private var voicePending=false;private var speechFailed=false;private var speechStarted=false;private var voiceToken:UUID? { didSet { if (oldValue != nil) != (voiceToken != nil) { voiceActivityChanged?(voiceToken != nil) } } };private var voiceDelay:Task<Void,Never>?
  private var pendingAction:LabAction = .translate;private var permissionSignature="";private var recordingReply:((Any?,String?)->Void)?;private var recordingTimer:Timer?;private var modifierRecorder=LabModifierRecorder();private var recordedShortcut:LabShortcut?
  private var panelAnchor=NSPoint.zero;private var resultWheel=LabWheelState();private var wheelMonitor:Any?;private var modeTask:Task<Void,Never>?
  private var panelScreenNumber:NSNumber?;private var panelMeasurement:LabAnswerMeasurement?

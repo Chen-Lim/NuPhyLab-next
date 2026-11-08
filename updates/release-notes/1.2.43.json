@@ -1,0 +1,11 @@
+{
+  "version": "1.2.43",
+  "zh-CN": [
+    "新增模拟声浪：麻将、奶油、木质、轻柔、段落和复古六类，每类三款声音。",
+    "支持后台打字播放、独立音量、自然变化与大键声音调节；仅在开启后使用输入监听。"
+  ],
+  "en": [
+    "Add Typing Sounds with three sounds each in six families: Marbly, Creamy, Woody, Soft, Tactile and Retro.",
+    "Play sounds while typing in other apps, with volume, natural variation and large-key controls; input monitoring is used only while enabled."
+  ]
+}

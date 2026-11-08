@@ -1,0 +1,2289 @@
+{
+  "revision": 3,
+  "categories": [
+    {
+      "id": "marble",
+      "zh": "麻将",
+      "en": "Marbly"
+    },
+    {
+      "id": "creamy",
+      "zh": "奶油",
+      "en": "Creamy"
+    },
+    {
+      "id": "woody",
+      "zh": "木质",
+      "en": "Woody"
+    },
+    {
+      "id": "soft",
+      "zh": "轻柔",
+      "en": "Soft"
+    },
+    {
+      "id": "tactile",
+      "zh": "段落",
+      "en": "Tactile"
+    },
+    {
+      "id": "retro",
+      "zh": "复古",
+      "en": "Retro"
+    }
+  ],
+  "packs": [
+    {
+      "id": "mahjong-crisp",
+      "name": "Marble Clack",
+      "names": {
+        "zh": "清脆麻将",
+        "en": "Marble Clack"
+      },
+      "category": "marble",
+      "description": {
+        "zh": "清亮弹润 · 中频颗粒",
+        "en": "Poppy attack · midrange texture"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "Techrul / Rainy 75 · CC0",
+      "sourceId": "rainy75",
+      "sourceUrl": "https://freesound.org/people/Techrul/sounds/815614/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "mahjong-porcelain",
+      "name": "Porcelain Marble",
+      "names": {
+        "zh": "白瓷麻将",
+        "en": "Porcelain Marble"
+      },
+      "category": "marble",
+      "description": {
+        "zh": "干脆短响 · 瓷质碰撞",
+        "en": "Short clack · porcelain contact"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "Techrul / Rainy 75 · CC0",
+      "sourceId": "rainy75",
+      "sourceUrl": "https://freesound.org/people/Techrul/sounds/815614/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "thock-deep",
+      "name": "Deep Marble",
+      "names": {
+        "zh": "厚润麻将",
+        "en": "Deep Marble"
+      },
+      "category": "marble",
+      "description": {
+        "zh": "低沉饱满 · 厚实落底",
+        "en": "Deep body · substantial landing"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "Techrul / Rainy 75 · CC0",
+      "sourceId": "rainy75",
+      "sourceUrl": "https://freesound.org/people/Techrul/sounds/815614/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "cream-milk",
+      "name": "Velvet Cream",
+      "names": {
+        "zh": "奶油绵密",
+        "en": "Velvet Cream"
+      },
+      "category": "creamy",
+      "description": {
+        "zh": "绵密柔和 · 顺滑回弹",
+        "en": "Dense and soft · smooth return"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "Techrul / Rainy 75 · CC0",
+      "sourceId": "rainy75",
+      "sourceUrl": "https://freesound.org/people/Techrul/sounds/815614/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "cream-butter",
+      "name": "Butter Cream",
+      "names": {
+        "zh": "黄油柔润",
+        "en": "Butter Cream"
+      },
+      "category": "creamy",
+      "description": {
+        "zh": "温润闷糯 · 更软落底",
+        "en": "Mellow and muted · softer landing"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "Techrul / Rainy 75 · CC0",
+      "sourceId": "rainy75",
+      "sourceUrl": "https://freesound.org/people/Techrul/sounds/815614/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "cream-pudding",
+      "name": "Pudding Pop",
+      "names": {
+        "zh": "布丁弹润",
+        "en": "Pudding Pop"
+      },
+      "category": "creamy",
+      "description": {
+        "zh": "弹润颗粒 · 轻快收尾",
+        "en": "Elastic pop · nimble finish"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "Techrul / Rainy 75 · CC0",
+      "sourceId": "rainy75",
+      "sourceUrl": "https://freesound.org/people/Techrul/sounds/815614/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "wood-bamboo",
+      "name": "Bamboo Knock",
+      "names": {
+        "zh": "竹节轻叩",
+        "en": "Bamboo Knock"
+      },
+      "category": "woody",
+      "description": {
+        "zh": "清脆干爽 · 竹节短响",
+        "en": "Dry contact · short woody tap"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "zrrion / Modified Technics / Gateron Yellow · CC0",
+      "sourceId": "technics",
+      "sourceUrl": "https://freesound.org/people/zrrion/sounds/665075/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "wood-walnut",
+      "name": "Walnut Knock",
+      "names": {
+        "zh": "胡桃木响",
+        "en": "Walnut Knock"
+      },
+      "category": "woody",
+      "description": {
+        "zh": "温暖中低频 · 木质回响",
+        "en": "Warm mids · woody resonance"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "zrrion / Modified Technics / Gateron Yellow · CC0",
+      "sourceId": "technics",
+      "sourceUrl": "https://freesound.org/people/zrrion/sounds/665075/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "wood-ebony",
+      "name": "Ebony Knock",
+      "names": {
+        "zh": "乌木低叩",
+        "en": "Ebony Knock"
+      },
+      "category": "woody",
+      "description": {
+        "zh": "厚重低叩 · 短尾收束",
+        "en": "Low solid knock · controlled decay"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "zrrion / Modified Technics / Gateron Yellow · CC0",
+      "sourceId": "technics",
+      "sourceUrl": "https://freesound.org/people/zrrion/sounds/665075/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "soft-velvet",
+      "name": "Felted Tap",
+      "names": {
+        "zh": "绒面轻敲",
+        "en": "Felted Tap"
+      },
+      "category": "soft",
+      "description": {
+        "zh": "柔化碰撞 · 细软触感",
+        "en": "Softened contact · gentle texture"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "grcekh / HHKB Professional Hybrid / Topre · CC0",
+      "sourceId": "hhkb",
+      "sourceUrl": "https://freesound.org/people/grcekh/sounds/546033/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "soft-cushion",
+      "name": "Cushioned Tap",
+      "names": {
+        "zh": "软垫轻触",
+        "en": "Cushioned Tap"
+      },
+      "category": "soft",
+      "description": {
+        "zh": "低频软弹 · 更少锐响",
+        "en": "Cushioned body · restrained top end"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "grcekh / HHKB Professional Hybrid / Topre · CC0",
+      "sourceId": "hhkb",
+      "sourceUrl": "https://freesound.org/people/grcekh/sounds/546033/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "soft-light",
+      "name": "Soft Landing",
+      "names": {
+        "zh": "轻柔落底",
+        "en": "Soft Landing"
+      },
+      "category": "soft",
+      "description": {
+        "zh": "轻巧短促 · 干净回弹",
+        "en": "Light short tap · clean return"
+      },
+      "designed": true,
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "samples": {
+        "regular": {
+          "press": [
+            "press/regular_0.wav",
+            "press/regular_1.wav",
+            "press/regular_2.wav",
+            "press/regular_3.wav",
+            "press/regular_4.wav",
+            "press/regular_5.wav",
+            "press/regular_6.wav",
+            "press/regular_7.wav"
+          ],
+          "release": [
+            "release/regular_0.wav",
+            "release/regular_1.wav",
+            "release/regular_2.wav",
+            "release/regular_3.wav"
+          ]
+        },
+        "space": {
+          "press": [
+            "press/space_0.wav",
+            "press/space_1.wav",
+            "press/space_2.wav"
+          ],
+          "release": [
+            "release/space_0.wav",
+            "release/space_1.wav"
+          ]
+        },
+        "enter": {
+          "press": [
+            "press/enter_0.wav",
+            "press/enter_1.wav",
+            "press/enter_2.wav"
+          ],
+          "release": [
+            "release/enter_0.wav",
+            "release/enter_1.wav"
+          ]
+        },
+        "backspace": {
+          "press": [
+            "press/backspace_0.wav",
+            "press/backspace_1.wav",
+            "press/backspace_2.wav"
+          ],
+          "release": [
+            "release/backspace_0.wav",
+            "release/backspace_1.wav"
+          ]
+        },
+        "shiftLeft": {
+          "press": [
+            "press/shiftLeft_0.wav",
+            "press/shiftLeft_1.wav",
+            "press/shiftLeft_2.wav"
+          ],
+          "release": [
+            "release/shiftLeft_0.wav",
+            "release/shiftLeft_1.wav"
+          ]
+        },
+        "shiftRight": {
+          "press": [
+            "press/shiftRight_0.wav",
+            "press/shiftRight_1.wav",
+            "press/shiftRight_2.wav"
+          ],
+          "release": [
+            "release/shiftRight_0.wav",
+            "release/shiftRight_1.wav"
+          ]
+        },
+        "tab": {
+          "press": [
+            "press/tab_0.wav",
+            "press/tab_1.wav",
+            "press/tab_2.wav"
+          ],
+          "release": [
+            "release/tab_0.wav",
+            "release/tab_1.wav"
+          ]
+        },
+        "caps": {
+          "press": [
+            "press/caps_0.wav",
+            "press/caps_1.wav",
+            "press/caps_2.wav"
+          ],
+          "release": [
+            "release/caps_0.wav",
+            "release/caps_1.wav"
+          ]
+        }
+      },
+      "source": "grcekh / HHKB Professional Hybrid / Topre · CC0",
+      "sourceId": "hhkb",
+      "sourceUrl": "https://freesound.org/people/grcekh/sounds/546033/",
+      "recordingClaim": "Tuned sound design; key identities and releases are modeled."
+    },
+    {
+      "id": "holypanda",
+      "name": "Holy Panda",
+      "category": "tactile",
+      "description": {
+        "zh": "饱满、弹跳",
+        "en": "Full · poppy"
+      },
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "mxbrown",
+      "name": "Cherry MX Brown",
+      "category": "tactile",
+      "description": {
+        "zh": "轻段落、温和",
+        "en": "Light · balanced"
+      },
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "topre",
+      "name": "Topre",
+      "category": "tactile",
+      "description": {
+        "zh": "闷润、柔和",
+        "en": "Damped · mellow"
+      },
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "boxnavy",
+      "name": "Kailh Box Navy",
+      "category": "retro",
+      "description": {
+        "zh": "强烈、清晰",
+        "en": "Bold · sharp"
+      },
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "bluealps",
+      "name": "SKCM Blue Alps",
+      "category": "retro",
+      "description": {
+        "zh": "复古、干脆",
+        "en": "Vintage · crisp"
+      },
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "id": "buckling",
+      "name": "Buckling Spring",
+      "category": "retro",
+      "description": {
+        "zh": "复古弹簧",
+        "en": "Vintage spring"
+      },
+      "dedicatedLargeKeys": true,
+      "variants": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "assets": [
+    "audio/mahjong-crisp/press/regular_0.wav",
+    "audio/mahjong-crisp/press/regular_1.wav",
+    "audio/mahjong-crisp/press/regular_2.wav",
+    "audio/mahjong-crisp/press/regular_3.wav",
+    "audio/mahjong-crisp/press/regular_4.wav",
+    "audio/mahjong-crisp/press/regular_5.wav",
+    "audio/mahjong-crisp/press/regular_6.wav",
+    "audio/mahjong-crisp/press/regular_7.wav",
+    "audio/mahjong-crisp/release/regular_0.wav",
+    "audio/mahjong-crisp/release/regular_1.wav",
+    "audio/mahjong-crisp/release/regular_2.wav",
+    "audio/mahjong-crisp/release/regular_3.wav",
+    "audio/mahjong-crisp/press/space_0.wav",
+    "audio/mahjong-crisp/press/space_1.wav",
+    "audio/mahjong-crisp/press/space_2.wav",
+    "audio/mahjong-crisp/release/space_0.wav",
+    "audio/mahjong-crisp/release/space_1.wav",
+    "audio/mahjong-crisp/press/enter_0.wav",
+    "audio/mahjong-crisp/press/enter_1.wav",
+    "audio/mahjong-crisp/press/enter_2.wav",
+    "audio/mahjong-crisp/release/enter_0.wav",
+    "audio/mahjong-crisp/release/enter_1.wav",
+    "audio/mahjong-crisp/press/backspace_0.wav",
+    "audio/mahjong-crisp/press/backspace_1.wav",
+    "audio/mahjong-crisp/press/backspace_2.wav",
+    "audio/mahjong-crisp/release/backspace_0.wav",
+    "audio/mahjong-crisp/release/backspace_1.wav",
+    "audio/mahjong-crisp/press/shiftLeft_0.wav",
+    "audio/mahjong-crisp/press/shiftLeft_1.wav",
+    "audio/mahjong-crisp/press/shiftLeft_2.wav",
+    "audio/mahjong-crisp/release/shiftLeft_0.wav",
+    "audio/mahjong-crisp/release/shiftLeft_1.wav",
+    "audio/mahjong-crisp/press/shiftRight_0.wav",
+    "audio/mahjong-crisp/press/shiftRight_1.wav",
+    "audio/mahjong-crisp/press/shiftRight_2.wav",
+    "audio/mahjong-crisp/release/shiftRight_0.wav",
+    "audio/mahjong-crisp/release/shiftRight_1.wav",
+    "audio/mahjong-crisp/press/tab_0.wav",
+    "audio/mahjong-crisp/press/tab_1.wav",
+    "audio/mahjong-crisp/press/tab_2.wav",
+    "audio/mahjong-crisp/release/tab_0.wav",
+    "audio/mahjong-crisp/release/tab_1.wav",
+    "audio/mahjong-crisp/press/caps_0.wav",
+    "audio/mahjong-crisp/press/caps_1.wav",
+    "audio/mahjong-crisp/press/caps_2.wav",
+    "audio/mahjong-crisp/release/caps_0.wav",
+    "audio/mahjong-crisp/release/caps_1.wav",
+    "audio/mahjong-porcelain/press/regular_0.wav",
+    "audio/mahjong-porcelain/press/regular_1.wav",
+    "audio/mahjong-porcelain/press/regular_2.wav",
+    "audio/mahjong-porcelain/press/regular_3.wav",
+    "audio/mahjong-porcelain/press/regular_4.wav",
+    "audio/mahjong-porcelain/press/regular_5.wav",
+    "audio/mahjong-porcelain/press/regular_6.wav",
+    "audio/mahjong-porcelain/press/regular_7.wav",
+    "audio/mahjong-porcelain/release/regular_0.wav",
+    "audio/mahjong-porcelain/release/regular_1.wav",
+    "audio/mahjong-porcelain/release/regular_2.wav",
+    "audio/mahjong-porcelain/release/regular_3.wav",
+    "audio/mahjong-porcelain/press/space_0.wav",
+    "audio/mahjong-porcelain/press/space_1.wav",
+    "audio/mahjong-porcelain/press/space_2.wav",
+    "audio/mahjong-porcelain/release/space_0.wav",
+    "audio/mahjong-porcelain/release/space_1.wav",
+    "audio/mahjong-porcelain/press/enter_0.wav",
+    "audio/mahjong-porcelain/press/enter_1.wav",
+    "audio/mahjong-porcelain/press/enter_2.wav",
+    "audio/mahjong-porcelain/release/enter_0.wav",
+    "audio/mahjong-porcelain/release/enter_1.wav",
+    "audio/mahjong-porcelain/press/backspace_0.wav",
+    "audio/mahjong-porcelain/press/backspace_1.wav",
+    "audio/mahjong-porcelain/press/backspace_2.wav",
+    "audio/mahjong-porcelain/release/backspace_0.wav",
+    "audio/mahjong-porcelain/release/backspace_1.wav",
+    "audio/mahjong-porcelain/press/shiftLeft_0.wav",
+    "audio/mahjong-porcelain/press/shiftLeft_1.wav",
+    "audio/mahjong-porcelain/press/shiftLeft_2.wav",
+    "audio/mahjong-porcelain/release/shiftLeft_0.wav",
+    "audio/mahjong-porcelain/release/shiftLeft_1.wav",
+    "audio/mahjong-porcelain/press/shiftRight_0.wav",
+    "audio/mahjong-porcelain/press/shiftRight_1.wav",
+    "audio/mahjong-porcelain/press/shiftRight_2.wav",
+    "audio/mahjong-porcelain/release/shiftRight_0.wav",
+    "audio/mahjong-porcelain/release/shiftRight_1.wav",
+    "audio/mahjong-porcelain/press/tab_0.wav",
+    "audio/mahjong-porcelain/press/tab_1.wav",
+    "audio/mahjong-porcelain/press/tab_2.wav",
+    "audio/mahjong-porcelain/release/tab_0.wav",
+    "audio/mahjong-porcelain/release/tab_1.wav",
+    "audio/mahjong-porcelain/press/caps_0.wav",
+    "audio/mahjong-porcelain/press/caps_1.wav",
+    "audio/mahjong-porcelain/press/caps_2.wav",
+    "audio/mahjong-porcelain/release/caps_0.wav",
+    "audio/mahjong-porcelain/release/caps_1.wav",
+    "audio/thock-deep/press/regular_0.wav",
+    "audio/thock-deep/press/regular_1.wav",
+    "audio/thock-deep/press/regular_2.wav",
+    "audio/thock-deep/press/regular_3.wav",
+    "audio/thock-deep/press/regular_4.wav",
+    "audio/thock-deep/press/regular_5.wav",
+    "audio/thock-deep/press/regular_6.wav",
+    "audio/thock-deep/press/regular_7.wav",
+    "audio/thock-deep/release/regular_0.wav",
+    "audio/thock-deep/release/regular_1.wav",
+    "audio/thock-deep/release/regular_2.wav",
+    "audio/thock-deep/release/regular_3.wav",
+    "audio/thock-deep/press/space_0.wav",
+    "audio/thock-deep/press/space_1.wav",
+    "audio/thock-deep/press/space_2.wav",
+    "audio/thock-deep/release/space_0.wav",
+    "audio/thock-deep/release/space_1.wav",
+    "audio/thock-deep/press/enter_0.wav",
+    "audio/thock-deep/press/enter_1.wav",
+    "audio/thock-deep/press/enter_2.wav",
+    "audio/thock-deep/release/enter_0.wav",
+    "audio/thock-deep/release/enter_1.wav",
+    "audio/thock-deep/press/backspace_0.wav",
+    "audio/thock-deep/press/backspace_1.wav",
+    "audio/thock-deep/press/backspace_2.wav",
+    "audio/thock-deep/release/backspace_0.wav",
+    "audio/thock-deep/release/backspace_1.wav",
+    "audio/thock-deep/press/shiftLeft_0.wav",
+    "audio/thock-deep/press/shiftLeft_1.wav",
+    "audio/thock-deep/press/shiftLeft_2.wav",
+    "audio/thock-deep/release/shiftLeft_0.wav",
+    "audio/thock-deep/release/shiftLeft_1.wav",
+    "audio/thock-deep/press/shiftRight_0.wav",
+    "audio/thock-deep/press/shiftRight_1.wav",
+    "audio/thock-deep/press/shiftRight_2.wav",
+    "audio/thock-deep/release/shiftRight_0.wav",
+    "audio/thock-deep/release/shiftRight_1.wav",
+    "audio/thock-deep/press/tab_0.wav",
+    "audio/thock-deep/press/tab_1.wav",
+    "audio/thock-deep/press/tab_2.wav",
+    "audio/thock-deep/release/tab_0.wav",
+    "audio/thock-deep/release/tab_1.wav",
+    "audio/thock-deep/press/caps_0.wav",
+    "audio/thock-deep/press/caps_1.wav",
+    "audio/thock-deep/press/caps_2.wav",
+    "audio/thock-deep/release/caps_0.wav",
+    "audio/thock-deep/release/caps_1.wav",
+    "audio/cream-milk/press/regular_0.wav",
+    "audio/cream-milk/press/regular_1.wav",
+    "audio/cream-milk/press/regular_2.wav",
+    "audio/cream-milk/press/regular_3.wav",
+    "audio/cream-milk/press/regular_4.wav",
+    "audio/cream-milk/press/regular_5.wav",
+    "audio/cream-milk/press/regular_6.wav",
+    "audio/cream-milk/press/regular_7.wav",
+    "audio/cream-milk/release/regular_0.wav",
+    "audio/cream-milk/release/regular_1.wav",
+    "audio/cream-milk/release/regular_2.wav",
+    "audio/cream-milk/release/regular_3.wav",
+    "audio/cream-milk/press/space_0.wav",
+    "audio/cream-milk/press/space_1.wav",
+    "audio/cream-milk/press/space_2.wav",
+    "audio/cream-milk/release/space_0.wav",
+    "audio/cream-milk/release/space_1.wav",
+    "audio/cream-milk/press/enter_0.wav",
+    "audio/cream-milk/press/enter_1.wav",
+    "audio/cream-milk/press/enter_2.wav",
+    "audio/cream-milk/release/enter_0.wav",
+    "audio/cream-milk/release/enter_1.wav",
+    "audio/cream-milk/press/backspace_0.wav",
+    "audio/cream-milk/press/backspace_1.wav",
+    "audio/cream-milk/press/backspace_2.wav",
+    "audio/cream-milk/release/backspace_0.wav",
+    "audio/cream-milk/release/backspace_1.wav",
+    "audio/cream-milk/press/shiftLeft_0.wav",
+    "audio/cream-milk/press/shiftLeft_1.wav",
+    "audio/cream-milk/press/shiftLeft_2.wav",
+    "audio/cream-milk/release/shiftLeft_0.wav",
+    "audio/cream-milk/release/shiftLeft_1.wav",
+    "audio/cream-milk/press/shiftRight_0.wav",
+    "audio/cream-milk/press/shiftRight_1.wav",
+    "audio/cream-milk/press/shiftRight_2.wav",
+    "audio/cream-milk/release/shiftRight_0.wav",
+    "audio/cream-milk/release/shiftRight_1.wav",
+    "audio/cream-milk/press/tab_0.wav",
+    "audio/cream-milk/press/tab_1.wav",
+    "audio/cream-milk/press/tab_2.wav",
+    "audio/cream-milk/release/tab_0.wav",
+    "audio/cream-milk/release/tab_1.wav",
+    "audio/cream-milk/press/caps_0.wav",
+    "audio/cream-milk/press/caps_1.wav",
+    "audio/cream-milk/press/caps_2.wav",
+    "audio/cream-milk/release/caps_0.wav",
+    "audio/cream-milk/release/caps_1.wav",
+    "audio/cream-butter/press/regular_0.wav",
+    "audio/cream-butter/press/regular_1.wav",
+    "audio/cream-butter/press/regular_2.wav",
+    "audio/cream-butter/press/regular_3.wav",
+    "audio/cream-butter/press/regular_4.wav",
+    "audio/cream-butter/press/regular_5.wav",
+    "audio/cream-butter/press/regular_6.wav",
+    "audio/cream-butter/press/regular_7.wav",
+    "audio/cream-butter/release/regular_0.wav",
+    "audio/cream-butter/release/regular_1.wav",
+    "audio/cream-butter/release/regular_2.wav",
+    "audio/cream-butter/release/regular_3.wav",
+    "audio/cream-butter/press/space_0.wav",
+    "audio/cream-butter/press/space_1.wav",
+    "audio/cream-butter/press/space_2.wav",
+    "audio/cream-butter/release/space_0.wav",
+    "audio/cream-butter/release/space_1.wav",
+    "audio/cream-butter/press/enter_0.wav",
+    "audio/cream-butter/press/enter_1.wav",
+    "audio/cream-butter/press/enter_2.wav",
+    "audio/cream-butter/release/enter_0.wav",
+    "audio/cream-butter/release/enter_1.wav",
+    "audio/cream-butter/press/backspace_0.wav",
+    "audio/cream-butter/press/backspace_1.wav",
+    "audio/cream-butter/press/backspace_2.wav",
+    "audio/cream-butter/release/backspace_0.wav",
+    "audio/cream-butter/release/backspace_1.wav",
+    "audio/cream-butter/press/shiftLeft_0.wav",
+    "audio/cream-butter/press/shiftLeft_1.wav",
+    "audio/cream-butter/press/shiftLeft_2.wav",
+    "audio/cream-butter/release/shiftLeft_0.wav",
+    "audio/cream-butter/release/shiftLeft_1.wav",
+    "audio/cream-butter/press/shiftRight_0.wav",
+    "audio/cream-butter/press/shiftRight_1.wav",
+    "audio/cream-butter/press/shiftRight_2.wav",
+    "audio/cream-butter/release/shiftRight_0.wav",
+    "audio/cream-butter/release/shiftRight_1.wav",
+    "audio/cream-butter/press/tab_0.wav",
+    "audio/cream-butter/press/tab_1.wav",
+    "audio/cream-butter/press/tab_2.wav",
+    "audio/cream-butter/release/tab_0.wav",
+    "audio/cream-butter/release/tab_1.wav",
+    "audio/cream-butter/press/caps_0.wav",
+    "audio/cream-butter/press/caps_1.wav",
+    "audio/cream-butter/press/caps_2.wav",
+    "audio/cream-butter/release/caps_0.wav",
+    "audio/cream-butter/release/caps_1.wav",
+    "audio/cream-pudding/press/regular_0.wav",
+    "audio/cream-pudding/press/regular_1.wav",
+    "audio/cream-pudding/press/regular_2.wav",
+    "audio/cream-pudding/press/regular_3.wav",
+    "audio/cream-pudding/press/regular_4.wav",
+    "audio/cream-pudding/press/regular_5.wav",
+    "audio/cream-pudding/press/regular_6.wav",
+    "audio/cream-pudding/press/regular_7.wav",
+    "audio/cream-pudding/release/regular_0.wav",
+    "audio/cream-pudding/release/regular_1.wav",
+    "audio/cream-pudding/release/regular_2.wav",
+    "audio/cream-pudding/release/regular_3.wav",
+    "audio/cream-pudding/press/space_0.wav",
+    "audio/cream-pudding/press/space_1.wav",
+    "audio/cream-pudding/press/space_2.wav",
+    "audio/cream-pudding/release/space_0.wav",
+    "audio/cream-pudding/release/space_1.wav",
+    "audio/cream-pudding/press/enter_0.wav",
+    "audio/cream-pudding/press/enter_1.wav",
+    "audio/cream-pudding/press/enter_2.wav",
+    "audio/cream-pudding/release/enter_0.wav",
+    "audio/cream-pudding/release/enter_1.wav",
+    "audio/cream-pudding/press/backspace_0.wav",
+    "audio/cream-pudding/press/backspace_1.wav",
+    "audio/cream-pudding/press/backspace_2.wav",
+    "audio/cream-pudding/release/backspace_0.wav",
+    "audio/cream-pudding/release/backspace_1.wav",
+    "audio/cream-pudding/press/shiftLeft_0.wav",
+    "audio/cream-pudding/press/shiftLeft_1.wav",
+    "audio/cream-pudding/press/shiftLeft_2.wav",
+    "audio/cream-pudding/release/shiftLeft_0.wav",
+    "audio/cream-pudding/release/shiftLeft_1.wav",
+    "audio/cream-pudding/press/shiftRight_0.wav",
+    "audio/cream-pudding/press/shiftRight_1.wav",
+    "audio/cream-pudding/press/shiftRight_2.wav",
+    "audio/cream-pudding/release/shiftRight_0.wav",
+    "audio/cream-pudding/release/shiftRight_1.wav",
+    "audio/cream-pudding/press/tab_0.wav",
+    "audio/cream-pudding/press/tab_1.wav",
+    "audio/cream-pudding/press/tab_2.wav",
+    "audio/cream-pudding/release/tab_0.wav",
+    "audio/cream-pudding/release/tab_1.wav",
+    "audio/cream-pudding/press/caps_0.wav",
+    "audio/cream-pudding/press/caps_1.wav",
+    "audio/cream-pudding/press/caps_2.wav",
+    "audio/cream-pudding/release/caps_0.wav",
+    "audio/cream-pudding/release/caps_1.wav",
+    "audio/wood-bamboo/press/regular_0.wav",
+    "audio/wood-bamboo/press/regular_1.wav",
+    "audio/wood-bamboo/press/regular_2.wav",
+    "audio/wood-bamboo/press/regular_3.wav",
+    "audio/wood-bamboo/press/regular_4.wav",
+    "audio/wood-bamboo/press/regular_5.wav",
+    "audio/wood-bamboo/press/regular_6.wav",
+    "audio/wood-bamboo/press/regular_7.wav",
+    "audio/wood-bamboo/release/regular_0.wav",
+    "audio/wood-bamboo/release/regular_1.wav",
+    "audio/wood-bamboo/release/regular_2.wav",
+    "audio/wood-bamboo/release/regular_3.wav",
+    "audio/wood-bamboo/press/space_0.wav",
+    "audio/wood-bamboo/press/space_1.wav",
+    "audio/wood-bamboo/press/space_2.wav",
+    "audio/wood-bamboo/release/space_0.wav",
+    "audio/wood-bamboo/release/space_1.wav",
+    "audio/wood-bamboo/press/enter_0.wav",
+    "audio/wood-bamboo/press/enter_1.wav",
+    "audio/wood-bamboo/press/enter_2.wav",
+    "audio/wood-bamboo/release/enter_0.wav",
+    "audio/wood-bamboo/release/enter_1.wav",
+    "audio/wood-bamboo/press/backspace_0.wav",
+    "audio/wood-bamboo/press/backspace_1.wav",
+    "audio/wood-bamboo/press/backspace_2.wav",
+    "audio/wood-bamboo/release/backspace_0.wav",
+    "audio/wood-bamboo/release/backspace_1.wav",
+    "audio/wood-bamboo/press/shiftLeft_0.wav",
+    "audio/wood-bamboo/press/shiftLeft_1.wav",
+    "audio/wood-bamboo/press/shiftLeft_2.wav",
+    "audio/wood-bamboo/release/shiftLeft_0.wav",
+    "audio/wood-bamboo/release/shiftLeft_1.wav",
+    "audio/wood-bamboo/press/shiftRight_0.wav",
+    "audio/wood-bamboo/press/shiftRight_1.wav",
+    "audio/wood-bamboo/press/shiftRight_2.wav",
+    "audio/wood-bamboo/release/shiftRight_0.wav",
+    "audio/wood-bamboo/release/shiftRight_1.wav",
+    "audio/wood-bamboo/press/tab_0.wav",
+    "audio/wood-bamboo/press/tab_1.wav",
+    "audio/wood-bamboo/press/tab_2.wav",
+    "audio/wood-bamboo/release/tab_0.wav",
+    "audio/wood-bamboo/release/tab_1.wav",
+    "audio/wood-bamboo/press/caps_0.wav",
+    "audio/wood-bamboo/press/caps_1.wav",
+    "audio/wood-bamboo/press/caps_2.wav",
+    "audio/wood-bamboo/release/caps_0.wav",
+    "audio/wood-bamboo/release/caps_1.wav",
+    "audio/wood-walnut/press/regular_0.wav",
+    "audio/wood-walnut/press/regular_1.wav",
+    "audio/wood-walnut/press/regular_2.wav",
+    "audio/wood-walnut/press/regular_3.wav",
+    "audio/wood-walnut/press/regular_4.wav",
+    "audio/wood-walnut/press/regular_5.wav",
+    "audio/wood-walnut/press/regular_6.wav",
+    "audio/wood-walnut/press/regular_7.wav",
+    "audio/wood-walnut/release/regular_0.wav",
+    "audio/wood-walnut/release/regular_1.wav",
+    "audio/wood-walnut/release/regular_2.wav",
+    "audio/wood-walnut/release/regular_3.wav",
+    "audio/wood-walnut/press/space_0.wav",
+    "audio/wood-walnut/press/space_1.wav",
+    "audio/wood-walnut/press/space_2.wav",
+    "audio/wood-walnut/release/space_0.wav",
+    "audio/wood-walnut/release/space_1.wav",
+    "audio/wood-walnut/press/enter_0.wav",
+    "audio/wood-walnut/press/enter_1.wav",
+    "audio/wood-walnut/press/enter_2.wav",
+    "audio/wood-walnut/release/enter_0.wav",
+    "audio/wood-walnut/release/enter_1.wav",
+    "audio/wood-walnut/press/backspace_0.wav",
+    "audio/wood-walnut/press/backspace_1.wav",
+    "audio/wood-walnut/press/backspace_2.wav",
+    "audio/wood-walnut/release/backspace_0.wav",
+    "audio/wood-walnut/release/backspace_1.wav",
+    "audio/wood-walnut/press/shiftLeft_0.wav",
+    "audio/wood-walnut/press/shiftLeft_1.wav",
+    "audio/wood-walnut/press/shiftLeft_2.wav",
+    "audio/wood-walnut/release/shiftLeft_0.wav",
+    "audio/wood-walnut/release/shiftLeft_1.wav",
+    "audio/wood-walnut/press/shiftRight_0.wav",
+    "audio/wood-walnut/press/shiftRight_1.wav",
+    "audio/wood-walnut/press/shiftRight_2.wav",
+    "audio/wood-walnut/release/shiftRight_0.wav",
+    "audio/wood-walnut/release/shiftRight_1.wav",
+    "audio/wood-walnut/press/tab_0.wav",
+    "audio/wood-walnut/press/tab_1.wav",
+    "audio/wood-walnut/press/tab_2.wav",
+    "audio/wood-walnut/release/tab_0.wav",
+    "audio/wood-walnut/release/tab_1.wav",
+    "audio/wood-walnut/press/caps_0.wav",
+    "audio/wood-walnut/press/caps_1.wav",
+    "audio/wood-walnut/press/caps_2.wav",
+    "audio/wood-walnut/release/caps_0.wav",
+    "audio/wood-walnut/release/caps_1.wav",
+    "audio/wood-ebony/press/regular_0.wav",
+    "audio/wood-ebony/press/regular_1.wav",
+    "audio/wood-ebony/press/regular_2.wav",
+    "audio/wood-ebony/press/regular_3.wav",
+    "audio/wood-ebony/press/regular_4.wav",
+    "audio/wood-ebony/press/regular_5.wav",
+    "audio/wood-ebony/press/regular_6.wav",
+    "audio/wood-ebony/press/regular_7.wav",
+    "audio/wood-ebony/release/regular_0.wav",
+    "audio/wood-ebony/release/regular_1.wav",
+    "audio/wood-ebony/release/regular_2.wav",
+    "audio/wood-ebony/release/regular_3.wav",
+    "audio/wood-ebony/press/space_0.wav",
+    "audio/wood-ebony/press/space_1.wav",
+    "audio/wood-ebony/press/space_2.wav",
+    "audio/wood-ebony/release/space_0.wav",
+    "audio/wood-ebony/release/space_1.wav",
+    "audio/wood-ebony/press/enter_0.wav",
+    "audio/wood-ebony/press/enter_1.wav",
+    "audio/wood-ebony/press/enter_2.wav",
+    "audio/wood-ebony/release/enter_0.wav",
+    "audio/wood-ebony/release/enter_1.wav",
+    "audio/wood-ebony/press/backspace_0.wav",
+    "audio/wood-ebony/press/backspace_1.wav",
+    "audio/wood-ebony/press/backspace_2.wav",
+    "audio/wood-ebony/release/backspace_0.wav",
+    "audio/wood-ebony/release/backspace_1.wav",
+    "audio/wood-ebony/press/shiftLeft_0.wav",
+    "audio/wood-ebony/press/shiftLeft_1.wav",
+    "audio/wood-ebony/press/shiftLeft_2.wav",
+    "audio/wood-ebony/release/shiftLeft_0.wav",
+    "audio/wood-ebony/release/shiftLeft_1.wav",
+    "audio/wood-ebony/press/shiftRight_0.wav",
+    "audio/wood-ebony/press/shiftRight_1.wav",
+    "audio/wood-ebony/press/shiftRight_2.wav",
+    "audio/wood-ebony/release/shiftRight_0.wav",
+    "audio/wood-ebony/release/shiftRight_1.wav",
+    "audio/wood-ebony/press/tab_0.wav",
+    "audio/wood-ebony/press/tab_1.wav",
+    "audio/wood-ebony/press/tab_2.wav",
+    "audio/wood-ebony/release/tab_0.wav",
+    "audio/wood-ebony/release/tab_1.wav",
+    "audio/wood-ebony/press/caps_0.wav",
+    "audio/wood-ebony/press/caps_1.wav",
+    "audio/wood-ebony/press/caps_2.wav",
+    "audio/wood-ebony/release/caps_0.wav",
+    "audio/wood-ebony/release/caps_1.wav",
+    "audio/soft-velvet/press/regular_0.wav",
+    "audio/soft-velvet/press/regular_1.wav",
+    "audio/soft-velvet/press/regular_2.wav",
+    "audio/soft-velvet/press/regular_3.wav",
+    "audio/soft-velvet/press/regular_4.wav",
+    "audio/soft-velvet/press/regular_5.wav",
+    "audio/soft-velvet/press/regular_6.wav",
+    "audio/soft-velvet/press/regular_7.wav",
+    "audio/soft-velvet/release/regular_0.wav",
+    "audio/soft-velvet/release/regular_1.wav",
+    "audio/soft-velvet/release/regular_2.wav",
+    "audio/soft-velvet/release/regular_3.wav",
+    "audio/soft-velvet/press/space_0.wav",
+    "audio/soft-velvet/press/space_1.wav",
+    "audio/soft-velvet/press/space_2.wav",
+    "audio/soft-velvet/release/space_0.wav",
+    "audio/soft-velvet/release/space_1.wav",
+    "audio/soft-velvet/press/enter_0.wav",
+    "audio/soft-velvet/press/enter_1.wav",
+    "audio/soft-velvet/press/enter_2.wav",
+    "audio/soft-velvet/release/enter_0.wav",
+    "audio/soft-velvet/release/enter_1.wav",
+    "audio/soft-velvet/press/backspace_0.wav",
+    "audio/soft-velvet/press/backspace_1.wav",
+    "audio/soft-velvet/press/backspace_2.wav",
+    "audio/soft-velvet/release/backspace_0.wav",
+    "audio/soft-velvet/release/backspace_1.wav",
+    "audio/soft-velvet/press/shiftLeft_0.wav",
+    "audio/soft-velvet/press/shiftLeft_1.wav",
+    "audio/soft-velvet/press/shiftLeft_2.wav",
+    "audio/soft-velvet/release/shiftLeft_0.wav",
+    "audio/soft-velvet/release/shiftLeft_1.wav",
+    "audio/soft-velvet/press/shiftRight_0.wav",
+    "audio/soft-velvet/press/shiftRight_1.wav",
+    "audio/soft-velvet/press/shiftRight_2.wav",
+    "audio/soft-velvet/release/shiftRight_0.wav",
+    "audio/soft-velvet/release/shiftRight_1.wav",
+    "audio/soft-velvet/press/tab_0.wav",
+    "audio/soft-velvet/press/tab_1.wav",
+    "audio/soft-velvet/press/tab_2.wav",
+    "audio/soft-velvet/release/tab_0.wav",
+    "audio/soft-velvet/release/tab_1.wav",
+    "audio/soft-velvet/press/caps_0.wav",
+    "audio/soft-velvet/press/caps_1.wav",
+    "audio/soft-velvet/press/caps_2.wav",
+    "audio/soft-velvet/release/caps_0.wav",
+    "audio/soft-velvet/release/caps_1.wav",
+    "audio/soft-cushion/press/regular_0.wav",
+    "audio/soft-cushion/press/regular_1.wav",
+    "audio/soft-cushion/press/regular_2.wav",
+    "audio/soft-cushion/press/regular_3.wav",
+    "audio/soft-cushion/press/regular_4.wav",
+    "audio/soft-cushion/press/regular_5.wav",
+    "audio/soft-cushion/press/regular_6.wav",
+    "audio/soft-cushion/press/regular_7.wav",
+    "audio/soft-cushion/release/regular_0.wav",
+    "audio/soft-cushion/release/regular_1.wav",
+    "audio/soft-cushion/release/regular_2.wav",
+    "audio/soft-cushion/release/regular_3.wav",
+    "audio/soft-cushion/press/space_0.wav",
+    "audio/soft-cushion/press/space_1.wav",
+    "audio/soft-cushion/press/space_2.wav",
+    "audio/soft-cushion/release/space_0.wav",
+    "audio/soft-cushion/release/space_1.wav",
+    "audio/soft-cushion/press/enter_0.wav",
+    "audio/soft-cushion/press/enter_1.wav",
+    "audio/soft-cushion/press/enter_2.wav",
+    "audio/soft-cushion/release/enter_0.wav",
+    "audio/soft-cushion/release/enter_1.wav",
+    "audio/soft-cushion/press/backspace_0.wav",
+    "audio/soft-cushion/press/backspace_1.wav",
+    "audio/soft-cushion/press/backspace_2.wav",
+    "audio/soft-cushion/release/backspace_0.wav",
+    "audio/soft-cushion/release/backspace_1.wav",
+    "audio/soft-cushion/press/shiftLeft_0.wav",
+    "audio/soft-cushion/press/shiftLeft_1.wav",
+    "audio/soft-cushion/press/shiftLeft_2.wav",
+    "audio/soft-cushion/release/shiftLeft_0.wav",
+    "audio/soft-cushion/release/shiftLeft_1.wav",
+    "audio/soft-cushion/press/shiftRight_0.wav",
+    "audio/soft-cushion/press/shiftRight_1.wav",
+    "audio/soft-cushion/press/shiftRight_2.wav",
+    "audio/soft-cushion/release/shiftRight_0.wav",
+    "audio/soft-cushion/release/shiftRight_1.wav",
+    "audio/soft-cushion/press/tab_0.wav",
+    "audio/soft-cushion/press/tab_1.wav",
+    "audio/soft-cushion/press/tab_2.wav",
+    "audio/soft-cushion/release/tab_0.wav",
+    "audio/soft-cushion/release/tab_1.wav",
+    "audio/soft-cushion/press/caps_0.wav",
+    "audio/soft-cushion/press/caps_1.wav",
+    "audio/soft-cushion/press/caps_2.wav",
+    "audio/soft-cushion/release/caps_0.wav",
+    "audio/soft-cushion/release/caps_1.wav",
+    "audio/soft-light/press/regular_0.wav",
+    "audio/soft-light/press/regular_1.wav",
+    "audio/soft-light/press/regular_2.wav",
+    "audio/soft-light/press/regular_3.wav",
+    "audio/soft-light/press/regular_4.wav",
+    "audio/soft-light/press/regular_5.wav",
+    "audio/soft-light/press/regular_6.wav",
+    "audio/soft-light/press/regular_7.wav",
+    "audio/soft-light/release/regular_0.wav",
+    "audio/soft-light/release/regular_1.wav",
+    "audio/soft-light/release/regular_2.wav",
+    "audio/soft-light/release/regular_3.wav",
+    "audio/soft-light/press/space_0.wav",
+    "audio/soft-light/press/space_1.wav",
+    "audio/soft-light/press/space_2.wav",
+    "audio/soft-light/release/space_0.wav",
+    "audio/soft-light/release/space_1.wav",
+    "audio/soft-light/press/enter_0.wav",
+    "audio/soft-light/press/enter_1.wav",
+    "audio/soft-light/press/enter_2.wav",
+    "audio/soft-light/release/enter_0.wav",
+    "audio/soft-light/release/enter_1.wav",
+    "audio/soft-light/press/backspace_0.wav",
+    "audio/soft-light/press/backspace_1.wav",
+    "audio/soft-light/press/backspace_2.wav",
+    "audio/soft-light/release/backspace_0.wav",
+    "audio/soft-light/release/backspace_1.wav",
+    "audio/soft-light/press/shiftLeft_0.wav",
+    "audio/soft-light/press/shiftLeft_1.wav",
+    "audio/soft-light/press/shiftLeft_2.wav",
+    "audio/soft-light/release/shiftLeft_0.wav",
+    "audio/soft-light/release/shiftLeft_1.wav",
+    "audio/soft-light/press/shiftRight_0.wav",
+    "audio/soft-light/press/shiftRight_1.wav",
+    "audio/soft-light/press/shiftRight_2.wav",
+    "audio/soft-light/release/shiftRight_0.wav",
+    "audio/soft-light/release/shiftRight_1.wav",
+    "audio/soft-light/press/tab_0.wav",
+    "audio/soft-light/press/tab_1.wav",
+    "audio/soft-light/press/tab_2.wav",
+    "audio/soft-light/release/tab_0.wav",
+    "audio/soft-light/release/tab_1.wav",
+    "audio/soft-light/press/caps_0.wav",
+    "audio/soft-light/press/caps_1.wav",
+    "audio/soft-light/press/caps_2.wav",
+    "audio/soft-light/release/caps_0.wav",
+    "audio/soft-light/release/caps_1.wav",
+    "audio/holypanda/press/GENERIC_R0.mp3",
+    "audio/holypanda/press/GENERIC_R1.mp3",
+    "audio/holypanda/press/GENERIC_R2.mp3",
+    "audio/holypanda/press/GENERIC_R3.mp3",
+    "audio/holypanda/press/GENERIC_R4.mp3",
+    "audio/holypanda/release/GENERIC.mp3",
+    "audio/holypanda/press/SPACE.mp3",
+    "audio/holypanda/release/SPACE.mp3",
+    "audio/holypanda/press/ENTER.mp3",
+    "audio/holypanda/release/ENTER.mp3",
+    "audio/holypanda/press/BACKSPACE.mp3",
+    "audio/holypanda/release/BACKSPACE.mp3",
+    "audio/mxbrown/press/GENERIC_R0.mp3",
+    "audio/mxbrown/press/GENERIC_R1.mp3",
+    "audio/mxbrown/press/GENERIC_R2.mp3",
+    "audio/mxbrown/press/GENERIC_R3.mp3",
+    "audio/mxbrown/press/GENERIC_R4.mp3",
+    "audio/mxbrown/release/GENERIC.mp3",
+    "audio/mxbrown/press/SPACE.mp3",
+    "audio/mxbrown/release/SPACE.mp3",
+    "audio/mxbrown/press/ENTER.mp3",
+    "audio/mxbrown/release/ENTER.mp3",
+    "audio/mxbrown/press/BACKSPACE.mp3",
+    "audio/mxbrown/release/BACKSPACE.mp3",
+    "audio/topre/press/GENERIC_R0.mp3",
+    "audio/topre/press/GENERIC_R1.mp3",
+    "audio/topre/press/GENERIC_R2.mp3",
+    "audio/topre/press/GENERIC_R3.mp3",
+    "audio/topre/press/GENERIC_R4.mp3",
+    "audio/topre/release/GENERIC.mp3",
+    "audio/topre/press/SPACE.mp3",
+    "audio/topre/release/SPACE.mp3",
+    "audio/topre/press/ENTER.mp3",
+    "audio/topre/release/ENTER.mp3",
+    "audio/topre/press/BACKSPACE.mp3",
+    "audio/topre/release/BACKSPACE.mp3",
+    "audio/boxnavy/press/GENERIC_R0.mp3",
+    "audio/boxnavy/press/GENERIC_R1.mp3",
+    "audio/boxnavy/press/GENERIC_R2.mp3",
+    "audio/boxnavy/press/GENERIC_R3.mp3",
+    "audio/boxnavy/press/GENERIC_R4.mp3",
+    "audio/boxnavy/release/GENERIC.mp3",
+    "audio/boxnavy/press/SPACE.mp3",
+    "audio/boxnavy/release/SPACE.mp3",
+    "audio/boxnavy/press/ENTER.mp3",
+    "audio/boxnavy/release/ENTER.mp3",
+    "audio/boxnavy/press/BACKSPACE.mp3",
+    "audio/boxnavy/release/BACKSPACE.mp3",
+    "audio/bluealps/press/GENERIC_R0.mp3",
+    "audio/bluealps/press/GENERIC_R1.mp3",
+    "audio/bluealps/press/GENERIC_R2.mp3",
+    "audio/bluealps/press/GENERIC_R3.mp3",
+    "audio/bluealps/press/GENERIC_R4.mp3",
+    "audio/bluealps/release/GENERIC.mp3",
+    "audio/bluealps/press/SPACE.mp3",
+    "audio/bluealps/release/SPACE.mp3",
+    "audio/bluealps/press/ENTER.mp3",
+    "audio/bluealps/release/ENTER.mp3",
+    "audio/bluealps/press/BACKSPACE.mp3",
+    "audio/bluealps/release/BACKSPACE.mp3",
+    "audio/buckling/press/GENERIC_R0.mp3",
+    "audio/buckling/press/GENERIC_R1.mp3",
+    "audio/buckling/press/GENERIC_R2.mp3",
+    "audio/buckling/press/GENERIC_R3.mp3",
+    "audio/buckling/press/GENERIC_R4.mp3",
+    "audio/buckling/release/GENERIC.mp3",
+    "audio/buckling/press/SPACE.mp3",
+    "audio/buckling/release/SPACE.mp3",
+    "audio/buckling/press/ENTER.mp3",
+    "audio/buckling/release/ENTER.mp3",
+    "audio/buckling/press/BACKSPACE.mp3",
+    "audio/buckling/release/BACKSPACE.mp3"
+  ]
+}

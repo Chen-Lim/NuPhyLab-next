@@ -24,6 +24,12 @@ If the keyboard needs a firmware update, follow the NuPhyIO reminder, close the 
 
 See [keyboard compatibility](docs/KEYBOARD_COMPATIBILITY.md) for firmware requirements and validation coverage. AIR65 V3 has no physical function row and does not offer automatic F1–F12 takeover.
 
+## Typing Sounds
+
+Open **Typing Sounds** below **Lighting Games** in the sidebar. Choose from 18 sounds: three each in Marbly, Creamy, Woody, Soft, Tactile and Retro. Preview and save favorites, and adjust master volume, release strength, natural variation, and separate levels for Space, Return, Backspace, left/right Shift, Tab and Caps Lock.
+
+The feature starts off. Enable it to play sounds while typing in other apps. All sounds are bundled and need no download or API. Previews need no Input Monitoring permission; typing playback does. Typing Sounds does not record text or upload input. [Usage and sound credits](docs/TYPING_SOUNDS.md)
+
 ## AI Assistant
 
 Enable Codex mode in AI Assistant to use the default command keys:
@@ -52,7 +58,7 @@ For spoken questions, enable **Hold to speak** and allow Microphone and Speech R
 
 Selected text, questions and any enabled images needed for the selected action are sent to your configured model service. API keys stay in the local Keychain. Selection and voice are disabled by default for new users.
 
-[Full setup and usage](docs/SELECTION.md) · [Models, images and permissions](docs/SELECTION_R2.md) · [Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [What's new in 1.2.42](docs/RELEASE_1.2.42.md)
+[Full setup and usage](docs/SELECTION.md) · [Models, images and permissions](docs/SELECTION_R2.md) · [Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [What's new in 1.2.43](docs/RELEASE_1.2.43.md)
 
 ## Updates and compatibility
 
@@ -80,4 +86,3 @@ Before `npm start`, quit the installed NuPhy Lab app and other keyboard control 
 The native build downloads a pinned, checksum-verified Sparkle framework. Run `npm run fetch-node` to fetch the standalone runtime, then `npm run package`. Follow the [release workflow](docs/RELEASING.en.md) for distribution signing, notarization and update verification.
 
 [Documentation index](docs/README.md) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Report an issue](https://github.com/bohu8264/NuPhyLab-next/issues)
-

@@ -43,6 +43,7 @@ await mkdir(path.join(contents,'Frameworks'),{recursive:true});
 await writeFile(path.join(resources,'update-metadata.json'),JSON.stringify({version,releaseNotesVersion:updateNotes.version,releaseNotesSHA256:updateNotes.sha256},null,2)+'\n');
 // ditto preserves Sparkle's versioned symlinks and executable permissions.
 execFileSync('/usr/bin/ditto',[path.join(root,'vendor/sparkle/Sparkle.framework'),path.join(contents,'Frameworks/Sparkle.framework')]);
+await cp(path.join(root,"assets/typing-sounds"),path.join(resources,"typing-sounds"),{recursive:true});
 // "hooks" carries the Claude Code hook scripts the app installs on request.
 // Design references and QA screenshots stay in the source checkout; the app
 // does not load docs at runtime.
@@ -111,7 +112,7 @@ await writeFile(
 <key>NSSpeechRecognitionUsageDescription</key><string>将你按住时说出的问题在本机转成文字，文字仅在提交框选问题后发送至你配置的模型服务。</string>
 <key>NSScreenCaptureUsageDescription</key><string>仅在主动框选时截取选定区域，供本机文字识别；提交后按你的设置发送文字或图片至模型服务。</string>
 <key>NSPrincipalClass</key><string>NSApplication</string>
-<key>NSInputMonitoringUsageDescription</key><string>仅在启用按键触发或全局快捷键后监听所选按键，保留正常输入。</string>
+<key>NSInputMonitoringUsageDescription</key><string>仅在启用按键触发、全局快捷键或模拟声浪后监听按键，保留正常输入，不记录输入内容。</string>
 </dict></plist>`,
 );
 // Record how this bundle was signed. An ad-hoc signature has no stable code

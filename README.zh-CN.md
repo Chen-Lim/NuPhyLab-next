@@ -24,6 +24,12 @@ NuPhy Lab 是适用于 macOS 的 **NuPhy AIR65 / AIR75 / AIR100 V3、NODE75 / NO
 
 兼容固件、型号和验证范围请见[键盘兼容性](docs/KEYBOARD_COMPATIBILITY.md)。AIR65 V3 没有实体 F 区，不提供 F1–F12 自动接管。
 
+## 模拟声浪
+
+在侧栏“灯光游戏”下方打开 **模拟声浪**。麻将、奶油、木质、轻柔、段落、复古六类各三款，共 18 款，可试听和收藏。总音量、回弹、自然变化，以及空格、回车、退格、左右 Shift、Tab、Caps Lock 的音量均可调节。
+
+首次默认关闭，开启后在其他应用中打字也会播放。声音随应用提供，不需要下载或 API；试听不需要输入监控，打字播放需要这项权限。声浪不记录文字或上传输入。[使用说明与声音来源](docs/TYPING_SOUNDS.md)
+
 ## AI 助手
 
 在 AI 助手中开启 Codex 模式后，默认命令键如下：
@@ -52,7 +58,7 @@ F8、F9 需要当前存在审批请求；F12 需要聚焦聊天输入框。命�
 
 选区文字、问题，以及启用后按操作需要附带的图片会发送到自己配置的模型服务。API Key 保存在本机钥匙串。新用户默认关闭框选和语音，可以按需开启。
 
-[完整使用说明](docs/SELECTION.md) · [模型、图片与权限](docs/SELECTION_R2.md) · [界面与翻译语言](docs/SELECTION_LANGUAGES.md) · [1.2.42 更新说明](docs/RELEASE_1.2.42.md)
+[完整使用说明](docs/SELECTION.md) · [模型、图片与权限](docs/SELECTION_R2.md) · [界面与翻译语言](docs/SELECTION_LANGUAGES.md) · [1.2.43 更新说明](docs/RELEASE_1.2.43.md)
 
 ## 更新与兼容
 
@@ -80,4 +86,3 @@ npm start
 原生构建会下载固定版本的 Sparkle，并验证 SHA-256。运行 `npm run fetch-node` 获取独立运行时，再使用 `npm run package` 打包。对外发布请遵循[发布流程](docs/RELEASING.md)，包括签名、公证、安装包及应用内更新验证。
 
 [文档目录](docs/README.md) · [第三方声明](THIRD_PARTY_NOTICES.md) · [问题反馈](https://github.com/bohu8264/NuPhyLab-next/issues)
-

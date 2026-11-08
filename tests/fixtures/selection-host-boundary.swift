@@ -8,6 +8,7 @@ enum AppLanguage {case zh,en}
  var showSettings:(()->Void)? {get set}
  var requestRelaunch:(()->Bool)? {get set}
  var recordingChanged:((Bool)->Void)? {get set}
+ var voiceActivityChanged:((Bool)->Void)? {get set}
  var isBusy:Bool {get}
  func updateLanguage(_ language:AppLanguage)
  func updateReservedKeys(_ codes:Set<UInt32>)
@@ -22,10 +23,22 @@ enum AppLanguage {case zh,en}
  static func make(directory:URL)->any SelectionFeature {SelectionBoundaryFixture()}
 }
 @MainActor private final class SelectionBoundaryFixture:SelectionFeature {
- var showSettings:(()->Void)?;var requestRelaunch:(()->Bool)?;var recordingChanged:((Bool)->Void)?;var isBusy=false
+ var showSettings:(()->Void)?;var requestRelaunch:(()->Bool)?;var recordingChanged:((Bool)->Void)?;var voiceActivityChanged:((Bool)->Void)?;var isBusy=false
  func updateLanguage(_ language:AppLanguage){}
  func updateReservedKeys(_ codes:Set<UInt32>){}
  func handle(_ body:[String:Any],reply:@escaping(Any?,String?)->Void){reply(nil,"Selection boundary fixture")}
  func consumeLocal(_ event:NSEvent)->Bool{false}
  func cancel(){};func cancelShortcutRecording(){};func refreshAuthorization(){};func shutdown(){}
+}
+
+// Typing audio is isolated from F-key/updater unit harnesses.
+@MainActor final class TypingSoundController {
+ init(directory:URL) {}
+ func setPaused(_ source:String,active:Bool) {}
+ func handle(_ body:[String:Any],reply:@escaping(Any?,String?)->Void) { reply(nil,"Typing boundary fixture") }
+ func shutdown() {}
+}
+
+enum TypingDictationCompletion {
+ static func confirmed(_ result:[String:Any]?) -> Bool { result?["released"] as? Bool == true && ["idle","finishing"].contains(result?["observedState"] as? String ?? "unknown") }
 }
