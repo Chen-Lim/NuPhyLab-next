@@ -6,33 +6,31 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>NuPhy Lab</title>
         <item>
-            <title>1.2.42</title>
-            <pubDate>Fri, 06 Nov 2026 15:26:08 +0800</pubDate>
+            <title>1.2.43</title>
+            <pubDate>Sun, 08 Nov 2026 10:30:59 +0800</pubDate>
             <link>https://github.com/bohu8264/NuPhyLab-next</link>
-            <sparkle:version>1.2.42</sparkle:version>
-            <sparkle:shortVersionString>1.2.42</sparkle:shortVersionString>
+            <sparkle:version>1.2.43</sparkle:version>
+            <sparkle:shortVersionString>1.2.43</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.5</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
             <description sparkle:format="plain-text"><![CDATA[NUPHY-RELEASE-NOTES 1
-version:1.2.42
+version:1.2.43
 [zh-CN]
-NuPhy Lab 1.2.42
+NuPhy Lab 1.2.43
 
-• 修复仅框选、未说话时，语音识别的无语音结果阻止翻译、总结与解释的问题。
-• 界面语言与本机语音识别语言独立；切换界面语言不再中止正在进行的语音操作。
-• 语言选择中的“简体中文”始终保留中文名称。
+• 新增模拟声浪：麻将、奶油、木质、轻柔、段落和复古六类，每类三款声音。
+• 支持后台打字播放、独立音量、自然变化与大键声音调节；仅在开启后使用输入监听。
 [en]
-NuPhy Lab 1.2.42
+NuPhy Lab 1.2.43
 
-• Fix silent selections being blocked by a no-speech recognition result when translating, summarizing or explaining.
-• Keep the interface language independent from local speech recognition; changing the interface language no longer cancels an active recording.
-• Keep the Simplified Chinese option labeled in Chinese in language menus.
+• Add Typing Sounds with three sounds each in six families: Marbly, Creamy, Woody, Soft, Tactile and Retro.
+• Play sounds while typing in other apps, with volume, natural variation and large-key controls; input monitoring is used only while enabled.
 ]]></description>
-            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.42/NuPhyLab-1.2.42-macOS-AppleSilicon.dmg" length="43855467" type="application/octet-stream" sparkle:edSignature="7A+rCliU+VkZE2Bz8q1lM9wHOslOx0NY99Qt2G4Rbx0V8AMcpG6MV4tdq1jmhWqZ3mLLyW78MvBrriXpA1qbAw=="/>
+            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.43/NuPhyLab-1.2.43-macOS-AppleSilicon.dmg" length="48545947" type="application/octet-stream" sparkle:edSignature="ZXHPhYoiZO7b5NMmr/bNd/30tXD9rDF3TkNT3HlY9HMs43YTwdbXlQ1fNW8wcPg8o49jdhhgJCYLBKQ/Sv5sBQ=="/>
         </item>
     </channel>
 </rss>
 <!-- sparkle-signatures:
-edSignature: Y9ROExZ/wqOOF3guO6DJlD+oltRHlwkLS7d2I9BMpW9U6wr6s6HbmaVSMDIqe0iEkvTGdpY8FamrZ5HLvbsQAA==
-length: 2013
+edSignature: iv1+Ui4WFy1GLy1Qzvlfv7y0v6MmrlJIBWSLJq0nH3iQQAUMfmJFDVQCCcxQL3DxzCAl8YoShSpxzh6n5ufLBA==
+length: 1860
 -->
