@@ -30,6 +30,14 @@ Open **Typing Sounds** below **Lighting Games** in the sidebar. Choose from 18 s
 
 The feature starts off. Enable it to play sounds while typing in other apps. All sounds are bundled and need no download or API. Previews need no Input Monitoring permission; typing playback does. Typing Sounds does not record text or upload input. [Usage and sound credits](docs/TYPING_SOUNDS.md)
 
+## Performance
+
+Open **Labs → Performance** to turn your computer keyboard into an instrument: six sounds, eight drum pads, a 16-step sequencer, and eight assignable clip slots. The library includes 18 original presets and 36 clips. Choose a slot before choosing its clip, then make the arrangement your own.
+
+Recordings and edits autosave locally. Duplicate, rename or restore deleted works, and export projects or WAV audio. Sounds are bundled; no API or microphone permission is needed. Performance keys work only while this window is in front. Switching apps releases held notes; minimizing or sleeping stops playback. Loops and previews may continue after an ordinary app switch; press Esc or Stop to end them. [Usage, sound credits and limitations](docs/PERFORMANCE.md)
+
+If a work is deleted or restored while a save is pending, saving from the old page pauses. Export the current project as a backup before using **Window → Recover Performance Page** to reopen the saved work.
+
 ## AI Assistant
 
 Enable Codex mode in AI Assistant to use the default command keys:
@@ -58,7 +66,7 @@ For spoken questions, enable **Hold to speak** and allow Microphone and Speech R
 
 Selected text, questions and any enabled images needed for the selected action are sent to your configured model service. API keys stay in the local Keychain. Selection and voice are disabled by default for new users.
 
-[Full setup and usage](docs/SELECTION.md) · [Models, images and permissions](docs/SELECTION_R2.md) · [Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [What's new in 1.2.43](docs/RELEASE_1.2.43.md)
+[Full setup and usage](docs/SELECTION.md) · [Models, images and permissions](docs/SELECTION_R2.md) · [Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [What's new in 1.2.44](docs/RELEASE_1.2.44.md)
 
 ## Updates and compatibility
 

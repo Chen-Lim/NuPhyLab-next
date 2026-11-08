@@ -68,6 +68,7 @@ export async function appDraftFixture(options={}){
     if(name==='../../shared/connection-display.mjs')return{deriveConnectionDisplay:()=>({stateId:'connected'})};
     if(name==='./connection-copy-v7')return{presentConnectionDisplay:v=>v,connectionCopy:v=>v.zh,connectionHeader:()=>'',connectionSidebar:()=>''};
     if(name==='./primitives')return{Button:component('Button'),Modal:component('Modal'),run:promise=>{void promise.catch(()=>{});}};
+    if(name==='./music/MusicLab')return {MusicLab:component('MusicLab')};
     const child=name.match(/^\.\/(FeedbackToast|AudioPanel|AudioPendingNotice|NativeLighting|Studio|Library|Codex|ClaudeCode|Device|Settings|SelectionLab|TypingSounds|StartupGuide)$/)?.[1];
     if(child)return{[child]:component(child)};
     throw Error('Unexpected App import '+name);

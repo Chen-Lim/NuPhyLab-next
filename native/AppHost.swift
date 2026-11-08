@@ -1,3 +1,4 @@
+import UniformTypeIdentifiers
 import AppKit
 import WebKit
 import Carbon
@@ -647,14 +648,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"audioControl")
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"selectionLab")
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"typingSounds")
+        config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"musicFile")
+        config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"musicControl")
         _ = typingSounds
-        selectionLab.voiceActivityChanged = { [weak self] active in self?.typingSounds.setPaused("selectionVoice", active:active) }
+        selectionLab.voiceActivityChanged = { [weak self] active in self?.typingSounds.setPaused("selectionVoice", active:active);self?.setMusicCapture("selectionVoice",active:active) }
         selectionLab.updateLanguage(english ? .en:.zh)
         selectionLab.showSettings = { [weak self] in self?.show(); self?.web.evaluateJavaScript("window.dispatchEvent(new CustomEvent('nuphylab:navigate',{detail:'ai'}))", completionHandler:nil) }
         selectionLab.recordingChanged = { [weak self] active in self?.selectionShortcutRecording=active;self?.typingSounds.setPaused("shortcut",active:active);self?.refreshHotkeys() }
         selectionLab.requestRelaunch = { [weak self] in
             guard let self, !self.terminating, !self.preparingUpdate, !self.driverOpenInFlight,
-                  !self.capturingKey, self.keyGestureGate.activeCount == 0, !self.selectionLab.isBusy else { return false }
+                  !self.capturingKey, !self.musicSaveFailed, !self.musicActive, !self.musicExportActive, !self.musicFlushInProgress, self.keyGestureGate.activeCount == 0, !self.selectionLab.isBusy else { return false }
             self.permissionRelaunchPending = true
             self.appendWorkerLog(Data("Completing selection permission setup by a clean app relaunch.\n".utf8))
             NSApp.terminate(nil); return true
@@ -736,6 +739,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         let windowItem=NSMenuItem();menu.addItem(windowItem)
         let windowMenu=NSMenu(title:self.T("窗口"));windowItem.submenu=windowMenu
         let resetItem=windowMenu.addItem(withTitle:self.T("恢复默认窗口大小"),action:#selector(resetWindowSize),keyEquivalent:"0");resetItem.target=self
+        let musicRecoveryItem=windowMenu.addItem(withTitle:english ? "Recover Performance Page…" : "恢复演奏页面…",action:#selector(recoverMusicPage),keyEquivalent:"");musicRecoveryItem.target=self
         NSApp.mainMenu=menu;NSApp.windowsMenu=windowMenu
         let tray=NSMenu();tray.addItem(withTitle:self.T("打开 NuPhy Lab"),action:#selector(show),keyEquivalent:"")
         tray.addItem(withTitle:self.T("暂停 / 继续"),action:#selector(togglePause),keyEquivalent:"")
@@ -869,7 +873,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func ready(_ address:String){
         guard !terminating,worker?.isRunning==true,let url=URL(string:address) else{return};baseURL=url
         if let bytes=try? Data(contentsOf:dataDirectory.appendingPathComponent("runtime.json")),let data=(try? JSONSerialization.jsonObject(with:bytes)) as? [String:Any]{apiToken=data["token"] as? String ?? ""}
-        web.load(URLRequest(url:url))
+        if musicEverUsed,web.url != nil {
+            // A worker restart must not replace the document holding unsaved
+            // recordings. The preferred port normally keeps the same origin.
+            if web.url?.host==url.host,web.url?.port==url.port,!musicDocumentLost {
+                let encoded=String(data:(try? JSONSerialization.data(withJSONObject:["token":apiToken])) ?? Data("{}".utf8),encoding:.utf8) ?? "{}"
+                web.evaluateJavaScript("window.__AIR_TOKEN__ = (\(encoded)).token;window.dispatchEvent(new Event('nuphylab:service-reconnected'));",completionHandler:nil)
+            } else {musicSaveFailed=true;presentMusicSaveFailure()}
+        } else {musicDocumentOrigin=url;web.load(URLRequest(url:url))}
         startHotkeyMonitoring()
     }
     @objc func show(){window?.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)}
@@ -893,11 +904,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         #endif
     }
     func prepareUpdateInstallation(){
-        guard !preparingUpdate, pendingUpdateInstall != nil, let base=baseURL else {return}
-        guard let version=pendingUpdateVersion else{return}
+        guard !preparingUpdate,!musicFlushInProgress,!musicExportActive,!terminating,pendingUpdateInstall != nil else{return}
+        flushMusicForTransition { [weak self] saved in
+            guard let self else{return}
+            if saved {self.prepareUpdateAfterMusicSave()}
+            else {self.presentMusicSaveFailure()}
+        }
+    }
+    func prepareUpdateAfterMusicSave(){
+        guard !preparingUpdate, pendingUpdateInstall != nil, let base=baseURL,let version=pendingUpdateVersion else {unlockMusicTransition();return}
         do {try PendingAppUpdate.stage(version:version)} catch {
             appendWorkerLog(Data("Unable to prepare update relaunch: \(error.localizedDescription)\n".utf8))
-            makeAppUpdateAlert(.preparationFailed,english:english).runModal();return
+            unlockMusicTransition();makeAppUpdateAlert(.preparationFailed,english:english).runModal();return
         }
         preparingUpdate=true
         setExitPresentation(true)
@@ -921,7 +939,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             }
         }.resume()
     }
-    @objc func willSleep(){ selectionLab.cancel(); keySessionSuspended=true;setHotkeysEnabled(false);audioCapture.stop();pendingAudio=nil }
+    @objc func willSleep(){ stopMusic(suspend:true); selectionLab.cancel(); keySessionSuspended=true;setHotkeysEnabled(false);audioCapture.stop();pendingAudio=nil }
     @objc func didWake(){ keySessionSuspended=false;if !terminating && !preparingUpdate {post(["op":"resumeConnection"]);refreshHotkeys()} }
     func post(_ data:[String:Any]){guard let base=baseURL else{return};var request=URLRequest(url:base.appendingPathComponent("api/command"));request.httpMethod="POST";request.setValue(apiToken,forHTTPHeaderField:"X-Air-Token");request.setValue("application/json",forHTTPHeaderField:"Content-Type");request.httpBody=try? JSONSerialization.data(withJSONObject:data);URLSession.shared.dataTask(with:request).resume()}
     func activateSlot(_ index:Int,phase:String="down",gesture:NativeKeyGesture?=nil,
@@ -960,6 +978,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         physicalHoldGesture=gesture;physicalHoldEpoch=epoch
         typingDictationGestures.insert(gesture.id)
         typingSounds.setPaused("dictation:"+gesture.id, active:true)
+        setMusicCapture("dictation:"+gesture.id,active:true)
         guard refreshPhysicalHold() else{return}
         let timer=Timer(timeInterval:0.5,repeats:true){[weak self] _ in _ = self?.refreshPhysicalHold()}
         physicalHoldHeartbeat=timer;RunLoop.main.add(timer,forMode:.common)
@@ -988,6 +1007,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             DispatchQueue.main.asyncAfter(deadline:.now()+8) { [weak self] in
                 guard let self,self.typingDictationGestures.remove(id) != nil else { return }
                 self.typingSounds.setPaused("dictationUnconfirmed",active:true)
+                self.setMusicCapture("dictationUnconfirmed",active:true)
+                self.setMusicCapture("dictation:"+id,active:false)
                 self.typingSounds.setPaused("dictation:"+id,active:false)
             }
         }
@@ -1027,7 +1048,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                     let neverStarted=ok && !up && result?["performed"] as? Bool==false
                     if up || neverStarted {
                         self.typingDictationGestures.remove(id)
-                        if up && !stopped { self.typingSounds.setPaused("dictationUnconfirmed",active:true) }
+                        if up && !stopped { self.typingSounds.setPaused("dictationUnconfirmed",active:true);self.setMusicCapture("dictationUnconfirmed",active:true) }
+                        self.setMusicCapture("dictation:"+id,active:false)
                         self.typingSounds.setPaused("dictation:"+id,active:false)
                     }
                 }
@@ -1054,10 +1076,87 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             if self.pendingAudio != nil {self.sendPendingAudio(base)}
         }}.resume()
     }
+    var musicExportActive=false
+    func saveMusicFile(_ body:[String:Any],reply:@escaping(Any?,String?)->Void){
+        guard !musicExportActive,!musicFlushInProgress,!terminating,let rawName=body["name"] as? String,let encoded=body["base64"] as? String,
+              encoded.utf8.count<=112*1024*1024,let data=Data(base64Encoded:encoded),data.count<=80*1024*1024 else {reply(nil,(self.english ? "File is too large or another export is in progress. Try again shortly." : "文件过大或正在保存，请稍后重试"));return}
+        let name=String(URL(fileURLWithPath:rawName).lastPathComponent.prefix(120))
+        let ext=URL(fileURLWithPath:name).pathExtension.lowercased()
+        guard ["wav","nuphy-music"].contains(ext) else {reply(nil,(self.english ? "Unsupported export format." : "不支持的导出格式"));return}
+        musicExportActive=true
+        let panel=NSSavePanel();panel.title=(self.english ? "Export performance" : "导出演奏");panel.nameFieldStringValue=name;panel.canCreateDirectories=true
+        if let type=UTType(filenameExtension:ext){panel.allowedContentTypes=[type]}
+        panel.beginSheetModal(for:window){[weak self] response in
+            guard let self else{reply(nil,"The window has closed.");return}
+            guard response == .OK,let destination=panel.url else{self.musicExportActive=false;reply(["saved":false],nil);return}
+            DispatchQueue.global(qos:.userInitiated).async {
+                do {try data.write(to:destination,options:.atomic);DispatchQueue.main.async{self.musicExportActive=false;reply(["saved":true],nil)}}
+                catch {DispatchQueue.main.async{self.musicExportActive=false;reply(nil,(self.english ? "Could not save the file: " : "未能保存文件：")+error.localizedDescription)}}
+            }
+        }
+    }
+    var retiredMusicDocuments=Set<String>()
+    var musicDocumentID:String?
+    var musicDocumentLost=false
+    var musicDocumentOrigin:URL?
+    var musicSaveFailed=false
+    var musicActive=false
+    var musicEverUsed=false
+    var musicCaptureReasons=Set<String>()
+    var musicFlushInProgress=false
+    var musicFlushEpoch=0
+    func refreshMusicPause(){
+        typingSounds.setPaused("music",active:musicActive && (NSApp?.isActive ?? false) && window?.isKeyWindow == true && window?.isVisible == true && window?.isMiniaturized == false)
+    }
+    func setMusicCapture(_ reason:String,active:Bool){
+        if active {musicCaptureReasons.insert(reason);stopMusic(suspend:true)} else {musicCaptureReasons.remove(reason)}
+    }
+    func musicPlayAllowed(recoverDictation:Bool=false,requireForeground:Bool=false)->Bool{
+        if recoverDictation {musicCaptureReasons.remove("dictationUnconfirmed")}
+        let foreground = (NSApp?.isActive ?? false) && window?.isKeyWindow == true && window?.isMiniaturized == false
+        return musicCaptureReasons.isEmpty && !terminating && !musicFlushInProgress && !preparingUpdate && (!requireForeground || foreground)
+    }
+    func stopMusic(suspend:Bool=false){
+        if suspend {musicActive=false;refreshMusicPause()}
+        web?.evaluateJavaScript("window.dispatchEvent(new Event('nuphylab:music-\(suspend ? "suspend":"stop")'))",completionHandler:nil)
+    }
+    func windowDidBecomeKey(_ notification:Notification){refreshMusicPause()}
+    func windowDidResignKey(_ notification:Notification){
+        typingSounds.setPaused("music",active:false)
+        web?.evaluateJavaScript("window.dispatchEvent(new Event('nuphylab:music-release'))",completionHandler:nil)
+    }
+    func windowWillClose(_ notification:Notification){stopMusic(suspend:true)}
+    func windowDidMiniaturize(_ notification:Notification){stopMusic(suspend:true)}
+    func webViewWebContentProcessDidTerminate(_ webView:WKWebView){
+        musicActive=false;refreshMusicPause()
+        guard musicEverUsed else{return}
+        musicDocumentLost=true;musicSaveFailed=true
+        // The lost process cannot provide a valid save receipt. Reopening is
+        // an explicit user choice, and keeps only already-saved works.
+        show()
+        let alert=NSAlert();alert.alertStyle = .warning
+        alert.messageText=english ? "The performance page closed unexpectedly" : "演奏页面意外关闭"
+        alert.informativeText=english ? "Saved works are safe. Changes that had not finished saving may be lost. Reopen the saved works?" : "已保存的作品仍在。未完成保存的改动可能已丢失。是否重新打开已保存的作品？"
+        alert.addButton(withTitle:english ? "Reopen saved works" : "重新打开已保存作品")
+        alert.addButton(withTitle:english ? "Later" : "稍后")
+        alert.beginSheetModal(for:window){[weak self] response in
+            guard let self,response == .alertFirstButtonReturn,let url=self.baseURL else{return}
+            self.reopenSavedMusicDocument(url)
+        }
+    }
     func userContentController(_ userContentController:WKUserContentController,didReceive message:WKScriptMessage,replyHandler:@escaping(Any?,String?)->Void){
         guard message.frameInfo.isMainFrame,let url=message.frameInfo.request.url,
-              url.host==baseURL?.host,url.port==baseURL?.port,
+              ((url.host==baseURL?.host && url.port==baseURL?.port) || (["musicFile","musicControl"].contains(message.name) && url.host==musicDocumentOrigin?.host && url.port==musicDocumentOrigin?.port)),
               let body=message.body as? [String:Any] else{replyHandler(nil,"Invalid origin");return}
+        if message.name == "musicFile" {saveMusicFile(body,reply:replyHandler);return}
+        if message.name == "musicControl" {
+            guard registerMusicDocument(body) else{replyHandler(nil,"The performance document is not current");return}
+            if body["saveHealthy"] as? Bool == true {musicSaveFailed=false;replyHandler(true,nil);return}
+            guard let present=body["present"] as? Bool,let active=body["active"] as? Bool else{replyHandler(nil,"Invalid music state");return}
+            let allowed=musicPlayAllowed(recoverDictation:body["resumeAfterDictation"] as? Bool == true,requireForeground:body["request"] as? Bool == true)
+            musicActive=present && active && allowed
+            refreshMusicPause();replyHandler(["allowed":allowed,"blocked":!musicCaptureReasons.isEmpty,"unconfirmed":musicCaptureReasons.contains("dictationUnconfirmed")],nil);return
+        }
         if message.name == "typingSounds" { typingSounds.handle(body, reply: replyHandler); return }
         if message.name == "selectionLab" { selectionLab.handle(body, reply: replyHandler); return }
         if message.name == "audioControl" {
@@ -1149,7 +1248,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         permissionRecovery.observe(granted:granted,
             captureReady:localGranted && permissionHelperReady && (!hotkeysEnabled || functionKeyTapIsActive()),now:now,
             freshGrantNeedsRelaunch:fresh != nil && granted && stale)
-        let canRecover = !selectionLab.isBusy && !capturingKey && keyGestureGate.activeCount==0 && !driverOpenInFlight && !preparingUpdate && !permissionRelaunchPending
+        let canRecover = !musicSaveFailed && !musicActive && !musicExportActive && !musicFlushInProgress && !selectionLab.isBusy && !capturingKey && keyGestureGate.activeCount==0 && !driverOpenInFlight && !preparingUpdate && !permissionRelaunchPending
             && !CommandLine.arguments.contains(PermissionAppRelaunch.argument)
         if permissionRecovery.shouldRecover(now:now,idle:canRecover) {
             permissionRelaunchPending=true
@@ -1193,10 +1292,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         return ["opened":opened,"permission":permission,"permissions":nativePermissionSnapshot()]
     }
     func applicationDidBecomeActive(_ notification:Notification){
+        refreshMusicPause()
         selectionLab.refreshAuthorization()
         reportNativePermissions(force:true);refreshHotkeys();resumeAfterOfficialDriverIfNeeded()
     }
     func applicationDidResignActive(_ notification:Notification){
+        typingSounds.setPaused("music",active:false)
+        web?.evaluateJavaScript("window.dispatchEvent(new Event('nuphylab:music-release'))",completionHandler:nil)
         selectionLab.cancelShortcutRecording()
         if driverOpenInFlight || driverReturnPending {driverReturnSawInactive=true}
         refreshHotkeys()
@@ -1480,6 +1582,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                 self.applyKeyConfiguration(keys)
                 let capture=(state?["audio"] as? [String:Any])?["capture"] as? [String:Any]
                 self.typingSounds.setPaused("microphone", active:capture?["enabled"] as? Bool == true && capture?["source"] as? String == "microphone")
+                self.setMusicCapture("microphone",active:capture?["enabled"] as? Bool == true && capture?["source"] as? String == "microphone")
                 self.audioCapture.sync(capture)
             }
         }
@@ -1678,7 +1781,92 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func applicationWillTerminate(_ notification:Notification) { typingSounds.shutdown() }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{return false}
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool{show();return true}
+    func unlockMusicTransition(){web?.evaluateJavaScript("window.dispatchEvent(new Event('nuphylab:music-quit-finished'))",completionHandler:nil)}
+    func registerMusicDocument(_ body:[String:Any])->Bool{
+        guard let id=body["documentId"] as? String,!id.isEmpty,!retiredMusicDocuments.contains(id),!musicDocumentLost else{return false}
+        if musicDocumentID==nil {
+            // Only a mounted editor can register. A late save/cleanup callback
+            // from the retired document cannot take over the new identity.
+            guard body["present"] as? Bool == true else{return false}
+            musicDocumentID=id
+        }
+        guard musicDocumentID==id else{return false}
+        if body["present"] as? Bool == true {musicEverUsed=true}
+        return true
+    }
+    func retireMusicDocumentForReload(){
+        if let id=musicDocumentID {retiredMusicDocuments.insert(id)}
+        musicEverUsed=false;musicDocumentLost=false;musicDocumentID=nil;musicSaveFailed=false
+    }
+    func reopenSavedMusicDocument(_ url:URL){
+        stopMusic(suspend:true)
+        retireMusicDocumentForReload();musicDocumentOrigin=url
+        web.load(URLRequest(url:url))
+    }
+    @objc func recoverMusicPage(){
+        show()
+        guard musicEverUsed,let url=baseURL else{return}
+        let alert=NSAlert();alert.alertStyle = .warning
+        alert.messageText=english ? "Reopen the saved performance?" : "重新打开已保存的演奏？"
+        alert.informativeText=english ? "Unsaved changes in the current page will be discarded. If the editor is still available, export a project backup before continuing. Saved works and other settings will remain." : "当前页面尚未保存的改动将被舍弃。如果编辑器仍可用，请先导出工程备份。已保存的作品和其他设置会保留。"
+        alert.addButton(withTitle:english ? "Cancel" : "取消")
+        alert.addButton(withTitle:english ? "Reopen saved works" : "重新打开已保存作品")
+        alert.beginSheetModal(for:window){[weak self] response in
+            if response == .alertSecondButtonReturn {self?.reopenSavedMusicDocument(url)}
+        }
+    }
+    func presentMusicSaveFailure(){
+        show()
+        let alert=NSAlert();alert.alertStyle = .warning
+        alert.messageText=english ? "Your performance has not finished saving" : "演奏尚未保存完成"
+        alert.informativeText=english ? "NuPhy Lab will stay open. Try saving again or export a project backup. If the editor cannot reconnect, recover the page from saved works using the button below or Window > Recover Performance Page." : "NuPhy Lab 将保持打开。请重试保存或先导出工程备份。若编辑器无法重连，可用下方按钮或「窗口 → 恢复演奏页面」重新打开已保存作品。"
+        alert.addButton(withTitle:english ? "Stay open" : "保持打开")
+        if baseURL != nil {alert.addButton(withTitle:english ? "Recover performance page…" : "恢复演奏页面…")}
+        alert.beginSheetModal(for:window){[weak self] response in
+            if response == .alertSecondButtonReturn {DispatchQueue.main.async{self?.recoverMusicPage()}}
+        }
+    }
+    func musicSaveReceiptIsValid(_ value:Any?)->Bool{
+        guard !musicDocumentLost,let expected=musicDocumentID,let receipt=value as? [String:Any] else{return false}
+        return receipt["saved"] as? Bool == true && receipt["documentId"] as? String == expected
+    }
+    func flushMusicForTransition(_ completion:@escaping(Bool)->Void){
+        guard musicEverUsed else{completion(true);return}
+        guard !musicFlushInProgress else{completion(false);return}
+        musicFlushInProgress=true;musicFlushEpoch+=1;let epoch=musicFlushEpoch
+        let finish:(Bool)->Void={ [weak self] saved in
+            guard let self,self.musicFlushInProgress,self.musicFlushEpoch==epoch else{return}
+            self.musicFlushInProgress=false
+            self.musicSaveFailed = !saved
+            if !saved {
+                // A cancelled save has not sent any worker signal, so it must
+                // not consume permission recovery's single relaunch attempt.
+                if self.permissionRelaunchPending {self.permissionRecovery.attempted=false;self.permissionRecovery.grantAt=ProcessInfo.processInfo.systemUptime}
+                self.permissionRelaunchPending=false
+                self.unlockMusicTransition()
+            }
+            completion(saved)
+        }
+        guard let web else{finish(false);return}
+        web.callAsyncJavaScript("window.dispatchEvent(new Event('nuphylab:music-quitting')); if(typeof window.__MUSIC_FLUSH__!=='function') throw new Error('Music save bridge unavailable'); return await window.__MUSIC_FLUSH__();",arguments:[:],in:nil,in:.page){result in
+            switch result {case .success(let value):finish(self.musicSaveReceiptIsValid(value));case .failure:finish(false)}
+        }
+        DispatchQueue.main.asyncAfter(deadline:.now()+20){finish(false)}
+    }
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply{
+        if musicExportActive || preparingUpdate {NSSound.beep();return .terminateCancel}
+        if musicFlushInProgress || terminating {return .terminateLater}
+        guard musicEverUsed else{return terminateAfterMusicSave(sender)}
+        flushMusicForTransition { [weak self] saved in
+            guard let self else{return}
+            if saved {
+                let result=self.terminateAfterMusicSave(sender)
+                if result != .terminateLater {if result == .terminateCancel {self.unlockMusicTransition()};NSApp.reply(toApplicationShouldTerminate:result == .terminateNow)}
+            } else {NSApp.reply(toApplicationShouldTerminate:false);self.presentMusicSaveFailure()}
+        }
+        return .terminateLater
+    }
+    func terminateAfterMusicSave(_ sender:NSApplication)->NSApplication.TerminateReply{
         if terminating{return .terminateLater}
         selectionLab.shutdown()
         typingSounds.setPaused("quitting",active:true)
@@ -1709,6 +1897,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         return .terminateLater
     }
     func setExitPresentation(_ active: Bool) {
+        if !active {unlockMusicTransition()}
         web.evaluateJavaScript("window.__AIR_EXITING__ = \(active ? "true" : "false"); window.dispatchEvent(new Event('nuphylab:shutdown'));", completionHandler:nil)
     }
     func webView(_ webView:WKWebView,decidePolicyFor navigationAction:WKNavigationAction,decisionHandler:@escaping(WKNavigationActionPolicy)->Void){

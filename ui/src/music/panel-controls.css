@@ -1,0 +1,93 @@
+/* Add ml-panel-fader to the existing range input and ml-panel-readout to its output. */
+.music-lab .ml-panel-readout {
+  min-inline-size: 4.5ch;
+  padding: 3px 7px;
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+  background: #fafafa;
+  color: #303030;
+  font-size: 11px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+  line-height: 16px;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.music-lab input.ml-panel-fader[type="range"] {
+  inline-size: 100%;
+  min-inline-size: 0;
+  block-size: 28px;
+  min-block-size: 28px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.music-lab input.ml-panel-fader[type="range"]:focus-visible {
+  outline: 2px solid #666;
+  outline-offset: 2px;
+}
+
+.music-lab input.ml-panel-fader[type="range"]:disabled {
+  cursor: default;
+  opacity: .5;
+}
+
+@media (forced-colors: none) {
+  .music-lab input.ml-panel-fader[type="range"] {
+    --ml-fader-knob: #262626;
+    --ml-fader-major: #919191;
+    --ml-fader-minor: #bdbdbd;
+    --ml-fader-rail: #d4d4d4;
+
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background-color: transparent;
+    /* One 1 px tick at each end and three major ticks in between. */
+    background-image:
+      linear-gradient(var(--ml-fader-major), var(--ml-fader-major)),
+      repeating-linear-gradient(90deg, var(--ml-fader-major) 0 1px, transparent 1px 25%),
+      repeating-linear-gradient(90deg, var(--ml-fader-minor) 0 1px, transparent 1px calc(100% / 12)),
+      linear-gradient(var(--ml-fader-rail), var(--ml-fader-rail));
+    background-size: 1px 13px, calc(100% - 9px) 13px, calc(100% - 9px) 7px, calc(100% - 9px) 1px;
+    background-position: right 4px center, center, center, center;
+    background-repeat: no-repeat;
+  }
+
+  .music-lab input.ml-panel-fader[type="range"]::-webkit-slider-runnable-track {
+    height: 16px;
+    border: 0;
+    background: transparent;
+  }
+
+  .music-lab input.ml-panel-fader[type="range"]::-moz-range-track {
+    height: 16px;
+    border: 0;
+    background: transparent;
+  }
+
+  .music-lab input.ml-panel-fader[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 9px;
+    height: 16px;
+    border: 0;
+    border-radius: 2px;
+    background: linear-gradient(#fff, #fff) center / 1px 8px no-repeat var(--ml-fader-knob);
+  }
+
+  .music-lab input.ml-panel-fader[type="range"]::-moz-range-thumb {
+    width: 9px;
+    height: 16px;
+    border: 0;
+    border-radius: 2px;
+    background: linear-gradient(#fff, #fff) center / 1px 8px no-repeat var(--ml-fader-knob);
+  }
+
+  .music-lab input.ml-panel-fader[type="range"]:hover:not(:disabled) {
+    --ml-fader-knob: #111;
+    --ml-fader-major: #777;
+  }
+}

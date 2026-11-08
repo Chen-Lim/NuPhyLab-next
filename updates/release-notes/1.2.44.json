@@ -1,0 +1,11 @@
+{
+  "version": "1.2.44",
+  "zh-CN": [
+    "新增演奏模式：六种音色、鼓垫与鼓机、八个可选片段槽位、18 首预设和 36 个素材。",
+    "支持自动保存个人作品、最近删除恢复及工程和 WAV 导出；演奏时协调模拟声浪，提供中英文界面。"
+  ],
+  "en": [
+    "Add Performance with six instruments, drum pads and a sequencer, eight assignable clip slots, 18 presets and 36 clips.",
+    "Autosave personal works, restore deleted works and export projects or WAV audio, with Typing Sounds coordination and bilingual controls."
+  ]
+}

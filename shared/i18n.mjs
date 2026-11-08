@@ -1,6 +1,7 @@
 import selectionMessages from "./selection-messages.json" with {type:"json"};
 import {overlayMessages} from "./ui-overlays-i18n.mjs";
 export const messages = {
+  "演奏模式":"Performance",
   "实验室":"Labs",
   "框选提问":"Ask about a selection",
   "请允许辅助功能，授权后会自动连接。": "Allow Accessibility; NuPhy Lab will connect automatically after permission is granted.",

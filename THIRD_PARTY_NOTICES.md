@@ -83,3 +83,6 @@ https://sparkle-project.org/
 Typing Sounds bundles 636 audio files: twelve tuned profiles derived from three CC0 recordings by Techrul, zrrion and grcekh, and six classic MIT-licensed sample sets from Thomas Lai’s Keyboard Simulator. Full credits, source links, transformation details and licenses are retained in `assets/typing-sounds/ATTRIBUTION.md`, `audio/CUSTOM_LICENSE.txt` and `audio/KBSIM_LICENSE.txt` (installed under Resources/typing-sounds). No recordings by the current user are included.
 
 模拟声浪包含636个音频文件：基于Techrul、zrrion及grcekh三段CC0公开录音的12款调校音色，以及Thomas Lai Keyboard Simulator的6套MIT授权经典素材。完整作者、来源及许可随包保留，未包含本机用户录音。
+
+## Salamander Grand Piano
+30 MP3 samples from the Salamander Grand Piano v3 by Alexander Holm, licensed CC BY 3.0. Original: https://github.com/sfzinstruments/SalamanderGrandPiano . MP3 conversion: https://github.com/Tonejs/audio/tree/master/salamander . License: https://creativecommons.org/licenses/by/3.0/ . This edition uses one velocity layer and pitch shifts between samples; it is not the complete original library. The bundled music/piano/LICENSE.txt and ATTRIBUTION.txt include the license and attribution.

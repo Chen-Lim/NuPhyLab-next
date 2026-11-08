@@ -1,3 +1,4 @@
+import {MusicRoutes} from './music-routes.mjs';
 import {getKeyboardProfile,getCanvasCount} from '../shared/keyboard-models.mjs';
 import {CodexAccessibilityBridge} from './codex-accessibility-bridge.mjs';
 import {createNativeKeyVerifier} from './native-key-auth.mjs';
@@ -43,6 +44,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir =
   process.env.AIR_STUDIO_DATA ??
   path.join(os.homedir(), "Library/Application Support/Air Studio");
+const musicRoutes=new MusicRoutes(dataDir,path.resolve(dataDir)===path.join(os.homedir(),'Library/Application Support/Air Studio')?{}:{source:null});
 const port = Number(process.env.AIR_STUDIO_PORT || process.env.AIR_STUDIO_PREFERRED_PORT || 0),
   token = process.env.AIR_STUDIO_TOKEN ?? randomBytes(32).toString("hex");
 const store = await new Store(dataDir).load();
@@ -1824,6 +1826,8 @@ const mime = {
   ".png": "image/png",
   ".json": "application/json; charset=utf-8",
   ".ico": "image/x-icon",
+  ".mp3": "audio/mpeg",
+  ".wav": "audio/wav",
 };
 function json(res, status, obj) {
   res.writeHead(status, {
@@ -1861,6 +1865,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     try {
+      if(url.pathname.startsWith('/api/music/')){const result=await musicRoutes.handle(req,url);return json(res,result.status,result.body);}
       if (req.method === "GET" && url.pathname === "/api/state")
         return json(res, 200, state());
       if (req.method === "GET" && url.pathname === "/api/layout")
@@ -1972,6 +1977,7 @@ async function shutdown() {
   try {
     while (busy) await new Promise((r) => setTimeout(r, 20));
     await commandTail;
+    await musicRoutes.drain();
     await commandBridgeClosed;
     // A failure in one cleanup step must not skip keyboard restoration or
     // leave another child process running after the application has exited.

@@ -1,0 +1,3 @@
+Salamander Grand Piano v3 — Alexander Holm. CC BY 3.0. https://creativecommons.org/licenses/by/3.0/
+Original: https://github.com/sfzinstruments/SalamanderGrandPiano
+MP3 conversion/subset supplied by https://github.com/Tonejs/audio/tree/master/salamander . This app uses a single velocity layer, resampled and pitch shifted at playback. Original sample library unchanged.

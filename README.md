@@ -52,6 +52,20 @@ Open **Typing Sounds** below **Lighting Games** in the sidebar. Choose from 18 s
 
 Sounds are bundled and need no download or API. Previews need no Input Monitoring permission; typing playback does. Typing Sounds uses key codes without recording text or uploading input.
 
+## 演奏模式 / Performance
+
+打开 **实验室 → 演奏模式**，把电脑键盘变成乐器：六种音色、八个鼓垫、16 步鼓机，以及八个可自由替换的片段槽位。作品库提供 18 首原创预设和 36 个片段；先选槽位，再选择素材，可以改编为自己的作品。
+
+录制和修改自动保存在本机，可复制、改名、删除后恢复，也可导出工程和 WAV。音源随应用提供，无需 API 或麦克风权限。演奏按键仅在本窗口前台生效；切换应用会释放按住的音符，最小化或休眠会停止播放。循环和试听可在普通切换应用后继续，按 Esc 或停止按钮结束。[使用说明、声音来源与限制](docs/PERFORMANCE.md)
+
+Open **Labs → Performance** to turn your computer keyboard into an instrument: six sounds, eight drum pads, a 16-step sequencer, and eight assignable clip slots. The library includes 18 original presets and 36 clips. Choose a slot before choosing its clip, then make the arrangement your own.
+
+Recordings and edits autosave locally. Duplicate, rename or restore deleted works, and export projects or WAV audio. Sounds are bundled; no API or microphone permission is needed. Performance keys work only while this window is in front. Switching apps releases held notes; minimizing or sleeping stops playback. Loops and previews may continue after an ordinary app switch; press Esc or Stop to end them. [Usage, sound credits and limitations](docs/PERFORMANCE.md)
+
+如果作品在保存期间被删除或恢复，旧页面会暂停保存。请先导出当前工程备份，再用 **窗口 → 恢复演奏页面** 打开已保存的作品。
+
+If a work is deleted or restored while a save is pending, saving from the old page pauses. Export the current project as a backup before using **Window → Recover Performance Page** to reopen the saved work.
+
 ## Codex 默认命令键 / Default Codex command keys
 
 在 AI 助手中开启 Codex 模式后使用。/ Enable Codex mode in AI Assistant to use these defaults.
@@ -74,6 +88,7 @@ Approval commands require a current request. Sending requires the chat composer 
 - 逐键 RGB 绘图、动画与本地作品库。/ Per-key RGB painting, animation and a local artwork library.
 - 按键触发、键盘游戏和声音律动。/ Key-triggered effects, keyboard games and audio-reactive lighting.
 - 18 款本地打字音效，可分别调节大键声音。/ 18 local typing sounds with separate large-key levels.
+- 六种演奏音色、鼓机、片段与个人音乐作品库。/ Six performance instruments, drums, clips and a personal music library.
 - Codex / Claude Code 任务快捷键和状态灯。/ Codex / Claude Code task shortcuts and status lights.
 - USB 自动识别键盘型号，各型号的作品分别保存。/ Automatic USB model detection, with separate artwork for each keyboard model.
 - 框选翻译、总结与提问，可选本机语音转写，并连接自己的模型服务。/ Selection translation, summaries and questions, with optional local speech transcription and your own model service.
@@ -101,4 +116,4 @@ Open **Labs → Ask about a selection**, choose a service and model in **Setting
 
 Selected text and questions are sent to your configured model service. Images are included only when enabled and needed for the selected action. API keys are stored in the local Keychain.
 
-[设置与使用 / Setup and usage](docs/SELECTION.md) · [界面与翻译语言 / Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [1.2.43 更新说明 / What's new in 1.2.43](docs/RELEASE_1.2.43.md)
+[设置与使用 / Setup and usage](docs/SELECTION.md) · [界面与翻译语言 / Interface and translation languages](docs/SELECTION_LANGUAGES.md) · [1.2.44 更新说明 / What's new in 1.2.44](docs/RELEASE_1.2.44.md)
