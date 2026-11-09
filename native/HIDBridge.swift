@@ -1236,7 +1236,15 @@ final class Air75Device {
         // Refresh it using read-only A1 rather than mutating the key with EE.
         // A1 identity/firmware discovery must remain available when an older
         // firmware cannot pass the lighting route. No writes are enabled here.
-        do { try readIdentity() } catch { closeTransport(); throw error }
+        do {
+            for attempt in 0..<3 {
+                do { try readIdentity(); break }
+                catch {
+                    if attempt == 2 || !S4.retryableProbe(error) { throw error }
+                    pump(0.06)
+                }
+            }
+        } catch { closeTransport(); throw error }
         protocolReady = false; compatibilityError = nil;ledCount=0
         var state = [UInt8]()
         var probeFailure: Error?
@@ -4669,7 +4677,7 @@ func testConnectionRecoveryProbes(_ check: (Bool, String) throws -> Void) throws
     try FileManager.default.createDirectory(at:directory,withIntermediateDirectories:true)
     defer {try? FileManager.default.removeItem(at:directory)}
     for model in [USBKeyboardModel.air75,.kick75] {
-        for fault in ["geometry","state","rgb","session","persistent","firmware"] {
+        for fault in ["geometry","state","rgb","session","persistent","firmware","wake"] {
             var commands=[UInt8](), injected=false, identityReads=0
             var sessionKey:UInt8=0
             let firmware:[UInt8]=fault == "firmware" ? [99,9,9,170,6,0,0,0] : model == .kick75 ? [18,0,4,170,6,0,0,0] : [16,0,1,170,6,0,0,0]
@@ -4678,6 +4686,7 @@ func testConnectionRecoveryProbes(_ check: (Bool, String) throws -> Void) throws
                 switch frame[1] {
                 case 0xa1:
                     identityReads += 1
+                    if fault == "wake" && !injected {injected=true;throw failure("HID_TIMEOUT","simulated shallow sleep initial wake timeout")}
                     if fault == "session" && identityReads == 2 {sessionKey=0x37;injected=true}
                     payload=firmware
                 case 0xd1:payload=[fault == "persistent" ? 218 : UInt8(model.totalCount)]
