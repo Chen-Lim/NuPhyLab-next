@@ -6,31 +6,35 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>NuPhy Lab</title>
         <item>
-            <title>1.2.44</title>
-            <pubDate>Sun, 08 Nov 2026 13:51:30 +0800</pubDate>
+            <title>1.2.45</title>
+            <pubDate>Mon, 09 Nov 2026 16:13:56 +0800</pubDate>
             <link>https://github.com/bohu8264/NuPhyLab-next</link>
-            <sparkle:version>1.2.44</sparkle:version>
-            <sparkle:shortVersionString>1.2.44</sparkle:shortVersionString>
+            <sparkle:version>1.2.45</sparkle:version>
+            <sparkle:shortVersionString>1.2.45</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.5</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
             <description sparkle:format="plain-text"><![CDATA[NUPHY-RELEASE-NOTES 1
-version:1.2.44
+version:1.2.45
 [zh-CN]
-NuPhy Lab 1.2.44
+NuPhy Lab 1.2.45
 
-• 新增演奏模式：六种音色、鼓垫与鼓机、八个可选片段槽位、18 首预设和 36 个素材。
-• 支持自动保存个人作品、最近删除恢复及工程和 WAV 导出；演奏时协调模拟声浪，提供中英文界面。
+• 实验室新增拖拽转换：图片、PDF、音视频格式转换，ZIP / TAR.GZ 打包与批量解压。
+• 支持先按住 Shift 再拖起文件；原件保留，进度、取消和最近 20 次记录集中在页面中。
+• 拖拽菜单采用更清晰的灰阶配色，新增 WebP 转换并保留透明背景。
+• 触发键默认为 Shift，可自定义为单个按键；自动保存设置，并提示输入监控权限和 AI / 框选按键冲突。
 [en]
-NuPhy Lab 1.2.44
+NuPhy Lab 1.2.45
 
-• Add Performance with six instruments, drum pads and a sequencer, eight assignable clip slots, 18 presets and 36 clips.
-• Autosave personal works, restore deleted works and export projects or WAV audio, with Typing Sounds coordination and bilingual controls.
+• Add Drag Convert in Labs for images, PDFs, video and audio, ZIP / TAR.GZ packing and batch extraction.
+• Hold Shift before or during a file drag. Originals are kept; progress, cancellation and the last 20 batches stay on the page.
+• Improve drag-menu contrast with a grayscale palette; add WebP conversion with transparency.
+• Shift is the default trigger; customize it to one supported key. Settings are saved automatically, with Input Monitoring guidance and AI and selection shortcut conflict checks.
 ]]></description>
-            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.44/NuPhyLab-1.2.44-macOS-AppleSilicon.dmg" length="50854069" type="application/octet-stream" sparkle:edSignature="AKoHRioJ5f7zkOeBG0hbyYeju7NwTHlCazKXiA2jiHR1Nmei0HGEhHeMoI3rwK8yAFTmkJ6empOTyrqY1d7zAw=="/>
+            <enclosure url="https://github.com/bohu8264/NuPhyLab-next/releases/download/v1.2.45/NuPhyLab-1.2.45-macOS-AppleSilicon.dmg" length="49907963" type="application/octet-stream" sparkle:edSignature="jlc8HdF8Qv2UJY8Z5IUSSY9Y039aQMDyKttqYJByc3YlsH7ZA9aiUZPC0q0a4NZgNB+B4Z5rGbltuTD3CDH4Bg=="/>
         </item>
     </channel>
 </rss>
 <!-- sparkle-signatures:
-edSignature: nIYstHAztuJC5EYNV+m6F3FMJmKQySQPSrpXH9GTGnhGd0+Kj0+EBZY+z1MPa5O/vyXrsq6jLapDeJsZNFIOAg==
-length: 1897
+edSignature: Q9z5x6Hx4ua/vtTSBv8MZ0vGseDh6MiTAJLLGS0Gk1ewEYEIy/84VJD+8lZEeTqJbbQ3ktaHWObvXUGId+AGBg==
+length: 2355
 -->
