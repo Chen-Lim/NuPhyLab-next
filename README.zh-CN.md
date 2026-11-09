@@ -94,3 +94,9 @@ npm start
 原生构建会下载固定版本的 Sparkle，并验证 SHA-256。运行 `npm run fetch-node` 获取独立运行时，再使用 `npm run package` 打包。对外发布请遵循[发布流程](docs/RELEASING.md)，包括签名、公证、安装包及应用内更新验证。
 
 [文档目录](docs/README.md) · [第三方声明](THIRD_PARTY_NOTICES.md) · [问题反馈](https://github.com/bohu8264/NuPhyLab-next/issues)
+
+## 拖拽转换
+
+在 **实验室 → 拖拽转换** 开启功能，从访达拖起文件，按 Shift（也可先按住再拖），移到菜单选项后松手。默认触发键为 Shift，可在页面自定义为单个修饰键、字母、数字、方向键或其他受支持的按键。转换在本机完成，原件保留，同名副本自动编号；进度、取消和最近 20 次结果都在页面中，不弹出额外结果窗口。无需 API 或模型下载。
+
+[功能与格式说明 / Features and formats](docs/DRAG_CONVERT.md)

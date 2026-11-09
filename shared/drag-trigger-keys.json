@@ -1,0 +1,464 @@
+[
+  {
+    "value": "shift",
+    "zh": "⇧ Shift",
+    "en": "⇧ Shift",
+    "group": "modifier"
+  },
+  {
+    "value": "option",
+    "zh": "⌥ Option",
+    "en": "⌥ Option",
+    "group": "modifier"
+  },
+  {
+    "value": "control",
+    "zh": "⌃ Control",
+    "en": "⌃ Control",
+    "group": "modifier"
+  },
+  {
+    "value": "command",
+    "zh": "⌘ Command",
+    "en": "⌘ Command",
+    "group": "modifier"
+  },
+  {
+    "value": "key:49",
+    "zh": "空格",
+    "en": "Space",
+    "group": "other"
+  },
+  {
+    "value": "key:0",
+    "zh": "A",
+    "en": "A",
+    "group": "letter"
+  },
+  {
+    "value": "key:11",
+    "zh": "B",
+    "en": "B",
+    "group": "letter"
+  },
+  {
+    "value": "key:8",
+    "zh": "C",
+    "en": "C",
+    "group": "letter"
+  },
+  {
+    "value": "key:2",
+    "zh": "D",
+    "en": "D",
+    "group": "letter"
+  },
+  {
+    "value": "key:14",
+    "zh": "E",
+    "en": "E",
+    "group": "letter"
+  },
+  {
+    "value": "key:3",
+    "zh": "F",
+    "en": "F",
+    "group": "letter"
+  },
+  {
+    "value": "key:5",
+    "zh": "G",
+    "en": "G",
+    "group": "letter"
+  },
+  {
+    "value": "key:4",
+    "zh": "H",
+    "en": "H",
+    "group": "letter"
+  },
+  {
+    "value": "key:34",
+    "zh": "I",
+    "en": "I",
+    "group": "letter"
+  },
+  {
+    "value": "key:38",
+    "zh": "J",
+    "en": "J",
+    "group": "letter"
+  },
+  {
+    "value": "key:40",
+    "zh": "K",
+    "en": "K",
+    "group": "letter"
+  },
+  {
+    "value": "key:37",
+    "zh": "L",
+    "en": "L",
+    "group": "letter"
+  },
+  {
+    "value": "key:46",
+    "zh": "M",
+    "en": "M",
+    "group": "letter"
+  },
+  {
+    "value": "key:45",
+    "zh": "N",
+    "en": "N",
+    "group": "letter"
+  },
+  {
+    "value": "key:31",
+    "zh": "O",
+    "en": "O",
+    "group": "letter"
+  },
+  {
+    "value": "key:35",
+    "zh": "P",
+    "en": "P",
+    "group": "letter"
+  },
+  {
+    "value": "key:12",
+    "zh": "Q",
+    "en": "Q",
+    "group": "letter"
+  },
+  {
+    "value": "key:15",
+    "zh": "R",
+    "en": "R",
+    "group": "letter"
+  },
+  {
+    "value": "key:1",
+    "zh": "S",
+    "en": "S",
+    "group": "letter"
+  },
+  {
+    "value": "key:17",
+    "zh": "T",
+    "en": "T",
+    "group": "letter"
+  },
+  {
+    "value": "key:32",
+    "zh": "U",
+    "en": "U",
+    "group": "letter"
+  },
+  {
+    "value": "key:9",
+    "zh": "V",
+    "en": "V",
+    "group": "letter"
+  },
+  {
+    "value": "key:13",
+    "zh": "W",
+    "en": "W",
+    "group": "letter"
+  },
+  {
+    "value": "key:7",
+    "zh": "X",
+    "en": "X",
+    "group": "letter"
+  },
+  {
+    "value": "key:16",
+    "zh": "Y",
+    "en": "Y",
+    "group": "letter"
+  },
+  {
+    "value": "key:6",
+    "zh": "Z",
+    "en": "Z",
+    "group": "letter"
+  },
+  {
+    "value": "key:29",
+    "zh": "0",
+    "en": "0",
+    "group": "number"
+  },
+  {
+    "value": "key:18",
+    "zh": "1",
+    "en": "1",
+    "group": "number"
+  },
+  {
+    "value": "key:19",
+    "zh": "2",
+    "en": "2",
+    "group": "number"
+  },
+  {
+    "value": "key:20",
+    "zh": "3",
+    "en": "3",
+    "group": "number"
+  },
+  {
+    "value": "key:21",
+    "zh": "4",
+    "en": "4",
+    "group": "number"
+  },
+  {
+    "value": "key:23",
+    "zh": "5",
+    "en": "5",
+    "group": "number"
+  },
+  {
+    "value": "key:22",
+    "zh": "6",
+    "en": "6",
+    "group": "number"
+  },
+  {
+    "value": "key:26",
+    "zh": "7",
+    "en": "7",
+    "group": "number"
+  },
+  {
+    "value": "key:28",
+    "zh": "8",
+    "en": "8",
+    "group": "number"
+  },
+  {
+    "value": "key:25",
+    "zh": "9",
+    "en": "9",
+    "group": "number"
+  },
+  {
+    "value": "key:50",
+    "zh": "`",
+    "en": "`",
+    "group": "other"
+  },
+  {
+    "value": "key:27",
+    "zh": "−",
+    "en": "−",
+    "group": "other"
+  },
+  {
+    "value": "key:24",
+    "zh": "=",
+    "en": "=",
+    "group": "other"
+  },
+  {
+    "value": "key:33",
+    "zh": "[",
+    "en": "[",
+    "group": "other"
+  },
+  {
+    "value": "key:30",
+    "zh": "]",
+    "en": "]",
+    "group": "other"
+  },
+  {
+    "value": "key:42",
+    "zh": "\\",
+    "en": "\\",
+    "group": "other"
+  },
+  {
+    "value": "key:41",
+    "zh": ";",
+    "en": ";",
+    "group": "other"
+  },
+  {
+    "value": "key:39",
+    "zh": "'",
+    "en": "'",
+    "group": "other"
+  },
+  {
+    "value": "key:43",
+    "zh": ",",
+    "en": ",",
+    "group": "other"
+  },
+  {
+    "value": "key:47",
+    "zh": ".",
+    "en": ".",
+    "group": "other"
+  },
+  {
+    "value": "key:44",
+    "zh": "/",
+    "en": "/",
+    "group": "other"
+  },
+  {
+    "value": "key:48",
+    "zh": "Tab",
+    "en": "Tab",
+    "group": "other"
+  },
+  {
+    "value": "key:36",
+    "zh": "Enter",
+    "en": "Enter",
+    "group": "other"
+  },
+  {
+    "value": "key:51",
+    "zh": "退格",
+    "en": "Backspace",
+    "group": "other"
+  },
+  {
+    "value": "key:117",
+    "zh": "Del",
+    "en": "Del",
+    "group": "other"
+  },
+  {
+    "value": "key:114",
+    "zh": "Ins / Help",
+    "en": "Ins / Help",
+    "group": "other"
+  },
+  {
+    "value": "key:116",
+    "zh": "PgUp",
+    "en": "PgUp",
+    "group": "other"
+  },
+  {
+    "value": "key:121",
+    "zh": "PgDn",
+    "en": "PgDn",
+    "group": "other"
+  },
+  {
+    "value": "key:115",
+    "zh": "Home",
+    "en": "Home",
+    "group": "other"
+  },
+  {
+    "value": "key:119",
+    "zh": "End",
+    "en": "End",
+    "group": "other"
+  },
+  {
+    "value": "key:126",
+    "zh": "↑",
+    "en": "↑",
+    "group": "other"
+  },
+  {
+    "value": "key:125",
+    "zh": "↓",
+    "en": "↓",
+    "group": "other"
+  },
+  {
+    "value": "key:123",
+    "zh": "←",
+    "en": "←",
+    "group": "other"
+  },
+  {
+    "value": "key:124",
+    "zh": "→",
+    "en": "→",
+    "group": "other"
+  },
+  {
+    "value": "key:122",
+    "zh": "F1",
+    "en": "F1",
+    "group": "other"
+  },
+  {
+    "value": "key:120",
+    "zh": "F2",
+    "en": "F2",
+    "group": "other"
+  },
+  {
+    "value": "key:99",
+    "zh": "F3",
+    "en": "F3",
+    "group": "other"
+  },
+  {
+    "value": "key:118",
+    "zh": "F4",
+    "en": "F4",
+    "group": "other"
+  },
+  {
+    "value": "key:96",
+    "zh": "F5",
+    "en": "F5",
+    "group": "other"
+  },
+  {
+    "value": "key:97",
+    "zh": "F6",
+    "en": "F6",
+    "group": "other"
+  },
+  {
+    "value": "key:98",
+    "zh": "F7",
+    "en": "F7",
+    "group": "other"
+  },
+  {
+    "value": "key:100",
+    "zh": "F8",
+    "en": "F8",
+    "group": "other"
+  },
+  {
+    "value": "key:101",
+    "zh": "F9",
+    "en": "F9",
+    "group": "other"
+  },
+  {
+    "value": "key:109",
+    "zh": "F10",
+    "en": "F10",
+    "group": "other"
+  },
+  {
+    "value": "key:103",
+    "zh": "F11",
+    "en": "F11",
+    "group": "other"
+  },
+  {
+    "value": "key:111",
+    "zh": "F12",
+    "en": "F12",
+    "group": "other"
+  }
+]

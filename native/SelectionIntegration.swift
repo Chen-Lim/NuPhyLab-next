@@ -74,7 +74,9 @@ enum SelectionPermissionProbe {
     var requestRelaunch: (() -> Bool)? { get set }
     var recordingChanged: ((Bool) -> Void)? { get set }
     var voiceActivityChanged: ((Bool) -> Void)? { get set }
+    var fileDragActive: (() -> Bool)? { get set }
     var isBusy: Bool { get }
+    var dragReservedTrigger: String? { get }
     func updateLanguage(_ language: AppLanguage)
     func updateReservedKeys(_ codes: Set<UInt32>)
     func handle(_ body: [String:Any], reply: @escaping (Any?, String?) -> Void)
@@ -84,7 +86,7 @@ enum SelectionPermissionProbe {
     func refreshAuthorization()
     func shutdown()
 }
-extension SelectionFeature { func cancel() { cancel(animatePanel: false) } }
+extension SelectionFeature { var dragReservedTrigger:String? {nil}; func cancel() { cancel(animatePanel: false) } }
 
 @MainActor enum SelectionFeatureFactory {
     static func make(directory: URL) -> any SelectionFeature {
@@ -98,6 +100,7 @@ extension SelectionFeature { func cancel() { cancel(animatePanel: false) } }
     private var language=AppLanguage.zh
     func updateLanguage(_ language:AppLanguage){self.language=language}
     var showSettings: (() -> Void)?
+    var fileDragActive: (() -> Bool)?
     var requestRelaunch: (() -> Bool)?
     var recordingChanged: ((Bool) -> Void)?
     var voiceActivityChanged: ((Bool) -> Void)?

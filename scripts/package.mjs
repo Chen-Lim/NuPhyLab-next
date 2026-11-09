@@ -44,6 +44,7 @@ await writeFile(path.join(resources,'update-metadata.json'),JSON.stringify({vers
 // ditto preserves Sparkle's versioned symlinks and executable permissions.
 execFileSync('/usr/bin/ditto',[path.join(root,'vendor/sparkle/Sparkle.framework'),path.join(contents,'Frameworks/Sparkle.framework')]);
 await cp(path.join(root,"assets/typing-sounds"),path.join(resources,"typing-sounds"),{recursive:true});
+await cp(path.join(root,"assets/drag-convert-licenses"),path.join(resources,"drag-convert-licenses"),{recursive:true});
 // "hooks" carries the Claude Code hook scripts the app installs on request.
 // Design references and QA screenshots stay in the source checkout; the app
 // does not load docs at runtime.

@@ -538,6 +538,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     var capturePermissionSignature:String?
     var permissionRecovery=PermissionCaptureRecovery()
     var permissionRelaunchPending=false
+    var permissionShutdownCommitted=false
     var permissionHelperReady=false
     private var permissionProbeProcess:Process?
     private var permissionProbeResult:[String:Any]?
@@ -598,8 +599,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     var pendingUpdateInstall: (() -> Void)?
     var pendingUpdateVersion: String?
     var preparingUpdate = false
+    var updateInstallCommitted = false
+    var updateAbortRecoveryRequested = false
+    var updatePreparationEpoch = 0
+    var applicationQuitPending = false
+    var updateMusicSaveEpoch:Int?
+    var updateRetiringWorker:Process?
     var workerRestartPolicy = WorkerRestartPolicy()
     var selectionShortcutRecording=false
+    var dragPresentationAllowed:Bool {
+        !terminating && !preparingUpdate && !updateInstallCommitted && !updateAbortRecoveryRequested && !permissionRelaunchPending && !musicFlushInProgress && !keySessionSuspended && !capturingKey && !selectionShortcutRecording && !selectionLab.isBusy && !IsSecureEventInputEnabled()
+    }
+    lazy var dragConvert = DragConvertController(directory: dataDirectory)
     lazy var typingSounds = TypingSoundController(directory: dataDirectory)
     lazy var selectionLab: any SelectionFeature = SelectionFeatureFactory.make(directory: dataDirectory)
     let windowFrameName = "AirStudio.CompactWindow.v1"
@@ -650,14 +661,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"typingSounds")
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"musicFile")
         config.userContentController.addScriptMessageHandler(self,contentWorld:.page,name:"musicControl")
+        config.userContentController.addScriptMessageHandler(self, contentWorld:.page, name:"dragConvert")
+        dragConvert.updateLanguage(english:english)
+        dragConvert.canPresent = { [weak self] in self?.dragPresentationAllowed ?? false }
+        dragConvert.reservedKeyCodes = { [weak self] in
+            guard let self, self.configuredKeysEnabled else { return [] }
+            return Set(self.keyConfiguration.map { $0.keyCode })
+        }
+        dragConvert.selectionReservedTrigger = { [weak self] in self?.selectionLab.dragReservedTrigger }
+        dragConvert.activityChanged = { [weak self] active in self?.typingSounds.setPaused("fileDrag",active:active) }
+        selectionLab.fileDragActive = { [weak self] in self?.dragConvert.isFileDragActive == true }
         _ = typingSounds
         selectionLab.voiceActivityChanged = { [weak self] active in self?.typingSounds.setPaused("selectionVoice", active:active);self?.setMusicCapture("selectionVoice",active:active) }
         selectionLab.updateLanguage(english ? .en:.zh)
         selectionLab.showSettings = { [weak self] in self?.show(); self?.web.evaluateJavaScript("window.dispatchEvent(new CustomEvent('nuphylab:navigate',{detail:'ai'}))", completionHandler:nil) }
         selectionLab.recordingChanged = { [weak self] active in self?.selectionShortcutRecording=active;self?.typingSounds.setPaused("shortcut",active:active);self?.refreshHotkeys() }
         selectionLab.requestRelaunch = { [weak self] in
-            guard let self, !self.terminating, !self.preparingUpdate, !self.driverOpenInFlight,
-                  !self.capturingKey, !self.musicSaveFailed, !self.musicActive, !self.musicExportActive, !self.musicFlushInProgress, self.keyGestureGate.activeCount == 0, !self.selectionLab.isBusy else { return false }
+            guard let self, !self.terminating, !self.preparingUpdate, !self.updateInstallCommitted, !self.driverOpenInFlight,
+                  !self.capturingKey, !self.musicSaveFailed, !self.musicActive, !self.musicExportActive, !self.musicFlushInProgress, self.keyGestureGate.activeCount == 0, !self.selectionLab.isBusy, !self.dragConvert.busy, !self.dragConvert.isFileDragActive else { return false }
+            self.permissionShutdownCommitted=false
             self.permissionRelaunchPending = true
             self.appendWorkerLog(Data("Completing selection permission setup by a clean app relaunch.\n".utf8))
             NSApp.terminate(nil); return true
@@ -748,6 +770,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         for item in tray.items {item.target=self};statusItem.menu=tray
     }
     func startWorker(){
+        guard !updateInstallCommitted,worker == nil else{return}
         guard let resources=Bundle.main.resourceURL else{return}
         closePhysicalHoldStore()
         nativeKeySigner=NativeKeySigner();trustedNativeKeyGestures.removeAll();gestureBindingEpochs.removeAll();keyBindingEpoch=nil
@@ -774,10 +797,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             self?.appendWorkerLog(data)
         }
         var pending=Data()
-        output.fileHandleForReading.readabilityHandler={ [weak self] handle in
+        output.fileHandleForReading.readabilityHandler={ [weak self,weak child] handle in
             let data=handle.availableData;if data.isEmpty{return};pending.append(data)
             while let newline=pending.firstIndex(of:10){let line=pending.prefix(upTo:newline);pending.removeSubrange(...newline)
-                if let message=(try? JSONSerialization.jsonObject(with:line)) as? [String:Any],message["event"] as? String=="ready",let url=message["url"] as? String {DispatchQueue.main.async {self?.ready(url)}}
+                if let message=(try? JSONSerialization.jsonObject(with:line)) as? [String:Any],message["event"] as? String=="ready",let url=message["url"] as? String,let child {DispatchQueue.main.async {self?.ready(url,from:child)}}
             }
         }
         child.terminationHandler={ [weak self] stopped in
@@ -790,11 +813,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             self.appendWorkerLog(Data("\n[\(ISO8601DateFormatter().string(from:Date()))] Worker exited: status=\(status), signaled=\(signaled)\n".utf8))
             // Flush queued log writes before presenting an error or allowing AppKit to exit.
             self.workerLogQueue.async { [weak self] in
-                DispatchQueue.main.async {self?.workerDidExit(status:status,signaled:signaled)}
+                DispatchQueue.main.async {self?.workerDidExit(stopped,status:status,signaled:signaled)}
             }
         }
         do{try child.run();worker=child}catch{
             appendWorkerLog(Data("Worker launch failed: \(error.localizedDescription)\n".utf8))
+            if updateAbortRecoveryRequested {presentUpdateRecoveryFailure();return}
             let alert=NSAlert();alert.messageText=self.T("无法启动 NuPhy Lab");alert.informativeText=error.localizedDescription;alert.runModal()
         }
     }
@@ -821,20 +845,48 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             }
         }
     }
+    func workerDidExit(_ stopped:Process,status:Int32,signaled:Bool){
+        // A retired worker cannot complete the current worker's shutdown ticket.
+        guard worker === stopped else{return}
+        workerDidExit(status:status,signaled:signaled)
+    }
     func workerDidExit(status:Int32,signaled:Bool){
+        if preparingUpdate {
+            updatePreparationEpoch+=1;preparingUpdate=false
+            setExitPresentation(false)
+        }
+        if updateRetiringWorker === worker {updateRetiringWorker=nil}
+        if permissionRelaunchPending && (!permissionShutdownCommitted || !terminating || musicFlushInProgress) {
+            // Authorization requests are not yet permission to exit. An early
+            // worker exit must retire the pending WebKit save callback first.
+            permissionRelaunchPending=false
+            permissionRecovery.attempted=false
+            permissionRecovery.grantAt=ProcessInfo.processInfo.systemUptime
+            if musicFlushInProgress {
+                musicFlushEpoch+=1;musicFlushInProgress=false;musicSaveFailed=true
+                self.replyToTermination(false)
+            }
+            unlockMusicTransition()
+            appendWorkerLog(Data("Permission relaunch deferred: worker exited before the saved shutdown was committed.\n".utf8))
+        }
         let permissionRecoveryFailed=permissionRelaunchPending && (status != 0 || signaled)
+        permissionShutdownCommitted=false
         stopHotkeyMonitoring()
         worker=nil
         baseURL=nil;apiToken=""
+        if updateInstallCommitted && !terminating {
+            appendWorkerLog(Data("Local service exited after update handoff; leaving restart to the installer.\n".utf8))
+            return
+        }
         if permissionRelaunchPending {
             permissionRelaunchPending=false
             if status==0 && !signaled {
-                do {try PermissionAppRelaunch.launch();NSApp.reply(toApplicationShouldTerminate:true);return}
+                do {try PermissionAppRelaunch.launch();self.replyToTermination(true);return}
                 catch {appendWorkerLog(Data("Permission relaunch could not start.\n".utf8))}
             }
             // A recovery may not bypass failed keyboard restoration. Keep the
             // host open; the ordinary failure alert below retains diagnostics.
-            terminating=false;typingSounds.setPaused("quitting",active:false);NSApp.reply(toApplicationShouldTerminate:false);setExitPresentation(false)
+            terminating=false;typingSounds.setPaused("quitting",active:false);self.replyToTermination(false);setExitPresentation(false)
             if status==0 && !signaled {startWorker();return}
             permissionRecovery.attempted=true
         }
@@ -842,11 +894,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             audioCapture.stop();pendingAudio=nil
             appendWorkerLog(Data("Restarting local service after unexpected exit in \(delay)s.\n".utf8))
             DispatchQueue.main.asyncAfter(deadline:.now()+delay){[weak self] in
-                guard let self=self,!self.terminating,self.worker==nil else{return}
+                guard let self=self,!self.terminating,!self.updateInstallCommitted,self.worker==nil else{return}
                 self.startWorker()
             }
             return
         }
+        if updateAbortRecoveryRequested && !terminating {presentUpdateRecoveryFailure();return}
         let failed=status != 0 || signaled
         if failed || !terminating {
             let alert=NSAlert()
@@ -868,10 +921,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             NSApp.activate(ignoringOtherApps:true)
             if alert.runModal() == .alertSecondButtonReturn {NSWorkspace.shared.activateFileViewerSelecting([workerLogURL])}
         }
-        if terminating {NSApp.reply(toApplicationShouldTerminate:true)}
+        if terminating {self.replyToTermination(true)}
+    }
+    func ready(_ address:String,from source:Process){
+        guard worker === source else{return}
+        ready(address)
     }
     func ready(_ address:String){
-        guard !terminating,worker?.isRunning==true,let url=URL(string:address) else{return};baseURL=url
+        guard !terminating,!updateInstallCommitted,worker?.isRunning==true,let url=URL(string:address) else{return};baseURL=url
         if let bytes=try? Data(contentsOf:dataDirectory.appendingPathComponent("runtime.json")),let data=(try? JSONSerialization.jsonObject(with:bytes)) as? [String:Any]{apiToken=data["token"] as? String ?? ""}
         if musicEverUsed,web.url != nil {
             // A worker restart must not replace the document holding unsaved
@@ -881,6 +938,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                 web.evaluateJavaScript("window.__AIR_TOKEN__ = (\(encoded)).token;window.dispatchEvent(new Event('nuphylab:service-reconnected'));",completionHandler:nil)
             } else {musicSaveFailed=true;presentMusicSaveFailure()}
         } else {musicDocumentOrigin=url;web.load(URLRequest(url:url))}
+        if updateAbortRecoveryRequested {updateRetiringWorker=nil;updateAbortRecoveryRequested=false;setExitPresentation(false)}
         startHotkeyMonitoring()
     }
     @objc func show(){window?.makeKeyAndOrderFront(nil);NSApp.activate(ignoringOtherApps:true)}
@@ -898,26 +956,79 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     @objc func restore(){post(["op":"restore"])}
     @objc func quit(){NSApp.terminate(nil)}
     @objc func checkForUpdates(){
+        if updateAbortRecoveryRequested {retryAbortedUpdateService();return}
         if pendingUpdateInstall != nil { prepareUpdateInstallation(); return }
         #if canImport(Sparkle)
         updater?.checkForUpdates()
         #endif
     }
     func prepareUpdateInstallation(){
-        guard !preparingUpdate,!musicFlushInProgress,!musicExportActive,!terminating,pendingUpdateInstall != nil else{return}
+        guard !preparingUpdate,!updateInstallCommitted,!updateAbortRecoveryRequested,!permissionRelaunchPending,!musicFlushInProgress,!musicExportActive,!terminating,pendingUpdateInstall != nil else{return}
+        guard !dragConvert.busy else{presentDragBusyNotice();return}
+        dragConvert.suspend()
+        updateMusicSaveEpoch=musicEverUsed ? musicFlushEpoch+1 : nil
         flushMusicForTransition { [weak self] saved in
             guard let self else{return}
+            self.updateMusicSaveEpoch=nil
             if saved {self.prepareUpdateAfterMusicSave()}
             else {self.presentMusicSaveFailure()}
         }
     }
+    func recoverAfterAbortedUpdate(){
+        guard !terminating,!updateAbortRecoveryRequested,
+              updateInstallCommitted || preparingUpdate || pendingUpdateInstall != nil else{return}
+        let releasedService=updateInstallCommitted || preparingUpdate
+        updatePreparationEpoch+=1
+        pendingUpdateInstall=nil;pendingUpdateVersion=nil;preparingUpdate=false
+        let cancellingUpdateQuit=updateInstallCommitted && applicationQuitPending
+        if musicFlushInProgress && (updateMusicSaveEpoch==musicFlushEpoch || cancellingUpdateQuit) {
+            musicFlushEpoch+=1;musicFlushInProgress=false
+        }
+        updateMusicSaveEpoch=nil
+        if cancellingUpdateQuit {replyToTermination(false)}
+        updateInstallCommitted=false
+        guard releasedService else{
+            if !applicationQuitPending {setExitPresentation(false)}
+            return
+        }
+        // The update has explicitly aborted. Keep the WebKit document and its
+        // drafts alive; restart only the released local service, then unlock
+        // when the replacement reports ready. No AppKit exit or relaunch ticket.
+        updateAbortRecoveryRequested=true;updateRetiringWorker=worker
+        dragConvert.suspend();stopHotkeyMonitoring()
+        appendWorkerLog(Data("Update aborted; recovering the local service while retaining the current document.\n".utf8))
+        retryAbortedUpdateService()
+    }
+    func retryAbortedUpdateService(){
+        guard updateAbortRecoveryRequested,!terminating,!updateInstallCommitted else{return}
+        if let retiring=updateRetiringWorker {
+            guard worker === retiring,retiring.isRunning else{return} // Wait for its queued exit callback.
+            let pid=retiring.processIdentifier
+            let sent=pid>0 ? Darwin.kill(pid,SIGTERM) : -1
+            let code=pid>0 ? errno : EINVAL
+            if sent != 0 && code != ESRCH {presentUpdateRecoveryFailure()}
+        } else if worker == nil {
+            workerRestartPolicy=WorkerRestartPolicy()
+            startWorker()
+        }
+    }
+    func presentUpdateRecoveryFailure(){
+        let alert=NSAlert();alert.alertStyle = .warning
+        alert.messageText=english ? "Resume NuPhy Lab" : "恢复 NuPhy Lab"
+        alert.informativeText=english ? "The update was cancelled. Your current page and unsaved work are still open. Retry to reconnect the local service." : "更新已取消，当前页面和未保存的作品仍保留。请重试连接本地服务。"
+        alert.addButton(withTitle:english ? "Retry" : "重试")
+        alert.addButton(withTitle:english ? "Stay open" : "保持打开")
+        if alert.runModal() == .alertFirstButtonReturn {retryAbortedUpdateService()}
+    }
     func prepareUpdateAfterMusicSave(){
-        guard !preparingUpdate, pendingUpdateInstall != nil, let base=baseURL,let version=pendingUpdateVersion else {unlockMusicTransition();return}
+        guard !preparingUpdate, !updateInstallCommitted, !updateAbortRecoveryRequested, pendingUpdateInstall != nil, let base=baseURL,let version=pendingUpdateVersion else {unlockMusicTransition();return}
+        guard !dragConvert.busy else{unlockMusicTransition();presentDragBusyNotice();return}
+        guard let requestWorker=worker,requestWorker.isRunning else{unlockMusicTransition();return}
         do {try PendingAppUpdate.stage(version:version)} catch {
             appendWorkerLog(Data("Unable to prepare update relaunch: \(error.localizedDescription)\n".utf8))
             unlockMusicTransition();makeAppUpdateAlert(.preparationFailed,english:english).runModal();return
         }
-        preparingUpdate=true
+        preparingUpdate=true;updatePreparationEpoch+=1;let epoch=updatePreparationEpoch
         setExitPresentation(true)
         var request=URLRequest(url:base.appendingPathComponent("api/command"),timeoutInterval:60)
         request.httpMethod="POST";request.setValue(apiToken,forHTTPHeaderField:"X-Air-Token")
@@ -925,10 +1036,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         request.httpBody=try? JSONSerialization.data(withJSONObject:["op":"prepareAppUpdate"])
         URLSession.shared.dataTask(with:request){[weak self] data,response,error in
             DispatchQueue.main.async {
-                guard let self=self else{return};self.preparingUpdate=false
+                guard let self=self,self.worker === requestWorker,self.updatePreparationEpoch==epoch,!self.updateAbortRecoveryRequested else{return};self.preparingUpdate=false
                 let result=data.flatMap{try? JSONSerialization.jsonObject(with:$0)} as? [String:Any]
                 if error == nil,(response as? HTTPURLResponse)?.statusCode==200,result?["ok"] as? Bool==true {
-                    self.stopHotkeyMonitoring();self.audioCapture.stop();self.pendingAudio=nil
+                    self.updateInstallCommitted=true
+                    self.dragConvert.shutdown();self.stopHotkeyMonitoring();self.audioCapture.stop();self.pendingAudio=nil
                     let install=self.pendingUpdateInstall;self.pendingUpdateInstall=nil;install?()
                 } else {
                     self.setExitPresentation(false)
@@ -939,8 +1051,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             }
         }.resume()
     }
-    @objc func willSleep(){ stopMusic(suspend:true); selectionLab.cancel(); keySessionSuspended=true;setHotkeysEnabled(false);audioCapture.stop();pendingAudio=nil }
-    @objc func didWake(){ keySessionSuspended=false;if !terminating && !preparingUpdate {post(["op":"resumeConnection"]);refreshHotkeys()} }
+    @objc func willSleep(){ dragConvert.suspend(); stopMusic(suspend:true); selectionLab.cancel(); keySessionSuspended=true;setHotkeysEnabled(false);audioCapture.stop();pendingAudio=nil }
+    @objc func didWake(){ keySessionSuspended=false;if !terminating && !preparingUpdate && !updateInstallCommitted && !updateAbortRecoveryRequested {dragConvert.resume();post(["op":"resumeConnection"]);refreshHotkeys()} }
     func post(_ data:[String:Any]){guard let base=baseURL else{return};var request=URLRequest(url:base.appendingPathComponent("api/command"));request.httpMethod="POST";request.setValue(apiToken,forHTTPHeaderField:"X-Air-Token");request.setValue("application/json",forHTTPHeaderField:"Content-Type");request.httpBody=try? JSONSerialization.data(withJSONObject:data);URLSession.shared.dataTask(with:request).resume()}
     func activateSlot(_ index:Int,phase:String="down",gesture:NativeKeyGesture?=nil,
                       source:NativeKeyEventSource?=nil,eventTime:Double?=nil){
@@ -1114,7 +1226,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func musicPlayAllowed(recoverDictation:Bool=false,requireForeground:Bool=false)->Bool{
         if recoverDictation {musicCaptureReasons.remove("dictationUnconfirmed")}
         let foreground = (NSApp?.isActive ?? false) && window?.isKeyWindow == true && window?.isMiniaturized == false
-        return musicCaptureReasons.isEmpty && !terminating && !musicFlushInProgress && !preparingUpdate && (!requireForeground || foreground)
+        return musicCaptureReasons.isEmpty && !terminating && !musicFlushInProgress && !preparingUpdate && !updateInstallCommitted && !updateAbortRecoveryRequested && (!requireForeground || foreground)
     }
     func stopMusic(suspend:Bool=false){
         if suspend {musicActive=false;refreshMusicPause()}
@@ -1156,6 +1268,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
             let allowed=musicPlayAllowed(recoverDictation:body["resumeAfterDictation"] as? Bool == true,requireForeground:body["request"] as? Bool == true)
             musicActive=present && active && allowed
             refreshMusicPause();replyHandler(["allowed":allowed,"blocked":!musicCaptureReasons.isEmpty,"unconfirmed":musicCaptureReasons.contains("dictationUnconfirmed")],nil);return
+        }
+        if message.name == "dragConvert" {
+            guard !terminating, !preparingUpdate, !updateInstallCommitted, !updateAbortRecoveryRequested, !musicFlushInProgress else{replyHandler(nil,english ? "Finishing the current operation" : "正在完成当前操作");return}
+            dragConvert.handle(body, reply:replyHandler);return
         }
         if message.name == "typingSounds" { typingSounds.handle(body, reply: replyHandler); return }
         if message.name == "selectionLab" { selectionLab.handle(body, reply: replyHandler); return }
@@ -1248,9 +1364,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         permissionRecovery.observe(granted:granted,
             captureReady:localGranted && permissionHelperReady && (!hotkeysEnabled || functionKeyTapIsActive()),now:now,
             freshGrantNeedsRelaunch:fresh != nil && granted && stale)
-        let canRecover = !musicSaveFailed && !musicActive && !musicExportActive && !musicFlushInProgress && !selectionLab.isBusy && !capturingKey && keyGestureGate.activeCount==0 && !driverOpenInFlight && !preparingUpdate && !permissionRelaunchPending
+        let canRecover = !dragConvert.busy && !dragConvert.isFileDragActive && !musicSaveFailed && !musicActive && !musicExportActive && !musicFlushInProgress && !selectionLab.isBusy && !capturingKey && keyGestureGate.activeCount==0 && !driverOpenInFlight && !preparingUpdate && !updateInstallCommitted && !updateAbortRecoveryRequested && !permissionRelaunchPending
             && !CommandLine.arguments.contains(PermissionAppRelaunch.argument)
         if permissionRecovery.shouldRecover(now:now,idle:canRecover) {
+            permissionShutdownCommitted=false
             permissionRelaunchPending=true
             appendWorkerLog(Data("Applying newly granted permissions by a single clean app relaunch.\n".utf8))
             NSApp.terminate(nil);return
@@ -1541,6 +1658,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         post(["op":"codexKeyStatus","registered":registeredCodes,"failed":failedCodes,"suspended":suspended])
     }
     func startHotkeyMonitoring(){
+        guard !updateInstallCommitted,!updateAbortRecoveryRequested else{return}
         stopHotkeyMonitoring()
         keyRevision = -1
         reportNativePermissions(force:true)
@@ -1574,7 +1692,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
                 let helper=native?["helper"] as? [String:Any] ?? native
                 self.permissionHelperReady=["inputMonitoring","accessibility","canPostEvents"].allSatisfy{helper?[$0] as? Bool==true}
                 if let value=settings?["language"] as? String, ["en","zh-CN"].contains(value), self.english != (value == "en") {
-                    self.english = value == "en"; self.buildMenus(); self.selectionLab.updateLanguage(self.english ? .en:.zh)
+                    self.english = value == "en"; self.buildMenus(); self.selectionLab.updateLanguage(self.english ? .en:.zh); self.dragConvert.updateLanguage(english:self.english)
                     #if canImport(Sparkle)
                     self.updateUserDriver?.refreshLanguage()
                     #endif
@@ -1778,10 +1896,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
     func sendCapturedFunctionKey(_ code:String,phase:String) {
         web.evaluateJavaScript("window.dispatchEvent(new CustomEvent('nuphylab:function-key',{detail:{code:'\(code)',phase:'\(phase)'}}));",completionHandler:nil)
     }
-    func applicationWillTerminate(_ notification:Notification) { typingSounds.shutdown() }
+    func applicationWillTerminate(_ notification:Notification) { dragConvert.shutdown(); typingSounds.shutdown() }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{return false}
     func applicationShouldHandleReopen(_ sender:NSApplication,hasVisibleWindows:Bool)->Bool{show();return true}
-    func unlockMusicTransition(){web?.evaluateJavaScript("window.dispatchEvent(new Event('nuphylab:music-quit-finished'))",completionHandler:nil)}
+    func unlockMusicTransition(){if !terminating && !preparingUpdate && !updateInstallCommitted && !updateAbortRecoveryRequested && !keySessionSuspended {dragConvert.resume()};web?.evaluateJavaScript("window.dispatchEvent(new Event('nuphylab:music-quit-finished'))",completionHandler:nil)}
     func registerMusicDocument(_ body:[String:Any])->Bool{
         guard let id=body["documentId"] as? String,!id.isEmpty,!retiredMusicDocuments.contains(id),!musicDocumentLost else{return false}
         if musicDocumentID==nil {
@@ -1853,21 +1971,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         }
         DispatchQueue.main.asyncAfter(deadline:.now()+20){finish(false)}
     }
+    func presentDragBusyNotice(){
+        let alert=NSAlert();alert.messageText=english ? "Files are still being converted" : "文件仍在转换中"
+        alert.informativeText=english ? "Wait for conversion to finish, or cancel it in Labs > Drag Convert, then try again. Your originals are kept." : "请等待转换完成，或在「实验室 → 拖拽转换」中取消后重试。原文件会保留。"
+        alert.addButton(withTitle:english ? "OK" : "好");alert.runModal()
+    }
+    func replyToTermination(_ allow:Bool){
+        guard applicationQuitPending else{return}
+        applicationQuitPending=false
+        NSApp.reply(toApplicationShouldTerminate:allow)
+    }
     func applicationShouldTerminate(_ sender:NSApplication)->NSApplication.TerminateReply{
+        guard !dragConvert.busy else{presentDragBusyNotice();return .terminateCancel}
         if musicExportActive || preparingUpdate {NSSound.beep();return .terminateCancel}
-        if musicFlushInProgress || terminating {return .terminateLater}
-        guard musicEverUsed else{return terminateAfterMusicSave(sender)}
+        if terminating {return .terminateLater}
+        if musicFlushInProgress {return applicationQuitPending ? .terminateLater : .terminateCancel}
+        applicationQuitPending=true
+        dragConvert.suspend()
+        guard musicEverUsed else{
+            let result=terminateAfterMusicSave(sender)
+            if result != .terminateLater {applicationQuitPending=false}
+            return result
+        }
         flushMusicForTransition { [weak self] saved in
             guard let self else{return}
             if saved {
                 let result=self.terminateAfterMusicSave(sender)
-                if result != .terminateLater {if result == .terminateCancel {self.unlockMusicTransition()};NSApp.reply(toApplicationShouldTerminate:result == .terminateNow)}
-            } else {NSApp.reply(toApplicationShouldTerminate:false);self.presentMusicSaveFailure()}
+                if result != .terminateLater {if result == .terminateCancel {self.unlockMusicTransition()};self.replyToTermination(result == .terminateNow)}
+            } else {self.replyToTermination(false);self.presentMusicSaveFailure()}
         }
         return .terminateLater
     }
     func terminateAfterMusicSave(_ sender:NSApplication)->NSApplication.TerminateReply{
         if terminating{return .terminateLater}
+        guard !dragConvert.busy else{presentDragBusyNotice();return .terminateCancel}
+        dragConvert.shutdown()
         selectionLab.shutdown()
         typingSounds.setPaused("quitting",active:true)
         resetOfficialDriverReturn()
@@ -1875,6 +2013,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         guard let worker=worker else{return .terminateNow}
         // A stopped process may still have a queued termination callback and log flush.
         // Let that callback surface a nonzero exit instead of bypassing it on a second quit.
+        permissionShutdownCommitted=permissionRelaunchPending
         terminating=true
         setExitPresentation(true)
         guard worker.isRunning else{return .terminateLater}
@@ -1884,12 +2023,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, WKNa
         let signalResult=workerPID>0 ? Darwin.kill(workerPID,SIGTERM) : -1
         let signalError=workerPID>0 ? errno : EINVAL
         if signalResult != 0 && signalError != ESRCH {
-            permissionRelaunchPending=false
+            permissionRelaunchPending=false;permissionShutdownCommitted=false
             terminating=false
             typingSounds.setPaused("quitting",active:false)
             setExitPresentation(false)
             appendWorkerLog(Data("Worker shutdown signal failed: pid=\(workerPID), errno=\(signalError)\n".utf8))
-            startHotkeyMonitoring()
+            dragConvert.resume();startHotkeyMonitoring()
             let alert=NSAlert();alert.alertStyle = .warning;alert.messageText=self.T("未能开始恢复键盘灯效");alert.informativeText=self.T("退出请求未能发送给灯光服务。应用仍保持运行，请稍后再试。");alert.runModal()
             return .terminateCancel
         }
@@ -1954,6 +2093,14 @@ extension AppDelegate: SPUUpdaterDelegate {
         pendingUpdateVersion=item.versionString
         prepareUpdateInstallation()
         return true
+    }
+    func updater(_ updater: SPUUpdater, didAbortWithError error: Error) {
+        recoverAfterAbortedUpdate()
+    }
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: Error?) {
+        // A nil error can also mean an installation is scheduled; it is not
+        // evidence that the committed installation has been cancelled.
+        if error != nil {recoverAfterAbortedUpdate()}
     }
 }
 #endif

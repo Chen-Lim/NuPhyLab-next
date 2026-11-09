@@ -1,0 +1,17 @@
+{
+  "tag": "v3.7.4",
+  "purpose": "Public headers only, links macOS system libarchive.2; no upstream binaries or build scripts.",
+  "files": [
+    {
+      "name": "archive.h",
+      "url": "https://raw.githubusercontent.com/libarchive/libarchive/v3.7.4/libarchive/archive.h",
+      "sha256": "618cd16c8fa40ddabc44f2d3eb3a35860f6b1d1d856b62a7f4f035b7a319bdab"
+    },
+    {
+      "name": "archive_entry.h",
+      "url": "https://raw.githubusercontent.com/libarchive/libarchive/v3.7.4/libarchive/archive_entry.h",
+      "sha256": "3695eb0193741b16b99e06cf1fc5e6db427b68a9475696ef746c024ae0a6ae72"
+    }
+  ],
+  "license": "https://raw.githubusercontent.com/libarchive/libarchive/v3.7.4/COPYING"
+}

@@ -8,6 +8,7 @@
 - [English installation, usage and development guide](../README.en.md)
 - [键盘型号、固件与兼容范围 / Keyboard models, firmware and compatibility](KEYBOARD_COMPATIBILITY.md)
 - [模拟声浪与音源说明 / Typing Sounds and sound credits](TYPING_SOUNDS.md)
+- [拖拽转换与自定义触发键 / Drag Convert and custom trigger keys](DRAG_CONVERT.md)
 - [演奏模式与作品 / Performance and saved works](PERFORMANCE.md)
 - [框选提问 / Ask about a selection](SELECTION.md)
 - [模型、图片与权限 / Models, images and permissions](SELECTION_R2.md)
@@ -23,6 +24,8 @@
 - [第三方声明 / Third-party notices](../THIRD_PARTY_NOTICES.md)
 
 ## 分版记录 / Version history
+
+- [1.2.45 发行说明 / Release notes](RELEASE_1.2.45.md)
 
 - [1.2.44 发行说明 / Release notes](RELEASE_1.2.44.md)
 - [1.2.43 发行说明 / Release notes](RELEASE_1.2.43.md)

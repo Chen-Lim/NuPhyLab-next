@@ -9,7 +9,9 @@ enum AppLanguage {case zh,en}
  var requestRelaunch:(()->Bool)? {get set}
  var recordingChanged:((Bool)->Void)? {get set}
  var voiceActivityChanged:((Bool)->Void)? {get set}
+ var fileDragActive:(()->Bool)? {get set}
  var isBusy:Bool {get}
+ var dragReservedTrigger:String? {get}
  func updateLanguage(_ language:AppLanguage)
  func updateReservedKeys(_ codes:Set<UInt32>)
  func handle(_ body:[String:Any],reply:@escaping(Any?,String?)->Void)
@@ -23,6 +25,8 @@ enum AppLanguage {case zh,en}
  static func make(directory:URL)->any SelectionFeature {SelectionBoundaryFixture()}
 }
 @MainActor private final class SelectionBoundaryFixture:SelectionFeature {
+ var dragReservedTrigger:String? {nil}
+ var fileDragActive:(()->Bool)?
  var showSettings:(()->Void)?;var requestRelaunch:(()->Bool)?;var recordingChanged:((Bool)->Void)?;var voiceActivityChanged:((Bool)->Void)?;var isBusy=false
  func updateLanguage(_ language:AppLanguage){}
  func updateReservedKeys(_ codes:Set<UInt32>){}
@@ -41,4 +45,18 @@ enum AppLanguage {case zh,en}
 
 enum TypingDictationCompletion {
  static func confirmed(_ result:[String:Any]?) -> Bool { result?["released"] as? Bool == true && ["idle","finishing"].contains(result?["observedState"] as? String ?? "unknown") }
+}
+
+// File conversion is isolated from keyboard/updater harnesses. Production
+// converters and drop callbacks are tested with generated file fixtures.
+final class DragConvertController {
+ var selectionReservedTrigger:()->String?={nil}
+ var reservedKeyCodes:()->Set<UInt32> = {[]}
+ var busy=false; var isFileDragActive=false
+ var canPresent:()->Bool = {true};var activityChanged:((Bool)->Void)?
+ var suspended=false
+ init(directory:URL) {}
+ func updateLanguage(english:Bool) {}
+ func handle(_ body:[String:Any],reply:@escaping(Any?,String?)->Void){reply(nil,"Drag boundary fixture")}
+ func suspend(){suspended=true};func resume(){suspended=false};func shutdown(){suspended=true}
 }

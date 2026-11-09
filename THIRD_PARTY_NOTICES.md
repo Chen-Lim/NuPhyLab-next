@@ -86,3 +86,18 @@ Typing Sounds bundles 636 audio files: twelve tuned profiles derived from three 
 
 ## Salamander Grand Piano
 30 MP3 samples from the Salamander Grand Piano v3 by Alexander Holm, licensed CC BY 3.0. Original: https://github.com/sfzinstruments/SalamanderGrandPiano . MP3 conversion: https://github.com/Tonejs/audio/tree/master/salamander . License: https://creativecommons.org/licenses/by/3.0/ . This edition uses one velocity layer and pitch shifts between samples; it is not the complete original library. The bundled music/piano/LICENSE.txt and ATTRIBUTION.txt include the license and attribution.
+
+## Drag Convert
+
+
+The drag observation and destination lifecycle implementation references and adapts MIT-licensed Swivel (Jonathan Lotan) and Kumquat (Ian Di Filippo). Convertino and Clementine were also reviewed as implementation references. Pinned revisions and scope are documented in docs/DRAG_CONVERT.md. Full MIT licence texts for all four projects are bundled in drag-convert-licenses and available in source under assets/drag-convert-licenses.
+
+## libarchive
+
+Build headers: upstream v3.7.4, native/drag/archive-headers/ORIGIN.json. Runtime links the macOS system libarchive.2. BSD license reproduced in assets/drag-convert-licenses/libarchive-BSD.txt. No third-party archive executables are bundled. QA-only compressed fixtures come from the same upstream libarchive/test release.
+
+## libwebp 1.6.0
+
+WebP 图片编码使用内置的 libwebp，BSD 许可及专利授权随包附带。
+WebP image encoding uses the bundled libwebp library. Its BSD license and patent grant are included in `drag-convert-licenses/libwebp-COPYING.txt` and `libwebp-PATENTS.txt`.
+Source: https://chromium.googlesource.com/webm/libwebp/

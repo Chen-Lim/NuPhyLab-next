@@ -1,0 +1,15 @@
+{
+  "version": "1.2.45",
+  "zh-CN": [
+    "实验室新增拖拽转换：图片、PDF、音视频格式转换，ZIP / TAR.GZ 打包与批量解压。",
+    "支持先按住 Shift 再拖起文件；原件保留，进度、取消和最近 20 次记录集中在页面中。",
+    "拖拽菜单采用更清晰的灰阶配色，新增 WebP 转换并保留透明背景。",
+    "触发键默认为 Shift，可自定义为单个按键；自动保存设置，并提示输入监控权限和 AI / 框选按键冲突。"
+  ],
+  "en": [
+    "Add Drag Convert in Labs for images, PDFs, video and audio, ZIP / TAR.GZ packing and batch extraction.",
+    "Hold Shift before or during a file drag. Originals are kept; progress, cancellation and the last 20 batches stay on the page.",
+    "Improve drag-menu contrast with a grayscale palette; add WebP conversion with transparency.",
+    "Shift is the default trigger; customize it to one supported key. Settings are saved automatically, with Input Monitoring guidance and AI and selection shortcut conflict checks."
+  ]
+}

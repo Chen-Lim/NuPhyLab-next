@@ -24,11 +24,13 @@ enum LabKeychain {
 @available(macOS 14, *)
 @MainActor final class SelectionLab:NSObject,NSWindowDelegate,SelectionFeature {
  let directory:URL;var showSettings:(()->Void)?;var requestRelaunch:(()->Bool)?;var recordingChanged:((Bool)->Void)?;var voiceActivityChanged:((Bool)->Void)?
+ var fileDragActive:(()->Bool)?
  private var language=AppLanguage.zh
  private var stopping=false
  private var keyboardReservedKeys=Set<UInt32>()
  private var shortcutConflict:Bool{preferences.shortcut.conflictsWithKeyboard(keyboardReservedKeys)}
  func updateReservedKeys(_ codes:Set<UInt32>){guard !stopping,codes != keyboardReservedKeys else{return};keyboardReservedKeys=codes;if shortcutConflict{cancel()};do{try register(preferences)}catch{registrationIssue=Self.friendly(error,language:language)}}
+ var dragReservedTrigger:String? { preferences.enabled ? DragTrigger.selectionReservation(keyCode:preferences.shortcut.keyCode,modifiers:preferences.shortcut.modifiers,modifierOnly:preferences.shortcut.modifierOnly == true) : nil }
  var isBusy:Bool{recordingReply != nil || !overlays.isEmpty || task != nil || utilityTask != nil || voicePending}
  private var freshPermissions:LabPermissionSnapshot?;private var freshAt:TimeInterval=0;private var nextProbe:TimeInterval=0;private var permissionProbe:Process?
  private var permissionRecheckUntil:TimeInterval=0
@@ -194,6 +196,7 @@ enum LabKeychain {
   do{try shortcut.validate();guard !shortcut.conflictsWithKeyboard(keyboardReservedKeys) else{throw LabIssue("此按键正在用于 AI 键盘控制，请选择其他按键或带修饰键的组合。")};var next=preferences;next.shortcut=shortcut;try register(next);try persist(next);preferences=next;reply(status(),nil)}catch{try? register(preferences);reply(nil,Self.friendly(error,language:language))}
  }
  func consumeLocal(_ event:NSEvent)->Bool{
+  if fileDragActive?() == true {return false}
   if event.type == .keyDown,event.keyCode==53,panel?.isVisible==true{cancel(animatePanel:true);return true}
   if recordingReply != nil{
    if event.type == .keyDown && event.keyCode==53{cancelShortcutRecording();return true}
@@ -209,6 +212,7 @@ enum LabKeychain {
  private func shortcutBegan(){guard !hold.keyboard else{return};startFromShortcut(held:true)}
  private func shortcutReleased(){if hold.releaseKeyboard(){commitSelection()};overlayFeedback()}
  private func startFromShortcut(held:Bool=false){
+  guard fileDragActive?() != true else{return}
   guard preferences.enabled,!held || !shortcutConflict else{return};guard configurationIssue(preferences).isEmpty else{cancel();showSettings?();return};guard !IsSecureEventInputEnabled() else{return};guard missing.isEmpty else{showPermissionPanel();return}
   cancel();hold.keyboard=held;pendingAction=preferences.defaultAction;viewState.action=pendingAction
   for screen in NSScreen.screens {

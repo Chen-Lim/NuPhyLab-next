@@ -1,0 +1,78 @@
+import {useEffect,useRef,useState} from 'react';
+import {FolderOpen,ChevronRight,ArrowUpRight,Check,LoaderCircle} from 'lucide-react';
+import {useLanguage} from './i18n';
+import './drag-convert.css';
+import triggerKeys from '../../shared/drag-trigger-keys.json';
+
+type Preferences={enabled:boolean;trigger:string;quality:number;maxDimension:number;outputDirectory?:string|null};
+type Batch={id:string;format:string;time:number;succeeded:number;failed:number;inputCount?:number;cancelled?:boolean;files:{input:string;output:string;error:string}[]};
+type Status={preferences:Preferences;ready:boolean;busy:boolean;completed:number;total:number;history:Batch[];issue:string;progress:number;currentAction:string;currentFile:string;cancelling:boolean;triggerLabels?:Record<string,string>;inputPermissionNeeded?:boolean};
+const defaults:Preferences={enabled:false,trigger:'shift',quality:.88,maxDimension:1600};
+const groups=[
+ {id:'image',zh:'图片',en:'Images',file:'PHOTO.HEIC',input:'JPG · PNG · HEIC · WebP · TIFF · BMP',actions:['jpg','png','webp','heic','tiff','small','imagesPDF','zip','zipFast'],note:['静态图片转格式；多张图片按文件名顺序合成一份 PDF。','Convert static images; combine selected images into one PDF in filename order.']},
+ {id:'pdf',zh:'PDF',en:'PDF',file:'DOCUMENT.PDF',input:'PDF',actions:['mergePDF','pdfPNG','pdfJPG','splitPDF','zip','zipEach'],note:['多选 PDF 可合并；拆页和转图片会存入独立文件夹。','Select multiple PDFs to merge. Split pages and images go into a new folder.']},
+ {id:'video',zh:'视频',en:'Video',file:'CLIP.MOV',input:'MP4 · MOV · M4V',actions:['mp4','mov','video720','video1080','m4a','zip','zipFast'],note:['转换视频、导出 720p / 1080p，或提取 M4A 音频。','Convert video, export at 720p / 1080p, or extract M4A audio.']},
+ {id:'audio',zh:'音频',en:'Audio',file:'TRACK.MP3',input:'MP3 · M4A · WAV · AIFF · CAF · AAC · FLAC',actions:['m4a','wav','aiff','zip','zipFast'],note:['M4A 适合分享，WAV / AIFF 方便继续编辑。','M4A for sharing. WAV / AIFF for editing.']},
+ {id:'archive',zh:'压缩包',en:'Archives',file:'3 FILES',input:'文件 · 文件夹 · 混合多选',actions:['zip','zipEach','tarGz'],note:['一起打包成 ZIP，或为每个选中项单独生成 ZIP。文件夹与混合文件也可以。','Pack one ZIP, or one ZIP per selected item. Folders and mixed selections work too.']},
+];
+function actionTitle(id:string,en:boolean){const names:Record<string,[string,string]>={webp:['WebP','WebP'],zip:['打包 ZIP','Pack ZIP'],zipEach:['分别 ZIP','Each ZIP'],zipFast:['快速 ZIP','Store ZIP'],tarGz:['TAR.GZ','TAR.GZ'],extract:['解压','Extract'],small:['小图 JPG','Small JPG'],imagesPDF:['合成 PDF','To PDF'],pdfPNG:['PNG','PNG'],pdfJPG:['JPG','JPG'],splitPDF:['拆分页面','Split pages'],mergePDF:['合并 PDF','Merge PDFs'],video720:['720p','720p'],video1080:['1080p','1080p']};return names[id]?.[en?1:0]??id.toUpperCase();}
+async function native(op:string,body:Record<string,unknown>={}):Promise<Status> {
+ const bridge=(window as unknown as {webkit?:{messageHandlers?:{dragConvert?:{postMessage:(body:unknown)=>Promise<Status>}}}}).webkit?.messageHandlers?.dragConvert;
+ if(!bridge)throw new Error('请在 NuPhy Lab 中打开 / Open in NuPhy Lab');
+ return bridge.postMessage({op,...body});
+}
+function Wheel({english,selected,actions,fileCount}:{english:boolean;selected:number|null;actions:string[];fileCount:number}) {
+ const count=actions.length,point=(r:number,a:number)=>[126+Math.sin(a)*r,126-Math.cos(a)*r];
+ const sector=(i:number)=>{const a=(i*2-1)*Math.PI/count+.045,b=(i*2+1)*Math.PI/count-.045;return `M${point(34,a)} A34 34 0 0 1 ${point(34,b)} L${point(112,b)} A112 112 0 0 0 ${point(112,a)} Z`;};
+ return <svg className="dc-wheel" viewBox="0 0 252 252" aria-label={english?'Menu preview':'菜单预览'} role="img">
+  <rect x="0.375" y="0.375" width="251.25" height="251.25" rx="18" fill="#141414" stroke="#636363" strokeWidth="0.75"/>
+  {actions.map((id,i)=>{const [x,y]=point(77,i*2*Math.PI/count),title=actionTitle(id,english),lines=english&&count>=9?title.split(' '):[title];return <g key={id}><path d={sector(i)} fill={selected===i?'#E6E6E6':'#292929'} stroke={selected===i?'#FFFFFF':'#5A5A5A'} strokeWidth={0.75}/><text x={x} y={y+4-(lines.length-1)*6} textAnchor="middle" fill={selected===i?'#111111':'#EDEDED'} fontSize={count>=7?11:count>=5?12:13} fontWeight="500">{lines.map((line,j)=><tspan key={j} x={x} dy={j?12:0}>{line}</tspan>)}</text></g>;})}
+  <text x="126" y="123" textAnchor="middle" fill="#EDEDED" fontSize="14">{fileCount}</text><text x="126" y="140" textAnchor="middle" fill="#A0A0A0" fontSize="10">{english?'FILES':'个文件'}</text>
+ </svg>;
+}
+export function DragConvertLab(){
+ const english=useLanguage()==='en',copy=(zh:string,en:string)=>english?en:zh;
+ const [status,setStatus]=useState<Status|null>(null),[error,setError]=useState(''),[saving,setSaving]=useState(false),[expanded,setExpanded]=useState<string|null>(null),[preview,setPreview]=useState<number|null>(null),[category,setCategory]=useState(0),[archiveMode,setArchiveMode]=useState(0);
+ const writing=useRef(false),alive=useRef(true);
+ useEffect(()=>{
+  alive.current=true;let reading=false;
+  const read=async()=>{if(reading||writing.current)return;reading=true;try{const value=await native('status');if(alive.current&&!writing.current)setStatus(value);}catch(e){if(alive.current)setError(String((e as Error).message));}finally{reading=false;}};
+  void read();const timer=setInterval(read,600);window.addEventListener('focus',read);
+  return()=>{alive.current=false;clearInterval(timer);window.removeEventListener('focus',read);};
+ },[]);
+ const localizedIssue=(message:string)=>{const split=message.indexOf(' / ');return split>=0&&/[\u3400-\u9fff]/.test(message.slice(0,split))?(english?message.slice(split+3):message.slice(0,split)):message;};
+ const preferences=status?.preferences??defaults;
+ const group=category===4&&archiveMode===1?{...groups[4],file:'ARCHIVE.ZIP',input:'ZIP · 7Z · RAR · TAR · GZ · BZ2 · XZ',actions:['extract','zip','tarGz'],note:['松手后解压到新文件夹。多选压缩包会分别解压，原压缩包保留。','Extract into a new folder. Multiple archives extract separately; originals are kept.']}:groups[category];
+ async function request(op:string,body:Record<string,unknown>={}){
+  if(writing.current)return;writing.current=true;setSaving(true);setError('');
+  try{const next=await native(op,body);if(alive.current&&op!=='reveal')setStatus(next);}catch(e){if(alive.current)setError(String((e as Error).message));}
+  finally{writing.current=false;if(alive.current)setSaving(false);}
+ }
+ const update=(value:Partial<Preferences>)=>void request('settings',{preferences:{...preferences,...value}});
+ const rawKeyTitle=(key:typeof triggerKeys[number])=>status?.triggerLabels?.[key.value]??key[english?'en':'zh'];
+ const keyTitle=(key:typeof triggerKeys[number])=>{const title=rawKeyTitle(key);return triggerKeys.some(other=>other.value!==key.value&&rawKeyTitle(other)===title)?`${title} · ${english?'US':'美式'} ${key.en}`:title;};
+ const activeKey=triggerKeys.find(key=>key.value===preferences.trigger),triggerLabel=activeKey?keyTitle(activeKey):'⇧ Shift';
+ const progress=status?Math.min(100,Math.round((status.completed+status.progress)/Math.max(1,status.total)*100)):0;
+ return <section className="dc-page">
+  <div className="dc-heading"><p>{copy('转换、打包、解压，顺手完成。','Convert, pack and extract. One gesture.')}</p><div className="dc-enabled"><span>{status?.ready?copy('已开启','Enabled'):copy('已关闭','Off')}</span><button className={'switch '+(preferences.enabled?'checked':'')} role="switch" aria-checked={preferences.enabled} aria-label={copy('开启拖拽转换','Enable Drag Convert')} disabled={!status||saving} onClick={()=>update({enabled:!preferences.enabled})}><span/></button></div></div>
+  {(error||status?.issue)&&<div className="dc-error" role="alert">{localizedIssue(error||status?.issue||'')}{status?.inputPermissionNeeded&&<button onClick={()=>void request('inputPermission')}>{copy('去授权','Allow access')}</button>}</div>}
+  <div className="dc-workspace">
+   <div className="dc-preview" onMouseLeave={()=>setPreview(null)}><div className="dc-preview-top"><span>{copy('鼠标旁的菜单','CURSOR MENU')}</span><span>{group.file}</span></div><div className="dc-scene"><Wheel english={english} selected={preview} actions={group.actions} fileCount={category===4&&archiveMode===0?3:category===1?2:1}/><div className="dc-demo-cursor" aria-hidden="true"><svg width="20" height="25" viewBox="0 0 23 27"><path d="M2 1v22l6-6 5 9 4-2-5-9h9Z" fill="#fff" stroke="#171717" strokeWidth="1.5"/></svg></div></div><div className="dc-preview-caption">{copy('菜单跟随文件类型变化','A menu matched to your file')}</div></div>
+   <div className="dc-catalog"><div className="dc-category-tabs" role="tablist" aria-label={copy('支持的文件类型','Supported file types')}>{groups.map((item,i)=><button key={item.id} role="tab" aria-selected={category===i} onClick={()=>{setCategory(i);setPreview(null);}}>{english?item.en:item.zh}</button>)}</div>{category===4&&<div className="dc-archive-tabs" role="group" aria-label={copy('压缩包操作预览','Archive operation preview')}>{[copy('打包文件','Pack files'),copy('解压文件','Extract files')].map((title,i)=><button key={i} aria-pressed={archiveMode===i} onClick={()=>{setArchiveMode(i);setPreview(null);}}>{title}</button>)}</div>}<p className="dc-inputs">{category===4&&archiveMode===0?copy(group.input,'Files · Folders · Mixed selection'):group.input}</p><div className="dc-actions">{group.actions.map((id,i)=><button key={id} onMouseEnter={()=>setPreview(i)} onFocus={()=>setPreview(i)} onClick={()=>setPreview(i)} aria-pressed={preview===i}><span>{String(i+1).padStart(2,'0')}</span>{actionTitle(id,english)}<ArrowUpRight size={13}/></button>)}</div><p className="dc-category-note">{group.note[english?1:0]}</p><div className="dc-instruction"><span>{copy('拖起文件','Drag a file')}</span><ChevronRight size={12}/><kbd>{triggerLabel}</kbd><ChevronRight size={12}/><span>{copy('移到选项后松手','Move to an option. Release.')}</span></div></div>
+  </div>
+  <div className="dc-settings" aria-label={copy('转换设置','Conversion settings')}>
+   <label><span>{copy('触发键','Trigger key')}</span><select disabled={!status||saving} value={preferences.trigger} onChange={e=>update({trigger:e.target.value})}>{(['modifier','letter','number','other'] as const).map(group=><optgroup key={group} label={copy({modifier:'修饰键',letter:'字母',number:'数字',other:'其他按键'}[group],{modifier:'Modifiers',letter:'Letters',number:'Numbers',other:'Other keys'}[group])}>{triggerKeys.filter(key=>key.group===group).map(key=><option key={key.value} value={key.value}>{keyTitle(key)}{key.value==='shift'?copy('（默认）',' (Default)'):''}</option>)}</optgroup>)}</select></label>
+   <label><span>{copy('JPG / HEIC / WebP 画质','JPG / HEIC / WebP quality')}</span><select disabled={!status||saving} value={preferences.quality} onChange={e=>update({quality:Number(e.target.value)})}><option value="0.72">{copy('小巧','Compact')}</option><option value="0.88">{copy('均衡','Balanced')}</option><option value="0.96">{copy('清晰','High')}</option><option value="1">{copy('最高','Maximum')}</option></select></label>
+   <label><span>{copy('小图 / PDF 图片长边','Small / PDF image edge')}</span><select disabled={!status||saving} value={preferences.maxDimension} onChange={e=>update({maxDimension:Number(e.target.value)})}>{[800,1200,1600,2400].map(n=><option key={n} value={n}>{n} px</option>)}</select></label>
+   <div className="dc-folder"><span>{copy('保存到','Save copies to')}</span><button disabled={!status||saving} onClick={()=>void request('folder')} title={preferences.outputDirectory??copy('原文件所在文件夹','Same folder as the original')}><FolderOpen size={16}/><span>{preferences.outputDirectory?.split('/').filter(Boolean).at(-1)??copy('原文件夹','Original folder')}</span><ChevronRight size={13}/></button>{preferences.outputDirectory&&<button className="dc-reset" disabled={saving} onClick={()=>void request('sourceFolder')}>{copy('恢复默认','Reset')}</button>}</div>
+  </div>
+  <div className="dc-footnote"><span>{copy('本机处理 · 保留原件 · 同名自动编号','On-device · Originals kept · Automatic filename numbering')}</span><span>{copy(`也可按住 ${triggerLabel} 再拖起 · Esc 取消`,`You can also hold ${triggerLabel} before dragging · Esc to cancel`)}</span></div>
+  <div className="dc-history-heading"><h3>{copy('最近转换','Recent conversions')}</h3><span>{copy('最近 20 次','Last 20 batches')}</span></div>
+  {status?.busy&&<div className="dc-job" role="status"><LoaderCircle size={16} className="dc-spin"/><div><strong>{actionTitle(status.currentAction,english)}<span>{progress}%</span></strong><p>{status.currentFile||copy('准备中','Preparing')}</p><progress max="100" value={progress}/></div><button disabled={saving||status.cancelling} onClick={()=>void request('cancel')}>{status.cancelling?copy('取消中','Cancelling'):copy('取消','Cancel')}</button></div>}
+  {!status?.history.length&&!status?.busy?<div className="dc-empty">{copy('转换后在这里查看结果，不弹出额外窗口。','Results appear here, without an extra window.')}</div>:<div className="dc-history">{status?.history.map(batch=><div className="dc-batch" key={batch.id}>
+   <div className="dc-batch-row"><span className="dc-result-mark">{batch.failed||batch.cancelled?'—':<Check size={14}/>}</span><div><strong>{(batch.inputCount??batch.files.length)===1?batch.files[0]?.input:copy(`${batch.inputCount??batch.files.length} 个文件`,`${batch.inputCount??batch.files.length} files`)}</strong><span>{batch.cancelled?copy('已取消 · ','Cancelled · '):''}{batch.succeeded} {copy('项完成','completed')}{batch.failed?` · ${batch.failed} ${copy('项未完成','failed')}`:''} · {actionTitle(batch.format,english)}</span></div><button className="dc-details" onClick={()=>setExpanded(expanded===batch.id?null:batch.id)} aria-expanded={expanded===batch.id}>{copy('详情','Details')}</button>{batch.succeeded>0&&<button className="dc-reveal" disabled={saving} onClick={()=>void request('reveal',{id:batch.id})}>{copy('查看文件','Show files')}<ArrowUpRight size={14}/></button>}</div>
+   {expanded===batch.id&&<ul className="dc-file-results">{batch.files.map((file,i)=><li key={i}><span>{file.input}</span><span>{file.error?localizedIssue(file.error):file.output}</span></li>)}</ul>}
+  </div>)}</div>}
+  <details className="dc-limits"><summary>{copy('格式与处理说明','Format and processing details')}</summary><p>{copy('触发键默认为 Shift，可选择单个修饰键、字母、数字或其他按键；Esc 保留用于取消。单键只在拖动文件时唤出菜单，不接管平常打字。功能键需要键盘发送标准 F 键，已被 AI 模式或框选提问占用的键不可用。键名跟随当前键盘布局显示，保存的是物理键位。每批最多 128 个选中项。压缩支持 ZIP、快速 ZIP（只打包不压缩）和 TAR.GZ；解压支持 ZIP、7Z、RAR、TAR 及 GZ/BZ2/XZ。压缩与解压每份最多 20,000 项、8 GB 展开内容；压缩包输入最大 4 GB。暂不支持密码、分卷、链接和特殊文件，保留下载隔离标记，不保留其他扩展属性。图片最高 100 百万像素 / 512 MB，PDF 最多 200 页 / 512 MB，音视频最高 4 GB / 2 小时。动画图片、多页 TIFF 和受保护的 PDF 不转换。WebP 保留透明背景，最高画质使用无损压缩，单边最大 16,383 像素。JPG / HEIC 透明区域填白；PDF 图片按 2 倍页面尺寸渲染，长边不超过所设尺寸。WAV / AIFF 为 44.1 kHz、16-bit 立体声。部分特殊音视频编码可能无法转换。','Shift is the default trigger. Choose one modifier, letter, number or other key; Escape remains cancellation. The key opens the menu only during file drags and does not replace normal typing. Function keys require standard F-key output. Keys used by AI mode or Ask about a selection are unavailable. Names follow the current keyboard layout; the physical key is saved. Up to 128 selected items. Pack ZIP, store-only ZIP or TAR.GZ; extract ZIP, 7Z, RAR, TAR and GZ/BZ2/XZ. Limit per archive: 20,000 entries and 8 GB expanded; input archive up to 4 GB. Passwords, split volumes, links and special files are excluded; download quarantine is preserved; other extended attributes are not preserved. Images: 100 MP / 512 MB. PDFs: 200 pages / 512 MB. Media: 4 GB / 2 hours. Animated images, multipage TIFF and protected PDFs are excluded. WebP preserves transparency; Maximum quality uses lossless compression. WebP dimensions are limited to 16,383 pixels per edge. JPG / HEIC transparency becomes white. PDF images render at 2× page size, capped at the selected edge. WAV / AIFF use 44.1 kHz, 16-bit stereo. Some media codecs may not be supported.')}</p></details>
+ </section>;
+}
